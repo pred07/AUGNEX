@@ -1,0 +1,175 @@
+import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { LEARNING_PATHS } from '../data/learningPaths';
+import { ChevronRight, Lock, CheckCircle2, Circle } from 'lucide-react';
+import { cn } from '../lib/utils';
+import Button from '../components/ui/Button';
+
+const PathCard = ({ path, isSelected, onClick }) => {
+    const Icon = path.icon;
+
+    return (
+        <motion.div
+            layout
+            onClick={onClick}
+            className={cn(
+                "cursor-pointer group relative overflow-hidden rounded-xl border p-6 transition-all duration-300",
+                isSelected
+                    ? `bg-surface/80 ${path.borderColor} shadow-[0_0_30px_-10px_rgba(0,0,0,0.5)]`
+                    : "bg-surface/30 border-white/5 hover:border-white/10 hover:bg-surface/50"
+            )}
+        >
+            {isSelected && (
+                <div className={cn("absolute inset-0 opacity-10 pointer-events-none bg-gradient-to-br from-transparent via-transparent to-current", path.color)} />
+            )}
+
+            <div className="flex items-start justify-between mb-4">
+                <div className={cn("p-3 rounded-lg bg-surface border border-white/5 transition-colors", isSelected ? path.color : "text-gray-500 group-hover:text-gray-300")}>
+                    <Icon size={24} />
+                </div>
+                {path.label && (
+                    <span className={cn("text-[10px] uppercase font-mono tracking-widest px-2 py-1 rounded border border-white/5", path.color)}>
+                        {path.label}
+                    </span>
+                )}
+            </div>
+
+            <h3 className={cn("text-xl font-orbitron font-bold mb-1 transition-colors", isSelected ? "text-white" : "text-gray-400 group-hover:text-gray-200")}>
+                {path.title}
+            </h3>
+            <p className="text-xs font-mono text-gray-500 uppercase tracking-wider mb-4">{path.subtitle}</p>
+
+            {isSelected && (
+                <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    className="space-y-4"
+                >
+                    <p className={cn("text-sm italic font-medium", path.color)}>"{path.philosophy}"</p>
+                    <p className="text-gray-400 text-sm leading-relaxed">{path.description}</p>
+
+                    <div className="pt-4 flex items-center gap-4">
+                        <Button variant="ghost" className={cn("border", path.borderColor, path.color, "hover:bg-white/5")} size="sm">
+                            ENTER PATH <ChevronRight className="ml-2 w-4 h-4" />
+                        </Button>
+                    </div>
+                </motion.div>
+            )}
+        </motion.div>
+    );
+};
+
+const ModuleList = ({ path }) => {
+    return (
+        <div className="space-y-8 pl-4 border-l border-white/5 ml-4 md:ml-0 md:pl-0 md:border-l-0">
+            {path.stages.map((stage, idx) => (
+                <div key={idx} className="relative">
+                    <h4 className="text-sm font-rajdhani font-bold text-gray-500 uppercase tracking-widest mb-4 flex items-center gap-3">
+                        <span className="w-8 h-[1px] bg-white/10" />
+                        {stage.title}
+                    </h4>
+
+                    <div className="grid gap-3">
+                        {stage.modules.map((module) => (
+                            <div
+                                key={module.id}
+                                onClick={() => module.status !== 'locked' && (window.location.href = `/modules/${module.id}`)}
+                                className={cn(
+                                    "p-4 rounded border flex items-center justify-between group transition-all",
+                                    module.status !== 'locked' ? "cursor-pointer hover:border-primary/50" : "cursor-not-allowed",
+                                    module.status === 'completed' ? "bg-primary/5 border-primary/20 text-gray-300" :
+                                        module.status === 'active' ? "bg-surface border-white/10 text-white shadow-lg" :
+                                            "bg-transparent border-transparent text-gray-600 opacity-60"
+                                )}
+                            >
+                                <div className="flex items-center gap-3">
+                                    {module.status === 'completed' && <CheckCircle2 size={16} className="text-primary" />}
+                                    {module.status === 'active' && <Circle size={16} className={cn("animate-pulse", path.color)} />}
+                                    {module.status === 'locked' && <Lock size={16} />}
+                                    <span className="font-mono text-sm">{module.title}</span>
+                                </div>
+
+                                {module.status === 'active' && (
+                                    <Button size="sm" variant="ghost" className="h-8 text-[10px] border border-white/10 hover:border-white/30">
+                                        START
+                                    </Button>
+                                )}
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            ))}
+        </div>
+    );
+};
+
+const LearningPaths = () => {
+    const [selectedPathId, setSelectedPathId] = useState('attack');
+
+    const selectedPath = LEARNING_PATHS.find(p => p.id === selectedPathId);
+
+    return (
+        <div className="max-w-6xl mx-auto space-y-10">
+            <div className="space-y-2">
+                <h1 className="text-4xl font-orbitron font-bold text-white">LEARNING PATHS</h1>
+                <p className="text-gray-400 font-mono text-sm">Select a specialization. Progress is independent per path.</p>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                {/* Path Selection List */}
+                <div className="lg:col-span-4 flex flex-col gap-4">
+                    {LEARNING_PATHS.map((path) => (
+                        <PathCard
+                            key={path.id}
+                            path={path}
+                            isSelected={selectedPathId === path.id}
+                            onClick={() => setSelectedPathId(path.id)}
+                        />
+                    ))}
+                </div>
+
+                {/* Path Detail View */}
+                <div className="lg:col-span-8">
+                    <AnimatePresence mode="wait">
+                        {selectedPath && (
+                            <motion.div
+                                key={selectedPath.id}
+                                initial={{ opacity: 0, x: 20 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                exit={{ opacity: 0, x: -20 }}
+                                transition={{ duration: 0.3 }}
+                                className="bg-surface/30 border border-white/5 rounded-2xl p-8 min-h-[600px] relative overflow-hidden"
+                            >
+                                {/* Decorative Backdrops */}
+                                <div className={cn("absolute top-0 right-0 w-64 h-64 bg-gradient-to-bl opacity-10 rounded-bl-[100px] pointer-events-none", selectedPath.color.replace('text-', 'from-'))} />
+
+                                <div className="mb-10">
+                                    <span className={cn("font-mono text-xs border px-2 py-1 rounded mb-4 inline-block", selectedPath.borderColor, selectedPath.color)}>
+                                        CURRENT STATUS: {selectedPath.role}
+                                    </span>
+                                    <h2 className="text-3xl font-orbitron font-bold text-white mb-2">{selectedPath.title} OVERVIEW</h2>
+                                    <div className="w-full bg-white/5 h-1 rounded-full overflow-hidden flex gap-0.5">
+                                        {/* Fake random progress for visual demo */}
+                                        <div className={cn("h-full w-12", selectedPath.color.replace('text-', 'bg-'))} />
+                                        <div className={cn("h-full w-4 opacity-50", selectedPath.color.replace('text-', 'bg-'))} />
+                                    </div>
+                                </div>
+
+                                <ModuleList path={selectedPath} />
+
+                                <div className="mt-12 p-6 border border-white/5 rounded-xl bg-background/50 text-center">
+                                    <p className="text-gray-500 font-mono text-xs mb-4">RESPECTING AUTONOMY // NO FORCED ORDER</p>
+                                    <p className="text-gray-400 text-sm max-w-lg mx-auto">
+                                        You can pause this path at any time and switch to another. Your progress here is saved and independent.
+                                    </p>
+                                </div>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+export default LearningPaths;
