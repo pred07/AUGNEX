@@ -1,15 +1,15 @@
 # Next Session Prompts
 
-**Objective:** detailed content expansion and interactive features.
+**Objective:** Interactive Quizzes and Content Expansion.
 
-## Step 1: Verification (If not done)
-*   "Verify that the favicon is visible and Admin mode correctly unlocks all 'Forge' modules."
+## Step 1: Verification (Mobile)
+*   "Verify the mobile layout on your device or emulator. Check the Bottom Nav and ensure 'Mark Complete' is accessible."
 
-## Step 2: Content Expansion (Exploit Path)
-*   "Start generating the content for the 'Attack Mode' (Exploit) path. Create the directory structure `src/data/modules/exploit` and generate the first 5 modules (e-1 to e-5)."
+## Step 2: Interactive Quizzes
+*   "Implement the `QuizComponent` in `src/components/QuizComponent.jsx`. It should take a list of questions (from frontmatter or separate JSON). Use the 'Red/Black' neon aesthetic. Users must score 80% to mark the module as complete."
 
-## Step 3: Interactive Quizzes
-*   "Implement a simple Quiz component at the bottom of `ModuleDetail`. It should read quiz data from the markdown frontmatter or a separate JSON file. Learners cannot 'Mark Complete' until they pass the quiz."
+## Step 3: Content Expansion (Exploit Path)
+*   "Start generating the content for the 'Attack Mode' (Exploit) path. Create `src/data/modules/e-1.md` through `e-5.md` focused on Web Exploitation Fundamentals."
 
-## Step 4: Profile & Settings
-*   "Create a User Profile page where learners can see their XP history, change their display name (persisted locally), and view a 'Certificate of Completion' for the Forge path."
+## Step 4: User Profile
+*   "Enhance the User Profile page to show a heatmap of activity (GitHub style) and a list of unlocked badges."

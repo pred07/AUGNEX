@@ -29,11 +29,11 @@ const MainLayout = ({ children }) => {
 
     return (
         <div className="min-h-screen bg-background flex text-gray-100 overflow-hidden font-inter">
-            {/* Sidebar - Fixed Narrow */}
+            {/* Desktop Sidebar - Hidden on Mobile */}
             <motion.aside
                 initial={{ x: -100 }}
                 animate={{ x: 0 }}
-                className="fixed w-20 xl:w-64 h-screen border-r border-white/5 bg-surface/50 backdrop-blur-xl flex flex-col z-40"
+                className="hidden md:flex fixed w-20 xl:w-64 h-screen border-r border-white/5 bg-surface/50 backdrop-blur-xl flex-col z-40"
             >
                 <div className="p-6 flex items-center justify-center xl:justify-start gap-3 border-b border-white/5">
                     <div className="w-8 h-8 rounded bg-primary/20 flex items-center justify-center text-primary border border-primary/50 shadow-[0_0_10px_rgba(0,255,157,0.2)]">
@@ -86,11 +86,44 @@ const MainLayout = ({ children }) => {
                 </div>
             </motion.aside>
 
+            {/* Mobile Bottom Navigation - Visible < md */}
+            <div className="md:hidden fixed bottom-0 left-0 right-0 h-16 bg-surface/90 backdrop-blur-xl border-t border-white/10 z-50 flex items-center justify-around px-2">
+                <Link to="/" className={cn("p-2 rounded-lg flex flex-col items-center gap-1", location.pathname === '/' ? "text-primary" : "text-gray-500")}>
+                    <Home size={20} />
+                    <span className="text-[10px] font-mono">Home</span>
+                </Link>
+                <Link to="/paths" className={cn("p-2 rounded-lg flex flex-col items-center gap-1", location.pathname === '/paths' ? "text-primary" : "text-gray-500")}>
+                    <Map size={20} />
+                    <span className="text-[10px] font-mono">Paths</span>
+                </Link>
+
+                {/* Center Action Button (Profile/User) */}
+                <div className="relative -top-5">
+                    <div className="w-12 h-12 rounded-full bg-primary/20 border border-primary/50 shadow-[0_0_15px_rgba(0,255,157,0.3)] flex items-center justify-center backdrop-blur-md">
+                        <img src={user?.avatar} alt="Me" className="w-10 h-10 rounded-full" />
+                    </div>
+                </div>
+
+                <Link to="/modules" className={cn("p-2 rounded-lg flex flex-col items-center gap-1", location.pathname === '/modules' ? "text-primary" : "text-gray-500")}>
+                    <Box size={20} />
+                    <span className="text-[10px] font-mono">Mods</span>
+                </Link>
+                <button onClick={logout} className="p-2 rounded-lg flex flex-col items-center gap-1 text-red-400">
+                    <LogOut size={20} />
+                    <span className="text-[10px] font-mono">Exit</span>
+                </button>
+            </div>
+
+            {/* Mobile Top Bar (Branding) */}
+            <div className="md:hidden fixed top-0 left-0 right-0 h-14 bg-background/80 backdrop-blur-md border-b border-white/5 z-40 flex items-center justify-center">
+                <span className="font-orbitron font-bold tracking-widest text-lg text-white">AUGNEX</span>
+            </div>
+
             {/* Main Content Area */}
-            <main className="flex-1 ml-20 xl:ml-64 relative min-h-screen overflow-y-auto overflow-x-hidden">
+            <main className="flex-1 ml-0 md:ml-20 xl:ml-64 relative min-h-screen overflow-y-auto overflow-x-hidden pb-20 md:pb-0 pt-16 md:pt-0">
                 {/* Top noise/grid overlay */}
                 <div className="absolute inset-0 bg-grid-pattern opacity-5 pointer-events-none fixed" />
-                <div className="relative z-10 p-6 xl:p-10 max-w-7xl mx-auto">
+                <div className="relative z-10 p-4 md:p-6 xl:p-10 max-w-7xl mx-auto">
                     {children}
                 </div>
             </main>

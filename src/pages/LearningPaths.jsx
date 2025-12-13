@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { LEARNING_PATHS } from '../data/learningPaths';
 import { ChevronRight, Lock, LockOpen, CheckCircle2, Circle } from 'lucide-react';
@@ -129,8 +129,18 @@ const ModuleList = ({ path }) => {
 const LearningPaths = () => {
     const [selectedPathId, setSelectedPathId] = useState('forge');
     const { user } = useAuth();
+    const detailRef = useRef(null);
 
     const selectedPath = LEARNING_PATHS.find(p => p.id === selectedPathId);
+
+    // Auto-scroll to details on mobile when path changes
+    useEffect(() => {
+        if (window.innerWidth < 1024 && detailRef.current) { // lg breakpoint
+            setTimeout(() => {
+                detailRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 100);
+        }
+    }, [selectedPathId]);
 
     return (
         <div className="max-w-6xl mx-auto space-y-10">
@@ -153,7 +163,7 @@ const LearningPaths = () => {
                 </div>
 
                 {/* Path Detail View */}
-                <div className="lg:col-span-8">
+                <div className="lg:col-span-8" ref={detailRef}>
                     <AnimatePresence mode="wait">
                         {selectedPath && (
                             <motion.div

@@ -98,7 +98,7 @@ const ModuleDetail = () => {
                 </h1>
 
                 {/* Markdown Content */}
-                <div className="prose prose-invert prose-lg max-w-none custom-markdown">
+                <div className="prose prose-invert prose sm:prose-base md:prose-lg max-w-none custom-markdown">
                     {loading ? (
                         <div className="animate-pulse space-y-4">
                             <div className="h-4 bg-white/10 rounded w-3/4"></div>
@@ -114,22 +114,22 @@ const ModuleDetail = () => {
             </div>
 
             {/* Action Bar */}
-            <div className="flex items-center justify-between bg-surface border border-white/10 p-6 rounded-xl sticky bottom-6 shadow-2xl backdrop-blur-md">
+            <div className="flex items-center justify-between bg-surface border border-white/10 p-6 rounded-xl sticky bottom-24 md:bottom-6 shadow-2xl backdrop-blur-md z-30">
                 <div className="flex items-center gap-4">
                     <button
                         onClick={handleComplete}
                         disabled={isCompleted}
-                        className={`px-6 py-3 rounded-lg font-bold font-orbitron transition-all flex items-center gap-2 ${isCompleted
-                                ? 'bg-green-500/20 text-green-400 cursor-default'
-                                : 'bg-primary hover:bg-primary-hover text-black shadow-[0_0_20px_rgba(0,255,157,0.3)] hover:shadow-[0_0_30px_rgba(0,255,157,0.5)]'
+                        className={`px-4 py-2 md:px-6 md:py-3 text-sm md:text-base rounded-lg font-bold font-orbitron transition-all flex items-center gap-2 ${isCompleted
+                            ? 'bg-green-500/20 text-green-400 cursor-default'
+                            : 'bg-primary hover:bg-primary-hover text-black shadow-[0_0_20px_rgba(0,255,157,0.3)] hover:shadow-[0_0_30px_rgba(0,255,157,0.5)]'
                             }`}
                     >
                         {isCompleted ? (
                             <>
-                                <CheckCircle size={20} /> COMPLETED
+                                <CheckCircle size={16} className="md:w-5 md:h-5" /> <span className="hidden md:inline">COMPLETED</span><span className="md:hidden">DONE</span>
                             </>
                         ) : (
-                            "MARK AS COMPLETE"
+                            <><span className="hidden md:inline">MARK AS COMPLETE</span><span className="md:hidden">COMPLETE</span></>
                         )}
                     </button>
                 </div>
@@ -139,13 +139,13 @@ const ModuleDetail = () => {
                         onClick={() => navigate(`/modules/${nextModuleId}`)}
                         // Admin can always go next; Learner can only go next if current is completed
                         disabled={!isCompleted && !isAdmin}
-                        className={`group px-6 py-3 rounded-lg font-bold font-orbitron transition-all flex items-center gap-2 ${(!isCompleted && !isAdmin)
-                                ? 'bg-white/5 text-gray-500 cursor-not-allowed'
-                                : 'bg-white/10 hover:bg-white/20 text-white'
+                        className={`group px-4 py-2 md:px-6 md:py-3 text-sm md:text-base rounded-lg font-bold font-orbitron transition-all flex items-center gap-2 ${(!isCompleted && !isAdmin)
+                            ? 'bg-white/5 text-gray-500 cursor-not-allowed'
+                            : 'bg-white/10 hover:bg-white/20 text-white'
                             }`}
                     >
-                        NEXT MODULE
-                        {(!isCompleted && !isAdmin) ? <Lock size={16} /> : <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />}
+                        <span className="hidden md:inline">NEXT MODULE</span><span className="md:hidden">NEXT</span>
+                        {(!isCompleted && !isAdmin) ? <Lock size={16} /> : <ArrowRight size={16} className="md:w-5 md:h-5 group-hover:translate-x-1 transition-transform" />}
                     </button>
                 ) : (
                     <span className="text-gray-500 font-mono text-sm">PATH COMPLETE</span>

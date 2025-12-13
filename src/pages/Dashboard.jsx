@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import GreetingHeader from '../components/dashboard/GreetingHeader';
 import ContinueLearningCard from '../components/dashboard/ContinueLearningCard';
 import NewsCarousel from '../components/dashboard/NewsCarousel';
@@ -29,6 +30,8 @@ const Dashboard = () => {
     const { isModuleLocked, isModuleCompleted } = useProgress();
     const modules = getAllModules();
 
+    const navigate = useNavigate();
+
     return (
         <div className="space-y-8 pb-10">
             <GreetingHeader />
@@ -42,7 +45,7 @@ const Dashboard = () => {
                 <section className="lg:col-span-2 space-y-4">
                     <div className="flex items-center justify-between">
                         <h3 className="text-lg font-orbitron text-gray-300">Available Modules (Forge)</h3>
-                        <span className="text-xs text-primary font-mono cursor-pointer hover:underline" onClick={() => window.location.href = '/paths'}>VIEW ALL PATHS</span>
+                        <span className="text-xs text-primary font-mono cursor-pointer hover:underline" onClick={() => navigate('/paths')}>VIEW ALL PATHS</span>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -57,7 +60,7 @@ const Dashboard = () => {
                                     initial={{ opacity: 0, y: 10 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ delay: 0.2 + (idx * 0.1) }}
-                                    onClick={() => !locked && (window.location.href = `/modules/${mod.id}`)}
+                                    onClick={() => !locked && navigate(`/modules/${mod.id}`)}
                                     className={`p-4 rounded-xl border transition-all duration-300 relative group overflow-hidden ${status === 'active'
                                         ? 'bg-surface/60 border-primary/30 shadow-[0_0_15px_rgba(0,255,157,0.05)] cursor-pointer hover:border-primary/50'
                                         : status === 'locked'
