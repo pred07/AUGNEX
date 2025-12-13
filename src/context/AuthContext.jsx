@@ -10,7 +10,12 @@ export const AuthProvider = ({ children }) => {
         // Check local storage for persisted session
         const storedUser = localStorage.getItem('user');
         if (storedUser) {
-            setUser(JSON.parse(storedUser));
+            try {
+                setUser(JSON.parse(storedUser));
+            } catch (error) {
+                console.error("Failed to parse stored user session:", error);
+                localStorage.removeItem('user');
+            }
         }
         setIsLoading(false);
     }, []);
@@ -22,11 +27,21 @@ export const AuthProvider = ({ children }) => {
                 if (username === 'admin' && password === 'admin') {
                     const userData = {
                         username: 'admin',
+                        role: 'admin', // unrestricted access
+                        rank: 'Architect',
+                        xp: 99999,
+                        // Admin sees everything unlocked
+                    };
+                    setUser(userData);
+                    localStorage.setItem('user', JSON.stringify(userData));
+                    resolve(userData);
+                } else if (username === 'learner' && password === 'learner') {
+                    const userData = {
+                        username: 'learner',
+                        role: 'learner', // restricted access
                         rank: 'Neophyte',
-                        xp: 1250,
-                        streak: 3,
-                        modulesCompleted: 4,
-                        avatar: 'https://ui-avatars.com/api/?name=Admin&background=00ff9d&color=0a0e1a'
+                        xp: 0,
+                        // Learner starts fresh
                     };
                     setUser(userData);
                     localStorage.setItem('user', JSON.stringify(userData));

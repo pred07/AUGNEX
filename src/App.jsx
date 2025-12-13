@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
+import { ProgressProvider } from './context/ProgressContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import MainLayout from './layouts/MainLayout';
 import Login from './pages/Login';
@@ -14,43 +15,45 @@ function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <Routes>
-          <Route path="/login" element={<Login />} />
+        <ProgressProvider>
+          <Routes>
+            <Route path="/login" element={<Login />} />
 
-          <Route path="/" element={
-            <ProtectedRoute>
-              <MainLayout>
-                <Dashboard />
-              </MainLayout>
-            </ProtectedRoute>
-          } />
+            <Route path="/" element={
+              <ProtectedRoute>
+                <MainLayout>
+                  <Dashboard />
+                </MainLayout>
+              </ProtectedRoute>
+            } />
 
-          <Route path="/paths" element={
-            <ProtectedRoute>
-              <MainLayout>
-                <LearningPaths />
-              </MainLayout>
-            </ProtectedRoute>
-          } />
+            <Route path="/paths" element={
+              <ProtectedRoute>
+                <MainLayout>
+                  <LearningPaths />
+                </MainLayout>
+              </ProtectedRoute>
+            } />
 
-          <Route path="/modules" element={
-            <ProtectedRoute>
-              <MainLayout>
-                <LearningPaths />
-              </MainLayout>
-            </ProtectedRoute>
-          } />
+            <Route path="/modules" element={
+              <ProtectedRoute>
+                <MainLayout>
+                  <LearningPaths />
+                </MainLayout>
+              </ProtectedRoute>
+            } />
 
-          <Route path="/modules/:moduleId" element={
-            <ProtectedRoute>
-              <MainLayout>
-                <ModuleDetail />
-              </MainLayout>
-            </ProtectedRoute>
-          } />
+            <Route path="/modules/:moduleId" element={
+              <ProtectedRoute>
+                <MainLayout>
+                  <ModuleDetail />
+                </MainLayout>
+              </ProtectedRoute>
+            } />
 
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </ProgressProvider>
       </AuthProvider>
     </BrowserRouter>
   );

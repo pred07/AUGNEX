@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { LEARNING_PATHS } from '../data/learningPaths';
-import { ChevronRight, Lock, CheckCircle2, Circle } from 'lucide-react';
+import { ChevronRight, Lock, LockOpen, CheckCircle2, Circle } from 'lucide-react';
 import { cn } from '../lib/utils';
 import Button from '../components/ui/Button';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+import { useProgress } from '../context/ProgressContext';
 
 const PathCard = ({ path, isSelected, onClick }) => {
     const Icon = path.icon;
@@ -60,6 +63,11 @@ const PathCard = ({ path, isSelected, onClick }) => {
 };
 
 const ModuleList = ({ path }) => {
+    const { isModuleLocked, isModuleCompleted } = useProgress();
+    const { user } = useAuth();
+    const isAdmin = user?.role === 'admin';
+    const navigate = useNavigate();
+
     return (
         <div className="space-y-8 pl-4 border-l border-white/5 ml-4 md:ml-0 md:pl-0 md:border-l-0">
             {path.stages.map((stage, idx) => (
@@ -70,32 +78,47 @@ const ModuleList = ({ path }) => {
                     </h4>
 
                     <div className="grid gap-3">
-                        {stage.modules.map((module) => (
-                            <div
-                                key={module.id}
-                                onClick={() => module.status !== 'locked' && (window.location.href = `/modules/${module.id}`)}
-                                className={cn(
-                                    "p-4 rounded border flex items-center justify-between group transition-all",
-                                    module.status !== 'locked' ? "cursor-pointer hover:border-primary/50" : "cursor-not-allowed",
-                                    module.status === 'completed' ? "bg-primary/5 border-primary/20 text-gray-300" :
-                                        module.status === 'active' ? "bg-surface border-white/10 text-white shadow-lg" :
-                                            "bg-transparent border-transparent text-gray-600 opacity-60"
-                                )}
-                            >
-                                <div className="flex items-center gap-3">
-                                    {module.status === 'completed' && <CheckCircle2 size={16} className="text-primary" />}
-                                    {module.status === 'active' && <Circle size={16} className={cn("animate-pulse", path.color)} />}
-                                    {module.status === 'locked' && <Lock size={16} />}
-                                    <span className="font-mono text-sm">{module.title}</span>
-                                </div>
+                        {stage.modules.map((module) => {
+                            const locked = isModuleLocked(path.id, module.id);
+                            const completed = isModuleCompleted(path.id, module.id);
 
-                                {module.status === 'active' && (
-                                    <Button size="sm" variant="ghost" className="h-8 text-[10px] border border-white/10 hover:border-white/30">
-                                        START
-                                    </Button>
-                                )}
-                            </div>
-                        ))}
+                            return (
+                                <div
+                                    key={module.id}
+                                    onClick={() => !locked && navigate(`/modules/${module.id}`)}
+                                    className={cn(
+                                        "p-4 rounded border flex items-center justify-between group transition-all",
+                                        !locked ? "cursor-pointer hover:border-primary/50" : "cursor-not-allowed",
+                                        completed ? "bg-primary/5 border-primary/20 text-gray-300" :
+                                            !locked ? "bg-surface border-white/10 text-white shadow-lg" :
+                                                "bg-transparent border-transparent text-gray-600 opacity-60"
+                                    )}
+                                >
+                                    <div className="flex items-center gap-3">
+                                        {completed && <CheckCircle2 size={16} className="text-primary" />}
+                                        {!completed && !locked && <Circle size={16} className={cn("animate-pulse", path.color)} />}
+                                        {locked && <Lock size={16} />}
+                                        <span className="font-mono text-sm">{module.title}</span>
+                                    </div>
+
+                                    {!locked && !completed && (
+                                        <Button size="sm" variant="ghost" className="h-8 text-[10px] border border-white/10 hover:border-white/30">
+                                            START
+                                        </Button>
+                                    )}
+                                    {!locked && completed && (
+                                        <Button size="sm" variant="ghost" className="h-8 text-[10px] text-primary hover:bg-primary/10">
+                                            REVIEW
+                                        </Button>
+                                    )}
+                                    {locked && isAdmin && (
+                                        <span className="text-[10px] text-red-500 font-mono border border-red-500/30 px-2 py-0.5 rounded">
+                                            ADMIN UNLOCKED
+                                        </span>
+                                    )}
+                                </div>
+                            );
+                        })}
                     </div>
                 </div>
             ))}
@@ -104,7 +127,8 @@ const ModuleList = ({ path }) => {
 };
 
 const LearningPaths = () => {
-    const [selectedPathId, setSelectedPathId] = useState('attack');
+    const [selectedPathId, setSelectedPathId] = useState('forge');
+    const { user } = useAuth();
 
     const selectedPath = LEARNING_PATHS.find(p => p.id === selectedPathId);
 
@@ -140,6 +164,13 @@ const LearningPaths = () => {
                                 transition={{ duration: 0.3 }}
                                 className="bg-surface/30 border border-white/5 rounded-2xl p-8 min-h-[600px] relative overflow-hidden"
                             >
+                                {/* Admin Indicator */}
+                                {user?.role === 'admin' && (
+                                    <div className="absolute top-4 right-4 z-10 px-3 py-1 bg-red-500/10 text-red-400 border border-red-500/20 text-[10px] font-mono rounded flex items-center gap-2">
+                                        <LockOpen size={12} />
+                                        ADMIN OVERRIDE
+                                    </div>
+                                )}
                                 {/* Decorative Backdrops */}
                                 <div className={cn("absolute top-0 right-0 w-64 h-64 bg-gradient-to-bl opacity-10 rounded-bl-[100px] pointer-events-none", selectedPath.color.replace('text-', 'from-'))} />
 
@@ -158,9 +189,11 @@ const LearningPaths = () => {
                                 <ModuleList path={selectedPath} />
 
                                 <div className="mt-12 p-6 border border-white/5 rounded-xl bg-background/50 text-center">
-                                    <p className="text-gray-500 font-mono text-xs mb-4">RESPECTING AUTONOMY // NO FORCED ORDER</p>
+                                    <p className="text-gray-500 font-mono text-xs mb-4">PROGRESSION PROTOCOL IN EFFECT</p>
                                     <p className="text-gray-400 text-sm max-w-lg mx-auto">
-                                        You can pause this path at any time and switch to another. Your progress here is saved and independent.
+                                        {user?.role === 'admin'
+                                            ? "Command Override Active. You have unrestricted access to all modules."
+                                            : "Modules must be completed in sequence. Master the fundamentals before advancing."}
                                     </p>
                                 </div>
                             </motion.div>
