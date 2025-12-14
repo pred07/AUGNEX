@@ -10,6 +10,9 @@ import Dashboard from './pages/Dashboard';
 import LearningPaths from './pages/LearningPaths';
 import ModuleDetail from './pages/ModuleDetail';
 import Profile from './pages/Profile';
+import ServiceRecord from './pages/ServiceRecord';
+import ModulesLibrary from './pages/ModulesLibrary';
+import PublicProfile from './pages/PublicProfile';
 // const Modules = () => <h1 className="text-2xl font-orbitron">Modules</h1>;
 
 function App() {
@@ -39,7 +42,7 @@ function App() {
             <Route path="/modules" element={
               <ProtectedRoute>
                 <MainLayout>
-                  <LearningPaths />
+                  <ModulesLibrary />
                 </MainLayout>
               </ProtectedRoute>
             } />
@@ -55,9 +58,24 @@ function App() {
             <Route path="/profile" element={
               <ProtectedRoute>
                 <MainLayout>
-                  <Profile />
+                  <ServiceRecord />
                 </MainLayout>
               </ProtectedRoute>
+            } />
+
+            <Route path="/service-record" element={
+              <ProtectedRoute>
+                <MainLayout>
+                  <ServiceRecord />
+                </MainLayout>
+              </ProtectedRoute>
+            } />
+
+            {/* Public Profile Route - Accessible without login (theoretically) */}
+            <Route path="/u/:publicId" element={
+              <MainLayout>
+                <PublicProfile />
+              </MainLayout>
             } />
 
             <Route path="*" element={<Navigate to="/" replace />} />

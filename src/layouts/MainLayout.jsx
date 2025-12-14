@@ -45,35 +45,37 @@ const MainLayout = ({ children }) => {
                 <nav className="flex-1 flex flex-col gap-2 p-4 mt-4">
                     <SidebarItem icon={Home} label="Dashboard" path="/" isActive={location.pathname === '/'} />
                     <SidebarItem icon={Map} label="Learning Paths" path="/paths" isActive={location.pathname === '/paths'} />
-                    <SidebarItem icon={Box} label="Modules" path="/modules" isActive={location.pathname === '/modules'} />
-                    <SidebarItem icon={Award} label="Achievements" path="/achievements" isActive={location.pathname === '/achievements'} />
+                    <SidebarItem icon={Box} label="Library" path="/modules" isActive={location.pathname === '/modules'} />
+                    <SidebarItem icon={Award} label="Service Record" path="/service-record" isActive={location.pathname === '/service-record'} />
                 </nav>
 
                 <div className="p-4 border-t border-white/5">
                     {user && (
-                        <div className="bg-surface/50 rounded-xl p-3 border border-white/5 mb-4 group hover:border-white/10 transition-colors">
-                            <div className="flex items-center gap-3">
-                                <img src={user.avatar} alt="Avatar" className="w-10 h-10 rounded-lg border border-white/10 group-hover:border-primary/50 transition-colors" />
-                                <div className="hidden xl:block overflow-hidden">
-                                    <p className="text-sm font-bold font-rajdhani truncate text-white">{user.username}</p>
-                                    <p className="text-xs text-primary font-mono">{user.rank}</p>
+                        <Link to="/service-record">
+                            <div className="bg-surface/50 rounded-xl p-3 border border-white/5 mb-4 group hover:border-white/10 transition-colors cursor-pointer">
+                                <div className="flex items-center gap-3">
+                                    <img src={user.avatar} alt="Avatar" className="w-10 h-10 rounded-lg border border-white/10 group-hover:border-primary/50 transition-colors" />
+                                    <div className="hidden xl:block overflow-hidden">
+                                        <p className="text-sm font-bold font-rajdhani truncate text-white">{user.username}</p>
+                                        <p className="text-xs text-primary font-mono">{user.rank}</p>
+                                    </div>
                                 </div>
-                            </div>
 
-                            <div className="mt-3 hidden xl:block">
-                                <div className="flex justify-between text-[10px] text-gray-500 mb-1 uppercase tracking-wider">
-                                    <span>XP Progress</span>
-                                    <span>{user.xp} / 2000</span>
-                                </div>
-                                <div className="h-1 w-full bg-white/5 rounded-full overflow-hidden">
-                                    <motion.div
-                                        initial={{ width: 0 }}
-                                        animate={{ width: `${(user.xp / 2000) * 100}%` }}
-                                        className="h-full bg-primary shadow-[0_0_10px_rgba(0,255,157,0.5)]"
-                                    />
+                                <div className="mt-3 hidden xl:block">
+                                    <div className="flex justify-between text-[10px] text-gray-500 mb-1 uppercase tracking-wider">
+                                        <span>XP Progress</span>
+                                        <span>{user.xp} / 2000</span>
+                                    </div>
+                                    <div className="h-1 w-full bg-white/5 rounded-full overflow-hidden">
+                                        <motion.div
+                                            initial={{ width: 0 }}
+                                            animate={{ width: `${(user.xp / 2000) * 100}%` }}
+                                            className="h-full bg-primary shadow-[0_0_10px_rgba(0,255,157,0.5)]"
+                                        />
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        </Link>
                     )}
 
                     <button
@@ -99,14 +101,21 @@ const MainLayout = ({ children }) => {
 
                 {/* Center Action Button (Profile/User) */}
                 <div className="relative -top-5">
-                    <div className="w-12 h-12 rounded-full bg-primary/20 border border-primary/50 shadow-[0_0_15px_rgba(0,255,157,0.3)] flex items-center justify-center backdrop-blur-md">
-                        <img src={user?.avatar} alt="Me" className="w-10 h-10 rounded-full" />
-                    </div>
+                    <Link to="/service-record">
+                        <div className={cn(
+                            "w-12 h-12 rounded-full border shadow-[0_0_15px_rgba(0,255,157,0.3)] flex items-center justify-center backdrop-blur-md transition-all",
+                            location.pathname === '/service-record'
+                                ? "bg-primary/20 border-primary"
+                                : "bg-surface border-primary/50"
+                        )}>
+                            <img src={user?.avatar} alt="Me" className="w-10 h-10 rounded-full" />
+                        </div>
+                    </Link>
                 </div>
 
                 <Link to="/modules" className={cn("p-2 rounded-lg flex flex-col items-center gap-1", location.pathname === '/modules' ? "text-primary" : "text-gray-500")}>
                     <Box size={20} />
-                    <span className="text-[10px] font-mono">Mods</span>
+                    <span className="text-[10px] font-mono">Lib</span>
                 </Link>
                 <button onClick={logout} className="p-2 rounded-lg flex flex-col items-center gap-1 text-red-400">
                     <LogOut size={20} />
@@ -120,7 +129,7 @@ const MainLayout = ({ children }) => {
             </div>
 
             {/* Main Content Area */}
-            <main className="flex-1 ml-0 md:ml-20 xl:ml-64 relative min-h-screen overflow-y-auto overflow-x-hidden pb-20 md:pb-0 pt-16 md:pt-0">
+            <main className="flex-1 ml-0 md:ml-20 xl:ml-64 relative min-h-screen overflow-y-auto overflow-x-hidden pb-32 md:pb-0 pt-16 md:pt-0">
                 {/* Top noise/grid overlay */}
                 <div className="absolute inset-0 bg-grid-pattern opacity-5 pointer-events-none fixed" />
                 <div className="relative z-10 p-4 md:p-6 xl:p-10 max-w-7xl mx-auto">

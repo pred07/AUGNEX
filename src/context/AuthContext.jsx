@@ -30,6 +30,7 @@ export const AuthProvider = ({ children }) => {
                         role: 'admin', // unrestricted access
                         rank: 'Architect',
                         xp: 99999,
+                        publicId: 'AG-88X1',
                         avatar: 'https://api.dicebear.com/9.x/dylan/svg?seed=admin',
                         socials: { twitter: '', linkedin: '', website: '' },
                         lastUsernameChange: null,
@@ -44,6 +45,7 @@ export const AuthProvider = ({ children }) => {
                         role: 'learner', // restricted access
                         rank: 'Neophyte',
                         xp: 0,
+                        publicId: 'AG-22B9',
                         avatar: 'https://api.dicebear.com/9.x/dylan/svg?seed=learner',
                         socials: { twitter: '', linkedin: '', website: '' },
                         lastUsernameChange: null,

@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { LEARNING_PATHS } from '../data/learningPaths';
-import { ChevronRight, Lock, LockOpen, CheckCircle2, Circle } from 'lucide-react';
+import { ChevronRight, Lock, LockOpen, CheckCircle2, Circle, Award } from 'lucide-react';
 import { cn } from '../lib/utils';
 import Button from '../components/ui/Button';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useProgress } from '../context/ProgressContext';
+import Certificate from '../components/social/Certificate';
 
 const PathCard = ({ path, isSelected, onClick }) => {
     const Icon = path.icon;
@@ -170,14 +171,23 @@ const PathOverview = ({ path, onEnter }) => (
 const LearningPaths = () => {
     const [selectedPathId, setSelectedPathId] = useState('forge');
     const [viewMode, setViewMode] = useState('overview'); // 'overview' | 'modules'
+    const [showCert, setShowCert] = useState(false);
     const { user } = useAuth();
+    const { isModuleCompleted } = useProgress();
     const detailRef = useRef(null);
 
     const selectedPath = LEARNING_PATHS.find(p => p.id === selectedPathId);
 
+    // Calculate completion for selected path
+    const totalModules = selectedPath?.sections.flatMap(s => s.modules).length || 0;
+    const completedCount = selectedPath?.sections.flatMap(s => s.modules).filter(m => isModuleCompleted(selectedPath.id, m.id)).length || 0;
+    const completionPercent = totalModules > 0 ? Math.round((completedCount / totalModules) * 100) : 0;
+    const isPathComplete = completionPercent === 100;
+
     // Reset view when path changes
     useEffect(() => {
         setViewMode('overview');
+        setShowCert(false);
     }, [selectedPathId]);
 
     // Auto-scroll to details on mobile when path changes
@@ -191,6 +201,15 @@ const LearningPaths = () => {
 
     return (
         <div className="max-w-6xl mx-auto space-y-10">
+            {showCert && (
+                <Certificate
+                    user={user}
+                    path={selectedPath}
+                    date={new Date().toLocaleDateString()}
+                    onClose={() => setShowCert(false)}
+                />
+            )}
+
             <div className="space-y-2">
                 <h1 className="text-4xl font-orbitron font-bold text-white">LEARNING PATHS</h1>
                 <p className="text-gray-400 font-mono text-sm">Select a specialization. Progress is independent per path.</p>
@@ -239,10 +258,19 @@ const LearningPaths = () => {
 
                                     {/* Progress Bar (Always visible) */}
                                     <div className="w-full bg-white/5 h-1 rounded-full overflow-hidden flex gap-0.5 mt-4">
-                                        {/* Fake random progress for visual demo */}
-                                        <div className={cn("h-full w-12", selectedPath.color.replace('text-', 'bg-'))} />
-                                        <div className={cn("h-full w-4 opacity-50", selectedPath.color.replace('text-', 'bg-'))} />
+                                        <div
+                                            className={cn("h-full transition-all duration-1000", selectedPath.color.replace('text-', 'bg-'))}
+                                            style={{ width: `${completionPercent}%` }}
+                                        />
                                     </div>
+
+                                    {isPathComplete && (
+                                        <div className="mt-4 animate-in fade-in slide-in-from-top-2">
+                                            <Button onClick={() => setShowCert(true)} className="w-full bg-gradient-to-r from-yellow-600 to-yellow-400 text-black font-bold shadow-[0_0_20px_rgba(255,215,0,0.3)] hover:shadow-[0_0_30px_rgba(255,215,0,0.5)] border-0">
+                                                <Award className="mr-2" /> CLAIM {selectedPath.title.toUpperCase()} CERTIFICATE
+                                            </Button>
+                                        </div>
+                                    )}
                                 </div>
 
                                 {viewMode === 'overview' ? (

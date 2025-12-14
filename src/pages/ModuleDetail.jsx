@@ -4,6 +4,8 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { ChevronLeft, CheckCircle, ArrowRight, Lock, Loader2, AlertTriangle } from 'lucide-react';
 import { LEARNING_PATHS } from '../data/learningPaths';
+import { QUIZZES } from '../data/quizzes';
+import Quiz from '../components/quiz/Quiz';
 import { useProgress } from '../context/ProgressContext';
 import { useAuth } from '../context/AuthContext';
 
@@ -18,6 +20,9 @@ const ModuleDetail = () => {
     // Find module metadata
     const path = LEARNING_PATHS.find(p => p.sections.some(s => s.modules.some(m => m.id === moduleId)));
     const moduleData = path?.sections.flatMap(s => s.modules).find(m => m.id === moduleId);
+    const quizData = QUIZZES[moduleId];
+
+    // ... (useEffect remains same) ...
 
     useEffect(() => {
         if (!moduleData) return;
@@ -46,6 +51,7 @@ const ModuleDetail = () => {
     }, [moduleId, moduleData, path, isModuleLocked, navigate]);
 
     if (!moduleData || !path) {
+        // ... (Error UI remains same) ...
         return (
             <div className="flex flex-col items-center justify-center h-[50vh] text-center space-y-4">
                 <AlertTriangle className="w-12 h-12 text-accent" />
@@ -113,25 +119,42 @@ const ModuleDetail = () => {
                 </div>
             </div>
 
+            {/* Quiz Section - Moved out of the sticky bar */}
+            {!isCompleted && quizData && (
+                <div className="mb-8">
+                    <Quiz data={quizData} onComplete={handleComplete} />
+                </div>
+            )}
+
             {/* Action Bar */}
             <div className="flex items-center justify-between bg-surface border border-white/10 p-6 rounded-xl sticky bottom-24 md:bottom-6 shadow-2xl backdrop-blur-md z-30">
                 <div className="flex items-center gap-4">
-                    <button
-                        onClick={handleComplete}
-                        disabled={isCompleted}
-                        className={`px-4 py-2 md:px-6 md:py-3 text-sm md:text-base rounded-lg font-bold font-orbitron transition-all flex items-center gap-2 ${isCompleted
-                            ? 'bg-green-500/20 text-green-400 cursor-default'
-                            : 'bg-primary hover:bg-primary-hover text-black shadow-[0_0_20px_rgba(0,255,157,0.3)] hover:shadow-[0_0_30px_rgba(0,255,157,0.5)]'
-                            }`}
-                    >
-                        {isCompleted ? (
-                            <>
-                                <CheckCircle size={16} className="md:w-5 md:h-5" /> <span className="hidden md:inline">COMPLETED</span><span className="md:hidden">DONE</span>
-                            </>
-                        ) : (
-                            <><span className="hidden md:inline">MARK AS COMPLETE</span><span className="md:hidden">COMPLETE</span></>
-                        )}
-                    </button>
+                    {/* If no quiz (or already completed), show standard button or Status */}
+                    {(!quizData || isCompleted) ? (
+                        <button
+                            onClick={handleComplete}
+                            disabled={isCompleted}
+                            className={`px-4 py-2 md:px-6 md:py-3 text-sm md:text-base rounded-lg font-bold font-orbitron transition-all flex items-center gap-2 ${isCompleted
+                                ? 'bg-green-500/20 text-green-400 cursor-default'
+                                : 'bg-primary hover:bg-primary-hover text-black shadow-[0_0_20px_rgba(0,255,157,0.3)] hover:shadow-[0_0_30px_rgba(0,255,157,0.5)]'
+                                }`}
+                        >
+                            {isCompleted ? (
+                                <>
+                                    <CheckCircle size={16} className="md:w-5 md:h-5" /> <span className="hidden md:inline">COMPLETED</span><span className="md:hidden">DONE</span>
+                                </>
+                            ) : (
+                                <><span className="hidden md:inline">MARK AS COMPLETE</span><span className="md:hidden">COMPLETE</span></>
+                            )}
+                        </button>
+                    ) : (
+                        // If Quiz exists and NOT completed: The Quiz component above handles the "Mark Complete" action.
+                        // This area can show a status or remain empty.
+                        <div className="flex items-center gap-2 text-gray-400 text-sm font-mono animate-pulse">
+                            <Lock size={16} />
+                            <span>PASS QUIZ TO UNLOCK NEXT MODULE</span>
+                        </div>
+                    )}
                 </div>
 
                 {nextModuleId ? (
