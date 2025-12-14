@@ -9,6 +9,7 @@ import Dashboard from './pages/Dashboard';
 
 import LearningPaths from './pages/LearningPaths';
 import ModuleDetail from './pages/ModuleDetail';
+import Profile from './pages/Profile';
 // const Modules = () => <h1 className="text-2xl font-orbitron">Modules</h1>;
 
 function App() {
@@ -47,6 +48,14 @@ function App() {
               <ProtectedRoute>
                 <MainLayout>
                   <ModuleDetail />
+                </MainLayout>
+              </ProtectedRoute>
+            } />
+
+            <Route path="/profile" element={
+              <ProtectedRoute>
+                <MainLayout>
+                  <Profile />
                 </MainLayout>
               </ProtectedRoute>
             } />

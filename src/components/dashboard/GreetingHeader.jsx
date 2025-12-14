@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 
 const QUOTES = [
@@ -55,7 +56,7 @@ const GreetingHeader = () => {
                     className="flex items-baseline gap-3"
                 >
                     <h1 className="text-3xl md:text-4xl font-orbitron font-bold text-white tracking-wide">
-                        WELCOME BACK, <span className="text-primary glow-text">{user?.username}</span>
+                        WELCOME BACK, <Link to="/profile" className="text-primary glow-text hover:text-white transition-colors">{user?.username}</Link>
                     </h1>
                     <span className="text-xs font-mono py-1 px-2 border border-primary/30 text-primary bg-primary/5 rounded">
                         {user?.rank}

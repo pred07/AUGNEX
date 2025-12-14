@@ -10,6 +10,7 @@ const Button = ({
     className,
     isLoading,
     disabled,
+    icon: Icon,
     ...props
 }) => {
     const baseStyles = "relative font-rajdhani font-semibold tracking-wider uppercase transition-all duration-300 flex items-center justify-center overflow-hidden group";
@@ -34,7 +35,7 @@ const Button = ({
             disabled={isLoading || disabled}
             {...props}
         >
-            {isLoading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+            {isLoading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : Icon && <Icon className="w-4 h-4 mr-2" />}
             <span className="relative z-10">{children}</span>
             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:animate-[shimmer_1s_infinite]" />
         </motion.button>

@@ -30,6 +30,9 @@ export const AuthProvider = ({ children }) => {
                         role: 'admin', // unrestricted access
                         rank: 'Architect',
                         xp: 99999,
+                        avatar: 'https://api.dicebear.com/9.x/dylan/svg?seed=admin',
+                        socials: { twitter: '', linkedin: '', website: '' },
+                        lastUsernameChange: null,
                         // Admin sees everything unlocked
                     };
                     setUser(userData);
@@ -41,6 +44,9 @@ export const AuthProvider = ({ children }) => {
                         role: 'learner', // restricted access
                         rank: 'Neophyte',
                         xp: 0,
+                        avatar: 'https://api.dicebear.com/9.x/dylan/svg?seed=learner',
+                        socials: { twitter: '', linkedin: '', website: '' },
+                        lastUsernameChange: null,
                         // Learner starts fresh
                     };
                     setUser(userData);
@@ -58,8 +64,39 @@ export const AuthProvider = ({ children }) => {
         localStorage.removeItem('user');
     };
 
+    const updateUserProfile = (userId, updates) => {
+        return new Promise((resolve, reject) => {
+            setTimeout(() => {
+                setUser(prev => {
+                    if (!prev) return null;
+                    const newUser = { ...prev, ...updates };
+
+                    // Validate username change limit
+                    if (updates.username && updates.username !== prev.username) {
+                        const now = new Date();
+                        const lastChange = prev.lastUsernameChange ? new Date(prev.lastUsernameChange) : null;
+
+                        if (lastChange) {
+                            const oneMonthAgo = new Date();
+                            oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+                            if (lastChange > oneMonthAgo) {
+                                reject(new Error("Username can only be changed once per month."));
+                                return prev;
+                            }
+                        }
+                        newUser.lastUsernameChange = now.toISOString();
+                    }
+
+                    localStorage.setItem('user', JSON.stringify(newUser));
+                    resolve(newUser);
+                    return newUser;
+                });
+            }, 500);
+        });
+    };
+
     return (
-        <AuthContext.Provider value={{ user, login, logout, isLoading, isAuthenticated: !!user }}>
+        <AuthContext.Provider value={{ user, login, logout, updateUserProfile, isLoading, isAuthenticated: !!user }}>
             {children}
         </AuthContext.Provider>
     );
