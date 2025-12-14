@@ -18,7 +18,7 @@ const ContinueLearningCard = () => {
 
         if (!forgePath) return null;
 
-        const allModules = forgePath.stages.flatMap(s => s.modules);
+        const allModules = forgePath.sections.flatMap(s => s.modules);
 
         // Find first incomplete module that isn't locked
         // Or finding the First Locked one implies the previous was the last completed one.
@@ -33,7 +33,7 @@ const ContinueLearningCard = () => {
     // Calculate percentage for valid bar
     // This is a rough estimate based on module index
     const forgePath = LEARNING_PATHS.find(p => p.id === 'forge');
-    const allModules = forgePath?.stages.flatMap(s => s.modules) || [];
+    const allModules = forgePath?.sections.flatMap(s => s.modules) || [];
     const currentIndex = allModules.findIndex(m => m.id === activeModule.id);
     const progressPercent = Math.round((currentIndex / allModules.length) * 100);
 

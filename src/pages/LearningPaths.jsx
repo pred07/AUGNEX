@@ -70,15 +70,15 @@ const ModuleList = ({ path }) => {
 
     return (
         <div className="space-y-8 pl-4 border-l border-white/5 ml-4 md:ml-0 md:pl-0 md:border-l-0">
-            {path.stages.map((stage, idx) => (
+            {path.sections.map((section, idx) => (
                 <div key={idx} className="relative">
                     <h4 className="text-sm font-rajdhani font-bold text-gray-500 uppercase tracking-widest mb-4 flex items-center gap-3">
                         <span className="w-8 h-[1px] bg-white/10" />
-                        {stage.title}
+                        {section.title}
                     </h4>
 
                     <div className="grid gap-3">
-                        {stage.modules.map((module) => {
+                        {section.modules.map((module) => {
                             const locked = isModuleLocked(path.id, module.id);
                             const completed = isModuleCompleted(path.id, module.id);
 
@@ -126,16 +126,63 @@ const ModuleList = ({ path }) => {
     );
 };
 
+const PathOverview = ({ path, onEnter }) => (
+    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+        <div className="space-y-4">
+            <h3 className="text-xl text-primary font-mono uppercase tracking-widest">Mission Briefing</h3>
+            <p className={cn("text-2xl font-light italic leading-relaxed text-gray-300", path.color)}>
+                "{path.philosophy}"
+            </p>
+        </div>
+
+        <div className="p-6 bg-white/5 rounded-xl border border-white/10 space-y-4">
+            <h4 className="text-sm font-bold text-gray-400 uppercase tracking-widest">Operational Context</h4>
+            <p className="text-gray-300 leading-relaxed text-lg">
+                {path.description}
+            </p>
+        </div>
+
+        <div className="grid grid-cols-3 gap-4">
+            <div className="p-4 bg-surface rounded-lg border border-white/5 text-center">
+                <div className="text-2xl font-bold text-white font-orbitron">{path.sections.flatMap(s => s.modules).length}</div>
+                <div className="text-[10px] text-gray-500 uppercase tracking-widest mt-1">Modules</div>
+            </div>
+            <div className="p-4 bg-surface rounded-lg border border-white/5 text-center">
+                <div className="text-2xl font-bold text-white font-orbitron">{path.role}</div>
+                <div className="text-[10px] text-gray-500 uppercase tracking-widest mt-1">Role</div>
+            </div>
+            <div className="p-4 bg-surface rounded-lg border border-white/5 text-center">
+                <div className="text-2xl font-bold text-white font-orbitron">
+                    {path.id === 'forge' ? 'BEGINNER' : path.id === 'overwatch' ? 'EXPERT' : 'ADVANCED'}
+                </div>
+                <div className="text-[10px] text-gray-500 uppercase tracking-widest mt-1">Difficulty</div>
+            </div>
+        </div>
+
+        <div className="pt-4">
+            <Button onClick={onEnter} className="w-full py-6 text-lg tracking-widest font-bold shadow-[0_0_20px_rgba(0,255,157,0.2)] hover:shadow-[0_0_40px_rgba(0,255,157,0.4)] transition-all">
+                ACCESS CURRICULUM <ChevronRight className="ml-2" />
+            </Button>
+        </div>
+    </div>
+);
+
 const LearningPaths = () => {
     const [selectedPathId, setSelectedPathId] = useState('forge');
+    const [viewMode, setViewMode] = useState('overview'); // 'overview' | 'modules'
     const { user } = useAuth();
     const detailRef = useRef(null);
 
     const selectedPath = LEARNING_PATHS.find(p => p.id === selectedPathId);
 
+    // Reset view when path changes
+    useEffect(() => {
+        setViewMode('overview');
+    }, [selectedPathId]);
+
     // Auto-scroll to details on mobile when path changes
     useEffect(() => {
-        if (window.innerWidth < 1024 && detailRef.current) { // lg breakpoint
+        if (window.innerWidth < 1024 && detailRef.current) {
             setTimeout(() => {
                 detailRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }, 100);
@@ -167,7 +214,7 @@ const LearningPaths = () => {
                     <AnimatePresence mode="wait">
                         {selectedPath && (
                             <motion.div
-                                key={selectedPath.id}
+                                key={`${selectedPath.id}-${viewMode}`}
                                 initial={{ opacity: 0, x: 20 }}
                                 animate={{ opacity: 1, x: 0 }}
                                 exit={{ opacity: 0, x: -20 }}
@@ -188,15 +235,26 @@ const LearningPaths = () => {
                                     <span className={cn("font-mono text-xs border px-2 py-1 rounded mb-4 inline-block", selectedPath.borderColor, selectedPath.color)}>
                                         CURRENT STATUS: {selectedPath.role}
                                     </span>
-                                    <h2 className="text-3xl font-orbitron font-bold text-white mb-2">{selectedPath.title} OVERVIEW</h2>
-                                    <div className="w-full bg-white/5 h-1 rounded-full overflow-hidden flex gap-0.5">
+                                    <h2 className="text-3xl font-orbitron font-bold text-white mb-2">{selectedPath.title}</h2>
+
+                                    {/* Progress Bar (Always visible) */}
+                                    <div className="w-full bg-white/5 h-1 rounded-full overflow-hidden flex gap-0.5 mt-4">
                                         {/* Fake random progress for visual demo */}
                                         <div className={cn("h-full w-12", selectedPath.color.replace('text-', 'bg-'))} />
                                         <div className={cn("h-full w-4 opacity-50", selectedPath.color.replace('text-', 'bg-'))} />
                                     </div>
                                 </div>
 
-                                <ModuleList path={selectedPath} />
+                                {viewMode === 'overview' ? (
+                                    <PathOverview path={selectedPath} onEnter={() => setViewMode('modules')} />
+                                ) : (
+                                    <div className="animate-in fade-in slide-in-from-right-8 duration-500">
+                                        <Button variant="ghost" size="sm" onClick={() => setViewMode('overview')} className="mb-6 hover:bg-white/5">
+                                            ← BACK TO MISSION BRIEF
+                                        </Button>
+                                        <ModuleList path={selectedPath} />
+                                    </div>
+                                )}
 
                                 <div className="mt-12 p-6 border border-white/5 rounded-xl bg-background/50 text-center">
                                     <p className="text-gray-500 font-mono text-xs mb-4">PROGRESSION PROTOCOL IN EFFECT</p>

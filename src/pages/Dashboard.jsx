@@ -23,7 +23,7 @@ const getAllModules = () => {
     if (!forgePath) return [];
 
     // Flatten modules
-    return forgePath.stages.flatMap(stage => stage.modules).slice(0, 4);
+    return forgePath.sections.flatMap(section => section.modules).slice(0, 4);
 };
 
 const Dashboard = () => {

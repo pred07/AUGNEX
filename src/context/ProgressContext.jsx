@@ -52,8 +52,8 @@ export const ProgressProvider = ({ children }) => {
 
         // Flatten all modules in the path to find the index
         let allModules = [];
-        path.stages.forEach(stage => {
-            allModules = [...allModules, ...stage.modules];
+        path.sections.forEach(section => {
+            allModules = [...allModules, ...section.modules];
         });
 
         const currentIndex = allModules.findIndex(m => m.id === moduleId);
@@ -69,8 +69,8 @@ export const ProgressProvider = ({ children }) => {
         if (!path) return null;
 
         let allModules = [];
-        path.stages.forEach(stage => {
-            allModules = [...allModules, ...stage.modules];
+        path.sections.forEach(section => {
+            allModules = [...allModules, ...section.modules];
         });
 
         const currentIndex = allModules.findIndex(m => m.id === currentModuleId);

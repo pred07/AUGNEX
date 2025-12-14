@@ -12,7 +12,7 @@ export const LEARNING_PATHS = [
         philosophy: "Tools are useless without understanding.",
         description: "Baseline cybersecurity literacy and environment readiness. The preparation before the specialization.",
         role: "Observer → Prepared Learner",
-        stages: [
+        sections: [
             {
                 title: "Phase 0: Mental Model",
                 modules: [
@@ -94,7 +94,7 @@ export const LEARNING_PATHS = [
         philosophy: "Exploit is not chaos. It’s precision.",
         description: "Understand how systems are attacked professionally. Break systems with intent and control.",
         role: "Offensive Security Practitioner",
-        stages: [
+        sections: [
             // Keeping existing structure for other paths as placeholder/future work based on previous prompt
             // Admin can unlock these later
             {
@@ -206,7 +206,7 @@ export const LEARNING_PATHS = [
         philosophy: "You can’t defend what you can’t see.",
         description: "Detect, respond, and protect systems. Stability is a weapon.",
         role: "Defensive Security Operator",
-        stages: [
+        sections: [
             {
                 title: "Defensive Foundations",
                 modules: [
@@ -305,7 +305,7 @@ export const LEARNING_PATHS = [
         philosophy: "The gap between red and blue is where failure lives.",
         description: "Bridge attack and defense. Integration, validation, and improvement.",
         role: "Security Engineer",
-        stages: [
+        sections: [
             {
                 title: "Purple Team Foundations",
                 modules: [
@@ -401,11 +401,85 @@ export const LEARNING_PATHS = [
         description: "System-level security design, oversight, and mastery.",
         role: "Security Architect",
         recommended: true,
-        stages: [
+        sections: [
             {
-                title: "Design Principles",
+                title: "Architecture Foundations",
                 modules: [
-                    { id: 'arc-1', title: "Security Architecture Fundamentals", status: 'locked' }
+                    { id: 'arc-1', title: "Security Architecture Fundamentals", status: 'locked' },
+                    { id: 'arc-2', title: "Business Alignment and Enablement", status: 'locked' },
+                    { id: 'arc-3', title: "The SABSA and TOGAF Frameworks", status: 'locked' },
+                    { id: 'arc-4', title: "Defense in Depth vs Zero Trust", status: 'locked' },
+                    { id: 'arc-5', title: "Threat Modeling at Scale", status: 'locked' }
+                ]
+            },
+            {
+                title: "Governance, Risk, and Compliance (GRC)",
+                modules: [
+                    { id: 'arc-6', title: "Building a Security Policy Framework", status: 'locked' },
+                    { id: 'arc-7', title: "Risk Assessment Methodologies (FAIR, NIST)", status: 'locked' },
+                    { id: 'arc-8', title: "Regulatory Landscape (GDPR, PCI, HIPAA, SOX)", status: 'locked' },
+                    { id: 'arc-9', title: "Third-Party Risk Management (TPRM)", status: 'locked' },
+                    { id: 'arc-10', title: "Audits and Assurance", status: 'locked' }
+                ]
+            },
+            {
+                title: "Identity & Access Architecture",
+                modules: [
+                    { id: 'arc-11', title: "Identity as the New Perimeter", status: 'locked' },
+                    { id: 'arc-12', title: "Modern Auth Standards (OIDC, SAML, OAuth2)", status: 'locked' },
+                    { id: 'arc-13', title: "Privileged Access Management (PAM) Strategy", status: 'locked' },
+                    { id: 'arc-14', title: "Customer IAM (CIAM) Considerations", status: 'locked' },
+                    { id: 'arc-15', title: "Directory Design (Active Directory, LDAP, Cloud IGA)", status: 'locked' }
+                ]
+            },
+            {
+                title: "Cloud Security Architecture",
+                modules: [
+                    { id: 'arc-16', title: "Shared Responsibility Models (IaaS, PaaS, SaaS)", status: 'locked' },
+                    { id: 'arc-17', title: "Cloud Native Security Patterns", status: 'locked' },
+                    { id: 'arc-18', title: "Container and Kubernetes Security Design", status: 'locked' },
+                    { id: 'arc-19', title: "Serverless Security Implications", status: 'locked' },
+                    { id: 'arc-20', title: "Multi-Cloud Strategy and Federation", status: 'locked' }
+                ]
+            },
+            {
+                title: "Application Security Design",
+                modules: [
+                    { id: 'arc-21', title: "Secure Software Development Life Cycle (S-SDLC)", status: 'locked' },
+                    { id: 'arc-22', title: "API Security Standards and Gateways", status: 'locked' },
+                    { id: 'arc-23', title: "Data Protection Design (Encryption, Tokenization)", status: 'locked' },
+                    { id: 'arc-24', title: "Microservices Security Patterns", status: 'locked' },
+                    { id: 'arc-25', title: "DevSecOps Pipeline Integration", status: 'locked' }
+                ]
+            },
+            {
+                title: "Zero Trust & Network Design",
+                modules: [
+                    { id: 'arc-26', title: "Zero Trust Architecture Principles (NIST 800-207)", status: 'locked' },
+                    { id: 'arc-27', title: "Micro-segmentation Strategy", status: 'locked' },
+                    { id: 'arc-28', title: "Secure Access Service Edge (SASE)", status: 'locked' },
+                    { id: 'arc-29', title: "Software-Defined Networking (SDN) Security", status: 'locked' },
+                    { id: 'arc-30', title: "Remote Access Evolution (VPN vs ZTNA)", status: 'locked' }
+                ]
+            },
+            {
+                title: "SecOps & Resilience Architecture",
+                modules: [
+                    { id: 'arc-31', title: "Designing for Resilience and Recovery", status: 'locked' },
+                    { id: 'arc-32', title: "Security Operations Center (SOC) Architecture", status: 'locked' },
+                    { id: 'arc-33', title: "Incident Response Readiness", status: 'locked' },
+                    { id: 'arc-34', title: "Business Continuity Planning (BCP)", status: 'locked' },
+                    { id: 'arc-35', title: "Designing Deception Technologies", status: 'locked' }
+                ]
+            },
+            {
+                title: "Security Leadership & Strategy",
+                modules: [
+                    { id: 'arc-36', title: "The CISO Role and Reporting Lines", status: 'locked' },
+                    { id: 'arc-37', title: "Budgeting and ROI for Security", status: 'locked' },
+                    { id: 'arc-38', title: "Security Culture and Awareness Programs", status: 'locked' },
+                    { id: 'arc-39', title: "Metrics and KPIs for Executives", status: 'locked' },
+                    { id: 'arc-40', title: "Emerging Threats and Future Trends (AI/Quantum)", status: 'locked' }
                 ]
             }
         ]

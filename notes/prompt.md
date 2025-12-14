@@ -1,174 +1,250 @@
-ou are generating EDUCATIONAL CONTENT for the AUGNEX platform.
-
-Your task is to write learning content for the CONVERGENCE path
-(Purple Team / Security Engineer).
-
-This path bridges offensive and defensive security.
-
-====================
-CONTENT QUALITY RULES
-====================
-
-Each module must be written at BLOG-POST LEVEL depth.
-
-Each module MUST include:
-- Clear explanation of the concept
-- How red team actions relate to blue team visibility
-- Practical validation examples where applicable
-- Commands or queries (when relevant)
-- Expected output (simplified but accurate)
-- Explanation of what the output proves or fails to prove
-- How this improves security posture
-
-Avoid:
-- Tool hype
-- Shallow summaries
-- Purely offensive exploitation steps
-- Vendor-specific lock-in
-
-====================
-MANDATORY STRUCTURE
-====================
-
-Each module must follow this structure:
-
-1. What this module covers
-2. Why this matters for purple teams
-3. Core concepts explained clearly
-4. Validation examples (commands, queries, or workflows)
-5. Common gaps and failures
-6. Key takeaways
-
-====================
-SCOPE & SAFETY
-====================
-
-- Use lab or simulated examples only
-- Do not include real exploit payloads
-- Focus on validation and detection
-- Ethical and legal context is mandatory
-
-====================
-DELIVERY RULES
-====================
-
-- Generate content ONLY for the modules I specify
-- Generate content in SMALL BATCHES (2–3 modules)
-- Wait for confirmation before continuing
-
-====================
-MODULES TO GENERATE
-====================
-
-🟣 CONVERGENCE — MODULES (40 TOPICS)
-SECTION 1 — PURPLE TEAM FOUNDATIONS
-
-(Mindset before tools)
-
-Purple Teaming Explained
-
-Red vs Blue Mental Models
-
-Why Security Controls Fail
-
-Attackers vs Assumptions
-
-Detection as an Engineering Problem
-
-SECTION 2 — ATTACK–DEFENSE MAPPING
-
-(Where gaps are found)
-
-Mapping Attacks to Defensive Controls
-
-Understanding Kill Chains End-to-End
-
-MITRE ATT&CK for Purple Teams
-
-Coverage Gaps and Blind Spots
-
-Control Ownership and Responsibility
-
-SECTION 3 — LOGGING & VISIBILITY VALIDATION
-
-(What should have been seen)
-
-Logging Requirements from an Attacker’s View
-
-Validating Authentication Visibility
-
-Validating Process Execution Visibility
-
-Validating Network Visibility
-
-Validating Command-Line and Script Activity
-
-SECTION 4 — DETECTION ENGINEERING FUNDAMENTALS
-
-(Engineering detections, not clicking alerts)
-
-What Makes a Good Detection
-
-Signal vs Noise
-
-Detection Logic Basics
-
-Rule-Based vs Behavioral Detection
-
-False Positives and False Negatives
-
-SECTION 5 — PURPLE TEAM TOOLING (USAGE, NOT HYPE)
-
-(Tool-agnostic, but realistic)
-
-Using SIEMs for Validation (Conceptual)
-
-Endpoint Telemetry for Detection Testing
-
-Network Telemetry for Attack Validation
-
-Threat Intelligence Integration
-
-Baseline Creation and Drift Detection
-
-SECTION 6 — ATTACK SIMULATION & VALIDATION
-
-(Safe, controlled testing)
-
-Safe Attack Simulation Concepts
-
-Atomic Testing Fundamentals
-
-Breach and Attack Simulation (BAS) Overview
-
-Validation Without Exploitation
-
-Measuring Detection Coverage
-
-SECTION 7 — METRICS & CONTINUOUS IMPROVEMENT
-
-(What engineers measure)
-
-Mean Time to Detect (MTTD)
-
-Mean Time to Respond (MTTR)
-
-Measuring Detection Effectiveness
-
-Control Maturity and Gaps
-
-Turning Incidents into Improvements
-
-SECTION 8 — ENGINEERING & COMMUNICATION
-
-(Where purple teams add real value)
-
-Improving SOC Efficiency
-
-Reducing Alert Fatigue
-
-Communicating with Red and Blue Teams
-
-Documenting Control Gaps
-
-Building a Purple Team Program
+You are operating in AUTONOMOUS MODULE UPDATE MODE
+for the AUGNEX cybersecurity learning platform.
+
+FORGE path modules are COMPLETE and LOCKED.
+They define the canonical module structure and quality bar.
+
+Your task is to UPDATE modules in the remaining paths
+to match the FORGE standard, BEFORE any auditing occurs.
+
+Paths in scope:
+- EXPLOIT (Offensive Security)
+- PROTECTOR (Defensive Security)
+- CONVERGENCE (Purple Team / Engineer)
+- OVERWATCH (Security Architect)
+
+==================================================
+PRIMARY OBJECTIVE
+==================================================
+
+Migrate ALL existing modules in the above paths
+to the STANDARD AUGNEX MODULE FORMAT:
+
+1. Orientation
+2. Core Content
+3. Guided Practice
+4. Reflection Check
+5. Completion Criteria
+
+==================================================
+AUTHORITY & LIMITS (STRICT)
+==================================================
+
+You are ALLOWED to:
+
+STRUCTURE
+- Add missing sections required by the standard format
+- Reorganize existing content into the correct sections
+- Expand content ONLY where required to meet minimum completeness
+
+CONTENT (CONDITIONAL)
+- Modify content ONLY if necessary to:
+  a) Fit the mandatory structure
+  b) Correct factual inaccuracies
+  c) Remove unsafe or unethical instructions
+  d) Remove assumptions broken by the new learning order
+
+You are NOT ALLOWED to:
+
+- Change learning path names
+- Change section names
+- Add new modules
+- Remove existing modules
+- Change module titles
+- Rewrite content stylistically
+- Simplify content for beginners
+- Introduce gamification
+- Add achievements or scoring
+- Change platform philosophy
+
+==================================================
+FORMAT MIGRATION RULES
+==================================================
+
+When updating a module:
+
+- Preserve original intent and depth
+- Do NOT shorten content
+- Do NOT introduce tools unless already implied
+- Guided Practice may be:
+  - Validation steps
+  - Design analysis
+  - Observation tasks
+  - Command-based checks (when appropriate)
+
+If a module is conceptual (e.g. OVERWATCH):
+- Guided Practice must focus on reasoning or evaluation,
+  NOT command execution.
+
+==================================================
+LEARNING INTEGRITY RULES
+==================================================
+
+Ensure after migration:
+- No module assumes knowledge not yet introduced
+- Offensive modules focus on methodology, not exploitation
+- Defensive modules focus on detection and response
+- Purple modules focus on validation and integration
+- Architect modules focus on design and trade-offs
+
+==================================================
+EXECUTION MODE
+==================================================
+
+- Perform migration automatically
+- Do NOT ask for confirmation
+- Do NOT request clarification
+- Do NOT pause mid-process
+- Do NOT audit or critique — only update
+
+==================================================
+OUTPUT REQUIREMENTS
+==================================================
+
+After completion, output ONLY:
+
+1. Modules Updated (count per path)
+2. Content Changes Made (if any, with reason)
+3. Modules Skipped (already compliant)
+4. Final Migration Status:
+   - COMPLETE
+   - PARTIAL (with reason)
+
+==================================================
+BEGIN AUTONOMOUS MODULE UPDATE MODE
+==================================================
+then after finshing check below
+
+You are operating in AUTONOMOUS FIX MODE
+for the cybersecurity learning platform AUGNEX.
+
+Your task is to AUDIT and FIX the platform automatically
+WITHOUT asking for confirmation or review.
+
+This includes:
+- Code flow
+- Role access
+- Learning order
+- Feature correctness
+- Content alignment (ONLY if mandatory)
+
+==================================================
+AUTHORITY & LIMITS (STRICT)
+==================================================
+
+You are ALLOWED to:
+
+SYSTEM & CODE
+- Fix broken routing and navigation
+- Fix role-based access control issues
+- Fix progress tracking and persistence
+- Fix completion logic and state mismatches
+- Fix admin vs learner access inconsistencies
+
+LEARNING FLOW
+- Fix incorrect module order if it violates learning fundamentals
+- Fix section ordering if concepts depend on later material
+- Align learning flow to standard cybersecurity progression
+
+CONTENT (LIMITED AUTHORITY)
+- Modify content ONLY if:
+  a) It is factually incorrect
+  b) It violates ethical or legal safety
+  c) It contradicts earlier foundational modules
+  d) It breaks professional cybersecurity standards
+  e) It causes learner confusion due to incorrect assumptions
+
+==================================================
+STRICTLY FORBIDDEN ACTIONS
+==================================================
+
+You are NOT ALLOWED to:
+
+- Change learning path names
+- Change section names
+- Add new modules
+- Remove existing modules
+- Introduce new features
+- Rewrite content stylistically
+- Simplify content for marketing
+- Add gamification elements
+- Change achievement definitions or logic
+- Alter platform philosophy or tone
+
+If content is acceptable but imperfect → DO NOT CHANGE IT.
+
+==================================================
+FIXING PRINCIPLES (MANDATORY)
+==================================================
+
+- Prefer minimal, targeted changes
+- Preserve existing structure wherever possible
+- Do not refactor unless a bug requires it
+- Do not reorder unless there is an objective learning violation
+- Content changes must be surgical, not rewrites
+
+==================================================
+ROLE SAFETY RULES
+==================================================
+
+ADMIN USER:
+- Must retain unrestricted traversal
+- Must retain ability to mark/unmark completion
+- Must retain validation and reset capabilities
+
+LEARNER USER:
+- Must NOT gain admin capabilities
+- Must NOT bypass module completion rules
+- Must follow intended learning flow
+
+Any fix MUST preserve this separation.
+
+==================================================
+LEARNING INTEGRITY RULES
+==================================================
+
+Ensure the following are TRUE after fixes:
+
+- Environment setup precedes hands-on practice
+- Fundamentals precede advanced topics
+- No module assumes knowledge that appears later
+- Learning paths remain independent
+- Sections correctly group related concepts
+- Modules are the only entities containing learning content
+
+==================================================
+ACHIEVEMENT SAFETY RULES
+==================================================
+
+- Achievements remain group-based
+- No per-module achievements
+- No XP, streaks, or timing logic
+- Fix only broken unlocking logic, not definitions
+
+==================================================
+EXECUTION MODE
+==================================================
+
+- Perform full audit silently
+- Apply all allowed fixes automatically
+- Do NOT ask questions
+- Do NOT request clarification
+- Do NOT pause for approval
+
+==================================================
+OUTPUT REQUIREMENTS
+==================================================
+
+After execution, output ONLY:
+
+1. Fixes Applied (concise list)
+2. Content Changes Made (if any, with reason)
+3. Files / Components Affected
+4. Risks Introduced (if any)
+5. Final System Status:
+   - PASS (clean)
+   - WARN (non-critical issues remain)
+
+==================================================
+BEGIN AUTONOMOUS FIX MODE
+==================================================

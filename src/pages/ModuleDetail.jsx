@@ -16,8 +16,8 @@ const ModuleDetail = () => {
     const { user } = useAuth();
 
     // Find module metadata
-    const path = LEARNING_PATHS.find(p => p.stages.some(s => s.modules.some(m => m.id === moduleId)));
-    const moduleData = path?.stages.flatMap(s => s.modules).find(m => m.id === moduleId);
+    const path = LEARNING_PATHS.find(p => p.sections.some(s => s.modules.some(m => m.id === moduleId)));
+    const moduleData = path?.sections.flatMap(s => s.modules).find(m => m.id === moduleId);
 
     useEffect(() => {
         if (!moduleData) return;
