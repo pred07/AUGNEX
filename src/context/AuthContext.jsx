@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { auth, googleProvider, signInWithPopup } from '../lib/firebase';
 
 const AuthContext = createContext(null);
 
@@ -61,6 +62,34 @@ export const AuthProvider = ({ children }) => {
         });
     };
 
+    const loginWithGoogle = async () => {
+        try {
+            const result = await signInWithPopup(auth, googleProvider);
+            const user = result.user;
+
+            // Map Firebase user to App user structure
+            const userData = {
+                username: user.displayName || user.email.split('@')[0], // Fallback if no display name
+                role: 'learner', // Default role for new users
+                rank: 'Neophyte',
+                xp: 0,
+                publicId: user.uid.slice(0, 8).toUpperCase(), // Generate a short ID from UID
+                avatar: user.photoURL || `https://api.dicebear.com/9.x/dylan/svg?seed=${user.email}`,
+                socials: { twitter: '', linkedin: '', website: '' },
+                lastUsernameChange: null,
+                authProvider: 'google',
+                email: user.email // Store email for real users
+            };
+
+            setUser(userData);
+            localStorage.setItem('user', JSON.stringify(userData));
+            return userData;
+        } catch (error) {
+            console.error("Firebase Login Error:", error);
+            throw error; // Propagate error to UI
+        }
+    };
+
     const logout = () => {
         setUser(null);
         localStorage.removeItem('user');
@@ -98,7 +127,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     return (
-        <AuthContext.Provider value={{ user, login, logout, updateUserProfile, isLoading, isAuthenticated: !!user }}>
+        <AuthContext.Provider value={{ user, login, loginWithGoogle, logout, updateUserProfile, isLoading, isAuthenticated: !!user }}>
             {children}
         </AuthContext.Provider>
     );
