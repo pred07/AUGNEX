@@ -143,7 +143,7 @@ const PathOverview = ({ path, onEnter }) => (
             </p>
         </div>
 
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="p-4 bg-surface rounded-lg border border-white/5 text-center">
                 <div className="text-2xl font-bold text-white">{path.sections.flatMap(s => s.modules).length}</div>
                 <div className="text-[10px] text-gray-500 uppercase tracking-widest mt-1">Modules</div>
@@ -238,7 +238,7 @@ const LearningPaths = () => {
                                 animate={{ opacity: 1, x: 0 }}
                                 exit={{ opacity: 0, x: -20 }}
                                 transition={{ duration: 0.3 }}
-                                className="bg-surface/30 border border-white/5 rounded-2xl p-8 min-h-[600px] relative overflow-hidden"
+                                className="bg-surface/30 border border-white/5 rounded-2xl p-4 md:p-8 min-h-[600px] relative overflow-hidden"
                             >
                                 {/* Admin Indicator */}
                                 {user?.role === 'admin' && (
@@ -251,10 +251,10 @@ const LearningPaths = () => {
                                 <div className={cn("absolute top-0 right-0 w-64 h-64 bg-gradient-to-bl opacity-10 rounded-bl-[100px] pointer-events-none", selectedPath.color.replace('text-', 'from-'))} />
 
                                 <div className="mb-10">
-                                    <span className={cn("font-mono text-xs border px-2 py-1 rounded mb-4 inline-flex flex-wrap gap-1 items-center max-w-full", selectedPath.borderColor, selectedPath.color)}>
-                                        <span className="whitespace-nowrap">CURRENT STATUS:</span>
-                                        <span className="whitespace-normal text-right md:text-left">{selectedPath.role}</span>
-                                    </span>
+                                    <div className={cn("font-mono text-xs border p-2 rounded mb-4 inline-flex flex-col items-start gap-1 max-w-full", selectedPath.borderColor, selectedPath.color)}>
+                                        <span className="whitespace-nowrap font-bold opacity-70">CURRENT STATUS:</span>
+                                        <span className="whitespace-normal leading-tight">{selectedPath.role}</span>
+                                    </div>
                                     <h2 className="text-3xl font-bold text-white mb-2">{selectedPath.title}</h2>
 
                                     {/* Progress Bar (Always visible) */}
