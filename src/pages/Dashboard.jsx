@@ -44,7 +44,7 @@ const Dashboard = () => {
                 {/* Module Overview - 2/3 Width */}
                 <section className="lg:col-span-2 space-y-4">
                     <div className="flex items-center justify-between">
-                        <h3 className="text-lg text-gray-300">Available Modules (Forge)</h3>
+                        <h3 className="text-lg text-muted">Available Modules (Forge)</h3>
                         <span className="text-xs text-primary font-mono cursor-pointer hover:underline" onClick={() => navigate('/paths')}>VIEW ALL PATHS</span>
                     </div>
 
@@ -64,25 +64,25 @@ const Dashboard = () => {
                                     className={`p-4 rounded-xl border transition-all duration-300 relative group overflow-hidden ${status === 'active'
                                         ? 'bg-surface/60 border-primary/30 shadow-[0_0_15px_rgba(0,255,157,0.05)] cursor-pointer hover:border-primary/50'
                                         : status === 'locked'
-                                            ? 'bg-surface/20 border-white/5 opacity-60 cursor-not-allowed'
-                                            : 'bg-surface/40 border-white/10 cursor-pointer hover:bg-surface/60'
+                                            ? 'bg-surface/20 border-border opacity-60 cursor-not-allowed'
+                                            : 'bg-surface/40 border-border cursor-pointer hover:bg-surface/60'
                                         }`}
                                 >
                                     {status === 'active' && <div className="absolute top-0 left-0 w-1 h-full bg-primary" />}
 
                                     <div className="flex justify-between items-start mb-3">
-                                        <div className={`p-2 rounded-lg ${status === 'active' ? 'bg-primary/10 text-primary' : 'bg-white/5 text-gray-500'}`}>
+                                        <div className={`p-2 rounded-lg ${status === 'active' ? 'bg-primary/10 text-primary' : 'bg-surface text-muted border border-border'}`}>
                                             {status === 'locked' ? <Lock size={18} /> : (mod.type === 'Network' ? <Server size={18} /> : <FileCode size={18} />)}
                                         </div>
-                                        <span className="text-[10px] font-mono text-gray-500 uppercase border border-white/5 px-2 py-0.5 rounded">
+                                        <span className="text-[10px] font-mono text-muted uppercase border border-border px-2 py-0.5 rounded">
                                             MODULE {mod.id.toUpperCase()}
                                         </span>
                                     </div>
 
-                                    <h4 className={`font-bold text-lg mb-1 ${status === 'active' ? 'text-white' : 'text-gray-400'}`}>
+                                    <h4 className={`font-bold text-lg mb-1 ${status === 'active' ? 'text-text-main' : 'text-muted'}`}>
                                         {mod.title}
                                     </h4>
-                                    <p className="text-xs text-gray-500 font-mono mb-3">{status.toUpperCase()}</p>
+                                    <p className="text-xs text-muted font-mono mb-3">{status.toUpperCase()}</p>
 
                                     {status === 'active' && (
                                         <div className="w-full bg-white/5 h-1 rounded-full overflow-hidden mt-2">

@@ -56,7 +56,7 @@ const ModulesLibrary = () => {
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" size={18} />
                     <input
                         type="text"
-                        placeholder="Search modules (e.g. 'Phishing', 'e-1')..."
+                        placeholder="Search modules..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         className="w-full bg-surface/50 border border-white/10 rounded-lg pl-10 pr-4 py-2 text-white focus:border-primary/50 focus:outline-none transition-colors"

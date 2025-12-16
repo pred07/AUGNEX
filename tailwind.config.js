@@ -7,13 +7,14 @@ export default {
     theme: {
         extend: {
             colors: {
-                background: "#0a0e1a", // Deep cyber black
-                surface: "#111827",    // Panel background
-                primary: "#00ff9d",    // Neon Green (Success/Action)
-                secondary: "#00f3ff",  // Neon Blue (Info/Tech)
-                accent: "#ff003c",     // Neon Red (Alert/Attack)
-                muted: "#64748b",      // Text mute
-                border: "#1e293b",     // Border color
+                background: "var(--bg-background)",
+                surface: "var(--bg-surface)",
+                primary: "var(--c-primary)",
+                secondary: "var(--c-secondary)",
+                accent: "var(--c-accent)",
+                muted: "var(--c-muted)",
+                border: "var(--c-border)",
+                'text-main': "var(--c-text-main)",
             },
             fontFamily: {
                 orbitron: ['Orbitron', 'sans-serif'],

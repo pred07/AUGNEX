@@ -46,7 +46,7 @@ const NewsCarousel = () => {
     return (
         <div className="bg-surface/30 border border-white/5 rounded-xl p-4 md:p-6 relative overflow-hidden h-full flex flex-col">
             <div className="flex justify-between items-center mb-4">
-                <h3 className="text-sm font-rajdhani font-bold text-gray-400 uppercase tracking-wider">Intel Feed</h3>
+                <h3 className="text-sm font-rajdhani font-bold text-muted uppercase tracking-wider">Intel Feed</h3>
                 <div className="flex gap-1">
                     {NEWS_ITEMS.map((_, idx) => (
                         <div
@@ -71,14 +71,14 @@ const NewsCarousel = () => {
                             <Icon size={24} />
                         </div>
                         <span className={`text-xs font-mono mb-1 ${currentItem.color}`}>{currentItem.category} • {currentItem.date}</span>
-                        <h4 className="text-lg md:text-xl font-bold font-orbitron text-gray-200 leading-snug hover:text-white transition-colors cursor-pointer">
+                        <h4 className="text-lg md:text-xl font-bold font-orbitron text-text-main leading-snug hover:text-primary transition-colors cursor-pointer">
                             {currentItem.title}
                         </h4>
                     </motion.div>
                 </AnimatePresence>
             </div>
 
-            <div className="mt-4 pt-4 border-t border-white/5 flex gap-2 items-center text-xs text-gray-500 hover:text-white transition-colors cursor-pointer group">
+            <div className="mt-4 pt-4 border-t border-white/5 flex gap-2 items-center text-xs text-muted hover:text-text-main transition-colors cursor-pointer group">
                 <span>READ FULL REPORT</span>
                 <ChevronRight size={14} className="group-hover:translate-x-1 transition-transform" />
             </div>

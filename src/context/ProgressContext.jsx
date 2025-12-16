@@ -14,9 +14,9 @@ export const ProgressProvider = ({ children }) => {
 
     // Load progress from local storage on mount
     useEffect(() => {
-        const storedProgress = localStorage.getItem('augnex_progress');
-        const storedXp = localStorage.getItem('augnex_xp');
-        const storedMedals = localStorage.getItem('augnex_medals');
+        const storedProgress = localStorage.getItem('nytvnt_progress');
+        const storedXp = localStorage.getItem('nytvnt_xp');
+        const storedMedals = localStorage.getItem('nytvnt_medals');
 
         if (storedProgress) setProgress(JSON.parse(storedProgress));
         if (storedXp) setXp(parseInt(storedXp, 10));
@@ -25,9 +25,9 @@ export const ProgressProvider = ({ children }) => {
 
     // Save progress whenever it changes
     useEffect(() => {
-        localStorage.setItem('augnex_progress', JSON.stringify(progress));
-        localStorage.setItem('augnex_xp', xp.toString());
-        localStorage.setItem('augnex_medals', JSON.stringify(unlockedMedals));
+        localStorage.setItem('nytvnt_progress', JSON.stringify(progress));
+        localStorage.setItem('nytvnt_xp', xp.toString());
+        localStorage.setItem('nytvnt_medals', JSON.stringify(unlockedMedals));
     }, [progress, xp, unlockedMedals]);
 
     const getCurrentRank = () => {

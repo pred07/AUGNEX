@@ -3,9 +3,41 @@
 @tailwind utilities;
 
 @layer base {
-  body {
-    @apply bg-background text-indigo-50 font-inter antialiased selection:bg-primary/20 selection:text-primary;
+  :root {
+    --bg-background: #0a0e1a;
+    --bg-surface: #111827;
+    --c-primary: #00ff9d;
+    --c-secondary: #00f3ff;
+    --c-accent: #ff003c;
+    --c-muted: #64748b;
+    --c-border: #1e293b;
+    --c-text-main: #e0e7ff;
+    /* indigo-50 */
   }
+
+  .light {
+    --bg-background: #f0fdf4;
+    /* Very faint green tint white */
+    --bg-surface: #ffffff;
+    --c-primary: #059669;
+    /* Emerald 600 */
+    --c-secondary: #0284c7;
+    /* Sky 600 */
+    --c-accent: #dc2626;
+    /* Red 600 */
+    --c-muted: #64748b;
+    --c-border: #cbd5e1;
+    /* Slate 300 */
+    --c-text-main: #0f172a;
+    /* Slate 900 */
+  }
+
+  body {
+    background-color: var(--bg-background);
+    color: var(--c-text-main);
+    @apply font-inter antialiased selection:bg-primary/20 selection:text-primary transition-colors duration-300;
+  }
+
 
   h1,
   h2,

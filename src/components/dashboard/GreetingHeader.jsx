@@ -55,8 +55,8 @@ const GreetingHeader = () => {
                     animate={{ opacity: 1, x: 0 }}
                     className="flex items-baseline gap-3"
                 >
-                    <h1 className="text-3xl md:text-4xl font-orbitron font-bold text-white tracking-wide">
-                        WELCOME BACK, <Link to="/profile" className="text-primary glow-text hover:text-white transition-colors">{user?.username}</Link>
+                    <h1 className="text-3xl md:text-4xl font-orbitron font-bold text-text-main tracking-wide">
+                        WELCOME BACK, <Link to="/profile" className="text-primary glow-text hover:text-text-main transition-colors">{user?.username}</Link>
                     </h1>
                     <span className="text-xs font-mono py-1 px-2 border border-primary/30 text-primary bg-primary/5 rounded">
                         {user?.rank}
@@ -71,7 +71,7 @@ const GreetingHeader = () => {
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, y: -10 }}
                             transition={{ duration: 0.5 }}
-                            className="text-muted text-sm font-mono italic"
+                            className="text-primary/80 text-sm font-mono tracking-wide"
                         >
                             "{QUOTES[quoteIndex]}"
                         </motion.p>

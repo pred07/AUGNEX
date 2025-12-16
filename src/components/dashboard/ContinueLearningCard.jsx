@@ -58,16 +58,16 @@ const ContinueLearningCard = () => {
                         Active Operation
                     </div>
 
-                    <h2 className="text-3xl font-bold text-white leading-tight">
+                    <h2 className="text-3xl font-bold text-text-main leading-tight">
                         {activeModule.title}
                     </h2>
 
-                    <p className="text-gray-400 max-w-md">
+                    <p className="text-muted max-w-md">
                         Resume your training in the Forge path. Establish your baseline.
                     </p>
 
                     <div className="space-y-2 pt-2">
-                        <div className="flex justify-between text-xs font-mono text-gray-400">
+                        <div className="flex justify-between text-xs font-mono text-muted">
                             <span>Progress: {progressPercent}% of Forge</span>
                             <span>XP Reward: +100</span>
                         </div>

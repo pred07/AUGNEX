@@ -49,7 +49,7 @@ const PathCard = ({ path, isSelected, onClick }) => {
                     animate={{ opacity: 1, height: 'auto' }}
                     className="space-y-4"
                 >
-                    <p className={cn("text-sm italic font-medium", path.color)}>"{path.philosophy}"</p>
+                    <p className={cn("text-sm font-mono tracking-wide", path.color)}>"{path.philosophy}"</p>
                     <p className="text-gray-400 text-sm leading-relaxed">{path.description}</p>
 
                     <div className="pt-4 flex items-center gap-4">

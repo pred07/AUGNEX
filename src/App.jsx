@@ -15,72 +15,76 @@ import ModulesLibrary from './pages/ModulesLibrary';
 import PublicProfile from './pages/PublicProfile';
 // const Modules = () => <h1 className="text-2xl font-orbitron">Modules</h1>;
 
+import { ThemeProvider } from './context/ThemeContext';
+
 function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <ProgressProvider>
-          <Routes>
-            <Route path="/login" element={<Login />} />
+        <ThemeProvider>
+          <ProgressProvider>
+            <Routes>
+              <Route path="/login" element={<Login />} />
 
-            <Route path="/" element={
-              <ProtectedRoute>
+              <Route path="/" element={
+                <ProtectedRoute>
+                  <MainLayout>
+                    <Dashboard />
+                  </MainLayout>
+                </ProtectedRoute>
+              } />
+
+              <Route path="/paths" element={
+                <ProtectedRoute>
+                  <MainLayout>
+                    <LearningPaths />
+                  </MainLayout>
+                </ProtectedRoute>
+              } />
+
+              <Route path="/modules" element={
+                <ProtectedRoute>
+                  <MainLayout>
+                    <ModulesLibrary />
+                  </MainLayout>
+                </ProtectedRoute>
+              } />
+
+              <Route path="/modules/:moduleId" element={
+                <ProtectedRoute>
+                  <MainLayout>
+                    <ModuleDetail />
+                  </MainLayout>
+                </ProtectedRoute>
+              } />
+
+              <Route path="/profile" element={
+                <ProtectedRoute>
+                  <MainLayout>
+                    <ServiceRecord />
+                  </MainLayout>
+                </ProtectedRoute>
+              } />
+
+              <Route path="/service-record" element={
+                <ProtectedRoute>
+                  <MainLayout>
+                    <ServiceRecord />
+                  </MainLayout>
+                </ProtectedRoute>
+              } />
+
+              {/* Public Profile Route - Accessible without login (theoretically) */}
+              <Route path="/u/:publicId" element={
                 <MainLayout>
-                  <Dashboard />
+                  <PublicProfile />
                 </MainLayout>
-              </ProtectedRoute>
-            } />
+              } />
 
-            <Route path="/paths" element={
-              <ProtectedRoute>
-                <MainLayout>
-                  <LearningPaths />
-                </MainLayout>
-              </ProtectedRoute>
-            } />
-
-            <Route path="/modules" element={
-              <ProtectedRoute>
-                <MainLayout>
-                  <ModulesLibrary />
-                </MainLayout>
-              </ProtectedRoute>
-            } />
-
-            <Route path="/modules/:moduleId" element={
-              <ProtectedRoute>
-                <MainLayout>
-                  <ModuleDetail />
-                </MainLayout>
-              </ProtectedRoute>
-            } />
-
-            <Route path="/profile" element={
-              <ProtectedRoute>
-                <MainLayout>
-                  <ServiceRecord />
-                </MainLayout>
-              </ProtectedRoute>
-            } />
-
-            <Route path="/service-record" element={
-              <ProtectedRoute>
-                <MainLayout>
-                  <ServiceRecord />
-                </MainLayout>
-              </ProtectedRoute>
-            } />
-
-            {/* Public Profile Route - Accessible without login (theoretically) */}
-            <Route path="/u/:publicId" element={
-              <MainLayout>
-                <PublicProfile />
-              </MainLayout>
-            } />
-
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
-        </ProgressProvider>
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </ProgressProvider>
+        </ThemeProvider>
       </AuthProvider>
     </BrowserRouter>
   );

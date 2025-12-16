@@ -71,7 +71,7 @@ const Login = () => {
                         className="flex items-center justify-center gap-3 mb-2"
                     >
                         <Shield className="text-primary w-8 h-8" />
-                        <h1 className="text-2xl font-orbitron font-bold tracking-widest text-white">AUGNEX</h1>
+                        <h1 className="text-2xl font-orbitron font-bold tracking-widest text-white">NYTVNT-OPS</h1>
                     </motion.div>
                     <motion.p
                         initial={{ opacity: 0 }}
