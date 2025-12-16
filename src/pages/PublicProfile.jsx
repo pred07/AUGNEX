@@ -115,7 +115,7 @@ const PublicProfile = () => {
                         <div className="w-32 h-32 rounded-full border-4 border-primary/20 flex items-center justify-center bg-black/50 shadow-[0_0_50px_rgba(0,255,157,0.1)] overflow-hidden">
                             <img src={profile.avatar} alt="Avatar" className="w-full h-full object-cover" />
                         </div>
-                        <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-surface border border-primary/20 rounded-full text-[10px] font-mono text-primary font-bold">
+                        <div className="absolute -bottom-2 md:-bottom-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-surface border border-primary/20 rounded-full text-[10px] md:text-xs font-mono text-primary font-bold shadow-lg whitespace-nowrap z-20">
                             LEVEL {currentRankIndex}
                         </div>
                     </div>
