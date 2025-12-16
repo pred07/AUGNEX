@@ -35,12 +35,12 @@ const MainLayout = ({ children }) => {
                 animate={{ x: 0 }}
                 className="hidden md:flex fixed w-20 xl:w-64 h-screen border-r border-white/5 bg-surface/50 backdrop-blur-xl flex-col z-40"
             >
-                <div className="p-6 flex items-center justify-center xl:justify-start gap-3 border-b border-white/5">
+                <Link to="/" className="p-6 flex items-center justify-center xl:justify-start gap-3 border-b border-white/5 hover:bg-white/5 transition-colors">
                     <div className="w-8 h-8 rounded bg-primary/20 flex items-center justify-center text-primary border border-primary/50 shadow-[0_0_10px_rgba(0,255,157,0.2)]">
                         <span className="font-bold font-orbitron text-lg">A</span>
                     </div>
                     <span className="hidden xl:block font-orbitron font-bold tracking-wider text-xl">AUGNEX</span>
-                </div>
+                </Link>
 
                 <nav className="flex-1 flex flex-col gap-2 p-4 mt-4">
                     <SidebarItem icon={Home} label="Dashboard" path="/" isActive={location.pathname === '/'} />
@@ -125,7 +125,9 @@ const MainLayout = ({ children }) => {
 
             {/* Mobile Top Bar (Branding) */}
             <div className="md:hidden fixed top-0 left-0 right-0 h-14 bg-background/80 backdrop-blur-md border-b border-white/5 z-40 flex items-center justify-center">
-                <span className="font-orbitron font-bold tracking-widest text-lg text-white">AUGNEX</span>
+                <Link to="/">
+                    <span className="font-orbitron font-bold tracking-widest text-lg text-white">AUGNEX</span>
+                </Link>
             </div>
 
             {/* Main Content Area */}

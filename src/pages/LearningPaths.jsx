@@ -53,7 +53,7 @@ const PathCard = ({ path, isSelected, onClick }) => {
                     <p className="text-gray-400 text-sm leading-relaxed">{path.description}</p>
 
                     <div className="pt-4 flex items-center gap-4">
-                        <Button variant="ghost" className={cn("border", path.borderColor, path.color, "hover:bg-white/5")} size="sm">
+                        <Button variant="ghost" className={cn("border w-full md:w-auto justify-center", path.borderColor, path.color, "hover:bg-white/5")} size="sm">
                             ENTER PATH <ChevronRight className="ml-2 w-4 h-4" />
                         </Button>
                     </div>
@@ -161,7 +161,7 @@ const PathOverview = ({ path, onEnter }) => (
         </div>
 
         <div className="pt-4 pb-4 md:pb-0">
-            <Button onClick={onEnter} className="w-full py-6 text-lg tracking-widest font-bold shadow-[0_0_20px_rgba(0,255,157,0.2)] hover:shadow-[0_0_40px_rgba(0,255,157,0.4)] transition-all">
+            <Button onClick={onEnter} className="w-full py-6 text-sm md:text-lg tracking-widest font-bold shadow-[0_0_20px_rgba(0,255,157,0.2)] hover:shadow-[0_0_40px_rgba(0,255,157,0.4)] transition-all flex items-center justify-center">
                 ACCESS CURRICULUM <ChevronRight className="ml-2" />
             </Button>
         </div>
