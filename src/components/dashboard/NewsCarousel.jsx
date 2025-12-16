@@ -44,7 +44,7 @@ const NewsCarousel = () => {
     const Icon = currentItem.icon;
 
     return (
-        <div className="bg-surface/30 border border-white/5 rounded-xl p-6 relative overflow-hidden h-full flex flex-col">
+        <div className="bg-surface/30 border border-white/5 rounded-xl p-4 md:p-6 relative overflow-hidden h-full flex flex-col">
             <div className="flex justify-between items-center mb-4">
                 <h3 className="text-sm font-rajdhani font-bold text-gray-400 uppercase tracking-wider">Intel Feed</h3>
                 <div className="flex gap-1">
@@ -71,7 +71,7 @@ const NewsCarousel = () => {
                             <Icon size={24} />
                         </div>
                         <span className={`text-xs font-mono mb-1 ${currentItem.color}`}>{currentItem.category} • {currentItem.date}</span>
-                        <h4 className="text-xl font-bold font-orbitron text-gray-200 leading-snug hover:text-white transition-colors cursor-pointer">
+                        <h4 className="text-lg md:text-xl font-bold font-orbitron text-gray-200 leading-snug hover:text-white transition-colors cursor-pointer">
                             {currentItem.title}
                         </h4>
                     </motion.div>

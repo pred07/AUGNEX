@@ -1,8 +1,9 @@
 import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, Filter, Lock, CheckCircle, ChevronRight, Box } from 'lucide-react';
+import { Search, Filter, Lock, CheckCircle, ChevronRight, Box, ArrowRight } from 'lucide-react';
 import { LEARNING_PATHS } from '../data/learningPaths';
 import { useProgress } from '../context/ProgressContext';
+import Button from '../components/ui/Button';
 
 const ModulesLibrary = () => {
     const navigate = useNavigate();
@@ -67,8 +68,8 @@ const ModulesLibrary = () => {
                     <button
                         onClick={() => setSelectedPath('all')}
                         className={`px-4 py-1.5 rounded-full text-xs font-mono whitespace-nowrap border transition-all ${selectedPath === 'all'
-                                ? 'bg-white text-black border-white'
-                                : 'bg-surface/30 text-gray-400 border-white/10 hover:border-white/30'
+                            ? 'bg-white text-black border-white'
+                            : 'bg-surface/30 text-gray-400 border-white/10 hover:border-white/30'
                             }`}
                     >
                         ALL MODULES
@@ -78,8 +79,8 @@ const ModulesLibrary = () => {
                             key={path.id}
                             onClick={() => setSelectedPath(path.id)}
                             className={`px-4 py-1.5 rounded-full text-xs font-mono whitespace-nowrap border transition-all ${selectedPath === path.id
-                                    ? `bg-primary/20 text-primary ${path.borderColor}`
-                                    : 'bg-surface/30 text-gray-400 border-white/10 hover:border-white/30'
+                                ? `bg-primary/20 text-primary ${path.borderColor}`
+                                : 'bg-surface/30 text-gray-400 border-white/10 hover:border-white/30'
                                 }`}
                         >
                             {path.title.toUpperCase()}
@@ -117,18 +118,32 @@ const ModulesLibrary = () => {
                                 {module.sectionTitle}
                             </p>
 
-                            <div className="flex items-center text-xs text-gray-400 group-hover:text-white transition-colors">
-                                <span>ACCESS MODULE</span>
-                                <ChevronRight size={14} className="ml-1 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
-                            </div>
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                className="border border-white/10 hover:border-primary/50 text-xs"
+                                icon={ArrowRight}
+                            >
+                                ACCESS
+                            </Button>
                         </div>
                     );
                 })}
             </div>
 
             {filteredModules.length === 0 && (
-                <div className="text-center py-20 text-gray-500">
-                    <p className="font-mono">NO MODULES FOUND MATCHING QUERY.</p>
+                <div className="flex flex-col items-center justify-center py-20 text-center animate-in fade-in duration-500">
+                    <div className="bg-surface/50 p-4 rounded-full border border-white/5 mb-4 relative">
+                        <div className="absolute inset-0 bg-primary/10 rounded-full blur-xl animate-pulse"></div>
+                        <Search className="w-8 h-8 text-gray-400 relative z-10" />
+                        <div className="absolute bottom-0 right-0 w-4 h-4 bg-surface rounded-full flex items-center justify-center border border-white/10 z-20">
+                            <span className="text-primary font-bold text-[10px]">!</span>
+                        </div>
+                    </div>
+                    <h3 className="text-xl font-orbitron font-bold text-white mb-2">NO MODULES DETECTED</h3>
+                    <p className="text-gray-500 font-mono text-sm max-w-sm">
+                        The queried parameters returned zero results. Verify search syntax or adjust filter classification.
+                    </p>
                 </div>
             )}
         </div>

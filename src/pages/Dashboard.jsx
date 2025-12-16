@@ -48,7 +48,7 @@ const Dashboard = () => {
                         <span className="text-xs text-primary font-mono cursor-pointer hover:underline" onClick={() => navigate('/paths')}>VIEW ALL PATHS</span>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {modules.map((mod, idx) => {
                             const locked = isModuleLocked('forge', mod.id);
                             const completed = isModuleCompleted('forge', mod.id);

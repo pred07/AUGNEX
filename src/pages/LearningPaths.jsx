@@ -54,7 +54,7 @@ const PathCard = ({ path, isSelected, onClick }) => {
 
                     <div className="pt-4 flex items-center gap-4">
                         <Button variant="ghost" className={cn("border w-full md:w-auto justify-center", path.borderColor, path.color, "hover:bg-white/5")} size="sm">
-                            ENTER PATH <ChevronRight className="ml-2 w-4 h-4" />
+                            ENTER PATH
                         </Button>
                     </div>
                 </motion.div>
@@ -131,7 +131,7 @@ const PathOverview = ({ path, onEnter }) => (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
         <div className="space-y-4">
             <h3 className="text-xl text-primary font-mono uppercase tracking-widest">Mission Briefing</h3>
-            <p className={cn("text-2xl font-light italic leading-relaxed text-gray-300", path.color)}>
+            <p className={cn("text-2xl font-rajdhani font-medium leading-relaxed text-gray-300", path.color)}>
                 "{path.philosophy}"
             </p>
         </div>
@@ -148,8 +148,18 @@ const PathOverview = ({ path, onEnter }) => (
                 <div className="text-2xl font-bold text-white">{path.sections.flatMap(s => s.modules).length}</div>
                 <div className="text-[10px] text-gray-500 uppercase tracking-widest mt-1">Modules</div>
             </div>
-            <div className="p-4 bg-surface rounded-lg border border-white/5 text-center">
-                <div className="text-2xl font-bold text-white">{path.role}</div>
+            <div className="p-4 bg-surface rounded-lg border border-white/5 text-center flex flex-col items-center justify-center">
+                <div className="text-lg md:text-xl font-bold text-white flex items-center gap-2 justify-center flex-wrap">
+                    {path.role.includes('→') ? (
+                        <>
+                            <span>{path.role.split('→')[0].trim()}</span>
+                            <ArrowRight size={14} className="text-gray-500" />
+                            <span>{path.role.split('→')[1].trim()}</span>
+                        </>
+                    ) : (
+                        path.role
+                    )}
+                </div>
                 <div className="text-[10px] text-gray-500 uppercase tracking-widest mt-1">Role</div>
             </div>
             <div className="p-4 bg-surface rounded-lg border border-white/5 text-center">
@@ -161,8 +171,8 @@ const PathOverview = ({ path, onEnter }) => (
         </div>
 
         <div className="pt-4 pb-4 md:pb-0">
-            <Button onClick={onEnter} className="w-full py-6 text-sm md:text-lg tracking-widest font-bold shadow-[0_0_20px_rgba(0,255,157,0.2)] hover:shadow-[0_0_40px_rgba(0,255,157,0.4)] transition-all flex items-center justify-center">
-                ACCESS CURRICULUM <ChevronRight className="ml-2" />
+            <Button onClick={onEnter} className="w-full py-6 text-sm md:text-lg tracking-widest font-bold shadow-[0_0_20px_rgba(0,255,157,0.2)] hover:shadow-[0_0_40px_rgba(0,255,157,0.4)] transition-all justify-center">
+                ACCESS CURRICULUM
             </Button>
         </div>
     </div>
