@@ -242,7 +242,7 @@ const LearningPaths = () => {
                             >
                                 {/* Admin Indicator */}
                                 {user?.role === 'admin' && (
-                                    <div className="absolute top-4 right-4 z-10 px-3 py-1 bg-red-500/10 text-red-400 border border-red-500/20 text-[10px] font-mono rounded flex items-center gap-2">
+                                    <div className="mb-4 md:mb-0 md:absolute md:top-4 md:right-4 z-10 px-3 py-1 bg-red-500/10 text-red-400 border border-red-500/20 text-[10px] font-mono rounded inline-flex items-center gap-2">
                                         <LockOpen size={12} />
                                         ADMIN OVERRIDE
                                     </div>
