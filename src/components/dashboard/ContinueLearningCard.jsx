@@ -42,7 +42,8 @@ const ContinueLearningCard = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="relative overflow-hidden rounded-2xl bg-surface border border-white/5 p-8 group hover:border-primary/30 transition-colors duration-500"
+            onClick={() => navigate(`/modules/${activeModule.id}`)}
+            className="relative overflow-hidden rounded-2xl bg-surface border border-white/5 p-8 group hover:border-primary/30 transition-colors duration-500 cursor-pointer"
         >
             {/* Background graphic */}
             <div className="absolute right-0 top-0 h-full w-1/3 bg-gradient-to-l from-primary/5 to-transparent skew-x-12 opacity-50 group-hover:opacity-100 transition-opacity duration-500" />
@@ -76,18 +77,7 @@ const ContinueLearningCard = () => {
                     </div>
                 </div>
 
-                <div className="flex flex-col items-end gap-3 shrink-0">
-                    <Button
-                        variant="primary"
-                        size="lg"
-                        onClick={() => navigate(`/modules/${activeModule.id}`)}
-                        className="w-full md:w-auto shadow-[0_0_20px_rgba(0,255,157,0.15)] group-hover:shadow-[0_0_30px_rgba(0,255,157,0.3)]"
-                    >
-                        <Play className="w-4 h-4 mr-2 fill-current" />
-                        Resume Mission
-                    </Button>
-                    <span className="text-xs text-gray-500 font-mono">Module {activeModule.id.toUpperCase()}</span>
-                </div>
+                <span className="text-xs text-gray-500 font-mono border border-white/10 px-2 py-1 rounded">Module {activeModule.id.toUpperCase()}</span>
             </div>
         </motion.div>
     );
