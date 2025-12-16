@@ -57,7 +57,7 @@ const ContinueLearningCard = () => {
                         Active Operation
                     </div>
 
-                    <h2 className="text-3xl font-orbitron font-bold text-white leading-tight">
+                    <h2 className="text-3xl font-bold text-white leading-tight">
                         {activeModule.title}
                     </h2>
 

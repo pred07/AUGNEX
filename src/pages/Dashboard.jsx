@@ -44,7 +44,7 @@ const Dashboard = () => {
                 {/* Module Overview - 2/3 Width */}
                 <section className="lg:col-span-2 space-y-4">
                     <div className="flex items-center justify-between">
-                        <h3 className="text-lg font-orbitron text-gray-300">Available Modules (Forge)</h3>
+                        <h3 className="text-lg text-gray-300">Available Modules (Forge)</h3>
                         <span className="text-xs text-primary font-mono cursor-pointer hover:underline" onClick={() => navigate('/paths')}>VIEW ALL PATHS</span>
                     </div>
 
@@ -79,7 +79,7 @@ const Dashboard = () => {
                                         </span>
                                     </div>
 
-                                    <h4 className={`font-rajdhani font-bold text-lg mb-1 ${status === 'active' ? 'text-white' : 'text-gray-400'}`}>
+                                    <h4 className={`font-bold text-lg mb-1 ${status === 'active' ? 'text-white' : 'text-gray-400'}`}>
                                         {mod.title}
                                     </h4>
                                     <p className="text-xs text-gray-500 font-mono mb-3">{status.toUpperCase()}</p>

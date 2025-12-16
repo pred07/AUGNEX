@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { auth, googleProvider, signInWithPopup } from '../lib/firebase';
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile } from 'firebase/auth';
 
 const AuthContext = createContext(null);
 
@@ -21,45 +22,98 @@ export const AuthProvider = ({ children }) => {
         setIsLoading(false);
     }, []);
 
-    const login = (username, password) => {
-        return new Promise((resolve, reject) => {
-            // Fake network delay for realism
-            setTimeout(() => {
-                if (username === 'admin' && password === 'admin') {
-                    const userData = {
-                        username: 'admin',
-                        role: 'admin', // unrestricted access
-                        rank: 'Architect',
-                        xp: 99999,
-                        publicId: 'AG-88X1',
-                        avatar: 'https://api.dicebear.com/9.x/dylan/svg?seed=admin',
-                        socials: { twitter: '', linkedin: '', website: '' },
-                        lastUsernameChange: null,
-                        // Admin sees everything unlocked
-                    };
-                    setUser(userData);
-                    localStorage.setItem('user', JSON.stringify(userData));
-                    resolve(userData);
-                } else if (username === 'learner' && password === 'learner') {
-                    const userData = {
-                        username: 'learner',
-                        role: 'learner', // restricted access
-                        rank: 'Neophyte',
-                        xp: 0,
-                        publicId: 'AG-22B9',
-                        avatar: 'https://api.dicebear.com/9.x/dylan/svg?seed=learner',
-                        socials: { twitter: '', linkedin: '', website: '' },
-                        lastUsernameChange: null,
-                        // Learner starts fresh
-                    };
-                    setUser(userData);
-                    localStorage.setItem('user', JSON.stringify(userData));
-                    resolve(userData);
-                } else {
-                    reject(new Error('Invalid credentials. Access Denied.'));
-                }
-            }, 800);
-        });
+    const login = async (usernameOrEmail, password) => {
+        // 1. Try Mock Credentials (legacy/demo)
+        if (usernameOrEmail === 'admin' && password === 'admin') {
+            const userData = {
+                username: 'admin',
+                role: 'admin',
+                rank: 'Architect',
+                xp: 99999,
+                publicId: 'AG-88X1',
+                avatar: 'https://api.dicebear.com/9.x/dylan/svg?seed=admin',
+                socials: { twitter: '', linkedin: '', website: '' },
+                lastUsernameChange: null,
+            };
+            setUser(userData);
+            localStorage.setItem('user', JSON.stringify(userData));
+            return userData;
+        }
+
+        if (usernameOrEmail === 'learner' && password === 'learner') {
+            const userData = {
+                username: 'learner',
+                role: 'learner',
+                rank: 'Neophyte',
+                xp: 0,
+                publicId: 'AG-22B9',
+                avatar: 'https://api.dicebear.com/9.x/dylan/svg?seed=learner',
+                socials: { twitter: '', linkedin: '', website: '' },
+                lastUsernameChange: null,
+            };
+            setUser(userData);
+            localStorage.setItem('user', JSON.stringify(userData));
+            return userData;
+        }
+
+        // 2. Try Firebase Auth (Real Users)
+        try {
+            // Note: Firebase requires EMAIL. If the user entered a username here that isn't an email, this will fail.
+            // For now, we assume 'Identity' field contains an email for real users.
+            const userCredential = await signInWithEmailAndPassword(auth, usernameOrEmail, password);
+            const user = userCredential.user;
+
+            const userData = {
+                username: user.displayName || user.email.split('@')[0],
+                role: 'learner',
+                rank: 'Neophyte',
+                xp: 0,
+                publicId: user.uid.slice(0, 8).toUpperCase(),
+                avatar: user.photoURL || `https://api.dicebear.com/9.x/dylan/svg?seed=${user.email}`,
+                socials: { twitter: '', linkedin: '', website: '' },
+                lastUsernameChange: null,
+                authProvider: 'email',
+                email: user.email
+            };
+
+            setUser(userData);
+            localStorage.setItem('user', JSON.stringify(userData));
+            return userData;
+        } catch (error) {
+            console.error("Login Error:", error);
+            throw new Error(error.message);
+        }
+    };
+
+    const register = async (email, password, username) => {
+        try {
+            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+            const user = userCredential.user;
+
+            await updateProfile(user, {
+                displayName: username
+            });
+
+            const userData = {
+                username: username,
+                role: 'learner',
+                rank: 'Neophyte',
+                xp: 0,
+                publicId: user.uid.slice(0, 8).toUpperCase(),
+                avatar: `https://api.dicebear.com/9.x/dylan/svg?seed=${email}`,
+                socials: { twitter: '', linkedin: '', website: '' },
+                lastUsernameChange: null,
+                authProvider: 'email',
+                email: email
+            };
+
+            setUser(userData);
+            localStorage.setItem('user', JSON.stringify(userData));
+            return userData;
+        } catch (error) {
+            console.error("Registration Error:", error);
+            throw error;
+        }
     };
 
     const loginWithGoogle = async () => {
@@ -127,7 +181,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     return (
-        <AuthContext.Provider value={{ user, login, loginWithGoogle, logout, updateUserProfile, isLoading, isAuthenticated: !!user }}>
+        <AuthContext.Provider value={{ user, login, register, loginWithGoogle, logout, updateUserProfile, isLoading, isAuthenticated: !!user }}>
             {children}
         </AuthContext.Provider>
     );

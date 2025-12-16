@@ -38,7 +38,7 @@ const PathCard = ({ path, isSelected, onClick }) => {
                 )}
             </div>
 
-            <h3 className={cn("text-xl font-orbitron font-bold mb-1 transition-colors", isSelected ? "text-white" : "text-gray-400 group-hover:text-gray-200")}>
+            <h3 className={cn("text-xl font-bold mb-1 transition-colors", isSelected ? "text-white" : "text-gray-400 group-hover:text-gray-200")}>
                 {path.title}
             </h3>
             <p className="text-xs font-mono text-gray-500 uppercase tracking-wider mb-4">{path.subtitle}</p>
@@ -73,7 +73,7 @@ const ModuleList = ({ path }) => {
         <div className="space-y-8 pl-4 border-l border-white/5 ml-4 md:ml-0 md:pl-0 md:border-l-0">
             {path.sections.map((section, idx) => (
                 <div key={idx} className="relative">
-                    <h4 className="text-sm font-rajdhani font-bold text-gray-500 uppercase tracking-widest mb-4 flex items-center gap-3">
+                    <h4 className="text-sm font-bold text-gray-500 uppercase tracking-widest mb-4 flex items-center gap-3">
                         <span className="w-8 h-[1px] bg-white/10" />
                         {section.title}
                     </h4>
@@ -145,22 +145,22 @@ const PathOverview = ({ path, onEnter }) => (
 
         <div className="grid grid-cols-3 gap-4">
             <div className="p-4 bg-surface rounded-lg border border-white/5 text-center">
-                <div className="text-2xl font-bold text-white font-orbitron">{path.sections.flatMap(s => s.modules).length}</div>
+                <div className="text-2xl font-bold text-white">{path.sections.flatMap(s => s.modules).length}</div>
                 <div className="text-[10px] text-gray-500 uppercase tracking-widest mt-1">Modules</div>
             </div>
             <div className="p-4 bg-surface rounded-lg border border-white/5 text-center">
-                <div className="text-2xl font-bold text-white font-orbitron">{path.role}</div>
+                <div className="text-2xl font-bold text-white">{path.role}</div>
                 <div className="text-[10px] text-gray-500 uppercase tracking-widest mt-1">Role</div>
             </div>
             <div className="p-4 bg-surface rounded-lg border border-white/5 text-center">
-                <div className="text-2xl font-bold text-white font-orbitron">
+                <div className="text-2xl font-bold text-white">
                     {path.id === 'forge' ? 'BEGINNER' : path.id === 'overwatch' ? 'EXPERT' : 'ADVANCED'}
                 </div>
                 <div className="text-[10px] text-gray-500 uppercase tracking-widest mt-1">Difficulty</div>
             </div>
         </div>
 
-        <div className="pt-4">
+        <div className="pt-4 pb-4 md:pb-0">
             <Button onClick={onEnter} className="w-full py-6 text-lg tracking-widest font-bold shadow-[0_0_20px_rgba(0,255,157,0.2)] hover:shadow-[0_0_40px_rgba(0,255,157,0.4)] transition-all">
                 ACCESS CURRICULUM <ChevronRight className="ml-2" />
             </Button>
@@ -211,7 +211,7 @@ const LearningPaths = () => {
             )}
 
             <div className="space-y-2">
-                <h1 className="text-4xl font-orbitron font-bold text-white">LEARNING PATHS</h1>
+                <h1 className="text-4xl font-bold text-white">LEARNING PATHS</h1>
                 <p className="text-gray-400 font-mono text-sm">Select a specialization. Progress is independent per path.</p>
             </div>
 
@@ -251,10 +251,11 @@ const LearningPaths = () => {
                                 <div className={cn("absolute top-0 right-0 w-64 h-64 bg-gradient-to-bl opacity-10 rounded-bl-[100px] pointer-events-none", selectedPath.color.replace('text-', 'from-'))} />
 
                                 <div className="mb-10">
-                                    <span className={cn("font-mono text-xs border px-2 py-1 rounded mb-4 inline-block", selectedPath.borderColor, selectedPath.color)}>
-                                        CURRENT STATUS: {selectedPath.role}
+                                    <span className={cn("font-mono text-xs border px-2 py-1 rounded mb-4 inline-flex flex-wrap gap-1 items-center max-w-full", selectedPath.borderColor, selectedPath.color)}>
+                                        <span className="whitespace-nowrap">CURRENT STATUS:</span>
+                                        <span className="whitespace-normal text-right md:text-left">{selectedPath.role}</span>
                                     </span>
-                                    <h2 className="text-3xl font-orbitron font-bold text-white mb-2">{selectedPath.title}</h2>
+                                    <h2 className="text-3xl font-bold text-white mb-2">{selectedPath.title}</h2>
 
                                     {/* Progress Bar (Always visible) */}
                                     <div className="w-full bg-white/5 h-1 rounded-full overflow-hidden flex gap-0.5 mt-4">

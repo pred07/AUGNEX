@@ -13,7 +13,8 @@
   h4,
   h5,
   h6 {
-    @apply font-orbitron tracking-wide;
+    /* @apply font-orbitron tracking-wide; - Removed for consistency */
+    @apply tracking-wide;
   }
 }
 
@@ -48,81 +49,86 @@
 .neon-border {
   box-shadow: 0 0 10px rgba(0, 255, 157, 0.2);
 }
+
 /* Markdown Content Styles */
 .prose {
-    @apply text-gray-300 font-inter leading-relaxed max-w-none;
+  @apply text-gray-300 font-inter leading-relaxed max-w-none;
+}
+
+/* Hide the first H1 in markdown content if it duplicates the page title */
+.prose h1:first-child {
+  display: none;
 }
 
 .prose h1 {
-    @apply text-3xl font-orbitron font-bold text-white mb-6 border-b border-white/10 pb-4;
+  @apply text-3xl font-bold text-white mb-6 border-b border-white/10 pb-4;
 }
 
 .prose h2 {
-    @apply text-2xl font-orbitron font-bold text-gray-100 mt-10 mb-4 flex items-center gap-2;
+  @apply text-2xl font-bold text-gray-100 mt-10 mb-4 flex items-start gap-2;
 }
 
 .prose h2::before {
-    content: "#";
-    @apply text-primary/50 text-lg;
+  content: "#";
+  @apply text-primary/50 text-lg;
 }
 
 .prose h3 {
-    @apply text-xl font-rajdhani font-bold text-gray-200 mt-8 mb-3;
+  @apply text-xl font-rajdhani font-bold text-gray-200 mt-8 mb-3;
 }
 
 .prose p {
-    @apply mb-4 text-base;
+  @apply mb-4 text-base;
 }
 
 .prose ul {
-    @apply list-disc list-outside ml-6 mb-6 marker:text-primary;
+  @apply list-disc list-outside ml-6 mb-6 marker:text-primary;
 }
 
 .prose ol {
-    @apply list-decimal list-outside ml-6 mb-6 marker:text-secondary;
+  @apply list-decimal list-outside ml-6 mb-6 marker:text-secondary;
 }
 
 .prose li {
-    @apply mb-2 pl-2;
+  @apply mb-2 pl-2;
 }
 
 .prose strong {
-    @apply text-white font-semibold;
+  @apply text-white font-semibold;
 }
 
 .prose code {
-    @apply font-mono text-sm bg-white/5 px-1.5 py-0.5 rounded text-secondary border border-white/5;
+  @apply font-mono text-sm bg-white/5 px-1.5 py-0.5 rounded text-secondary border border-white/5;
 }
 
 .prose pre {
-    @apply bg-black/40 border border-white/10 rounded-lg p-4 mb-6 overflow-x-auto;
+  @apply bg-black/40 border border-white/10 rounded-lg p-4 mb-6 overflow-x-auto;
 }
 
 .prose pre code {
-    @apply bg-transparent p-0 border-0 text-gray-300 block;
+  @apply bg-transparent p-0 border-0 text-gray-300 block;
 }
 
 .prose blockquote {
-    @apply border-l-4 border-primary/50 bg-primary/5 p-4 rounded-r-lg mb-6 italic text-gray-400;
+  @apply border-l-4 border-primary/50 bg-primary/5 p-4 rounded-r-lg mb-6 italic text-gray-400;
 }
 
 .prose table {
-    @apply w-full text-left border-collapse mb-8;
+  @apply w-full text-left border-collapse mb-8;
 }
 
 .prose th {
-    @apply border-b border-white/10 p-4 font-rajdhani font-bold text-gray-200 uppercase tracking-wider bg-white/5;
+  @apply border-b border-white/10 p-4 font-rajdhani font-bold text-gray-200 uppercase tracking-wider bg-white/5;
 }
 
 .prose td {
-    @apply border-b border-white/5 p-4 text-sm font-mono text-gray-400;
+  @apply border-b border-white/5 p-4 text-sm font-mono text-gray-400;
 }
 
 .prose tr:hover td {
-    @apply bg-white/5 text-gray-200;
+  @apply bg-white/5 text-gray-200;
 }
 
 .prose a {
-    @apply text-primary hover:text-primary/80 transition-colors underline decoration-primary/30 underline-offset-4;
+  @apply text-primary hover:text-primary/80 transition-colors underline decoration-primary/30 underline-offset-4;
 }
-
