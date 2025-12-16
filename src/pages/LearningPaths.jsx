@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { LEARNING_PATHS } from '../data/learningPaths';
-import { ChevronRight, Lock, LockOpen, CheckCircle2, Circle, Award } from 'lucide-react';
+import { ChevronRight, ChevronLeft, ArrowRight, Lock, LockOpen, CheckCircle2, Circle, Award } from 'lucide-react';
 import { cn } from '../lib/utils';
 import Button from '../components/ui/Button';
 import { useNavigate } from 'react-router-dom';
@@ -253,7 +253,17 @@ const LearningPaths = () => {
                                 <div className="mb-10">
                                     <div className={cn("font-mono text-xs border p-2 rounded mb-4 inline-flex flex-col items-start gap-1 max-w-full", selectedPath.borderColor, selectedPath.color)}>
                                         <span className="whitespace-nowrap font-bold opacity-70">CURRENT STATUS:</span>
-                                        <span className="whitespace-normal leading-tight">{selectedPath.role}</span>
+                                        <span className="whitespace-normal leading-tight flex items-center flex-wrap gap-2">
+                                            {selectedPath.role.includes('→') ? (
+                                                <>
+                                                    {selectedPath.role.split('→')[0].trim()}
+                                                    <ArrowRight size={12} />
+                                                    {selectedPath.role.split('→')[1].trim()}
+                                                </>
+                                            ) : (
+                                                selectedPath.role
+                                            )}
+                                        </span>
                                     </div>
                                     <h2 className="text-3xl font-bold text-white mb-2">{selectedPath.title}</h2>
 
@@ -278,8 +288,8 @@ const LearningPaths = () => {
                                     <PathOverview path={selectedPath} onEnter={() => setViewMode('modules')} />
                                 ) : (
                                     <div className="animate-in fade-in slide-in-from-right-8 duration-500">
-                                        <Button variant="ghost" size="sm" onClick={() => setViewMode('overview')} className="mb-6 hover:bg-white/5">
-                                            ← BACK TO MISSION BRIEF
+                                        <Button variant="ghost" size="sm" onClick={() => setViewMode('overview')} className="mb-6 hover:bg-white/5 flex items-center">
+                                            <ChevronLeft className="w-4 h-4 mr-2" /> BACK TO MISSION BRIEF
                                         </Button>
                                         <ModuleList path={selectedPath} />
                                     </div>
