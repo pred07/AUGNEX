@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CheckCircle2, XCircle, ChevronRight, AlertTriangle, ShieldCheck } from 'lucide-react';
 import Button from '../ui/Button';
+import CyberButton from '../ui/CyberButton';
 import { cn } from '../../lib/utils';
 
 const Quiz = ({ data, onComplete }) => {
@@ -53,7 +54,7 @@ const Quiz = ({ data, onComplete }) => {
                     <ShieldCheck size={32} />
                 </div>
                 <div>
-                    <h3 className="text-2xl font-orbitron font-bold text-white mb-2">KNOWLEDGE CHECK</h3>
+                    <h3 className="text-2xl font-bold text-white mb-2">KNOWLEDGE CHECK</h3>
                     <p className="text-gray-400 max-w-md mx-auto">
                         Verify your understanding of the material. You must score 100% to proceed to the next module.
                     </p>
@@ -62,9 +63,9 @@ const Quiz = ({ data, onComplete }) => {
                     <span>{data.questions.length} QUESTIONS</span>
                     <span>100% PASS RATE</span>
                 </div>
-                <Button onClick={handleStart} className="w-full md:w-auto px-12 shadow-[0_0_20px_rgba(0,255,157,0.2)]">
-                    INITIATE SEQUENCE <ChevronRight className="ml-2 w-4 h-4" />
-                </Button>
+                <CyberButton onClick={handleStart} className="w-full md:w-auto px-12 shadow-[0_0_20px_rgba(0,255,157,0.2)]">
+                    INITIATE SEQUENCE
+                </CyberButton>
             </div>
         );
     }
@@ -97,9 +98,9 @@ const Quiz = ({ data, onComplete }) => {
                 </div>
 
                 {passed ? (
-                    <Button onClick={onComplete} className="w-full md:w-auto px-12 animate-pulse shadow-[0_0_30px_rgba(0,255,157,0.4)]">
-                        CONFIRM & PROCEED <ChevronRight className="ml-2 w-4 h-4" />
-                    </Button>
+                    <CyberButton onClick={onComplete} className="w-full md:w-auto px-12 animate-pulse shadow-[0_0_30px_rgba(0,255,157,0.4)]">
+                        CONFIRM & PROCEED
+                    </CyberButton>
                 ) : (
                     <Button onClick={handleRetry} className="w-full md:w-auto px-12 bg-red-500/20 text-red-400 border-red-500/50 hover:bg-red-500/30 hover:text-red-300">
                         RETRY SIMULATION
@@ -158,7 +159,7 @@ const Quiz = ({ data, onComplete }) => {
             </div>
 
             <div className="pt-8 flex justify-end">
-                <Button
+                <CyberButton
                     disabled={selectedOption === null}
                     onClick={handleNext}
                     className={cn(
@@ -166,8 +167,8 @@ const Quiz = ({ data, onComplete }) => {
                         selectedOption === null ? "opacity-50 grayscale" : "opacity-100"
                     )}
                 >
-                    {isLastQuestion ? "FINISH" : "NEXT QUESTION"} <ChevronRight className="ml-2 w-4 h-4" />
-                </Button>
+                    {isLastQuestion ? "FINISH" : "NEXT QUESTION"}
+                </CyberButton>
             </div>
         </div>
     );
