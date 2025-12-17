@@ -7,14 +7,14 @@ export default {
     theme: {
         extend: {
             colors: {
-                background: "var(--bg-background)",
-                surface: "var(--bg-surface)",
-                primary: "var(--c-primary)",
-                secondary: "var(--c-secondary)",
-                accent: "var(--c-accent)",
-                muted: "var(--c-muted)",
-                border: "var(--c-border)",
-                'text-main': "var(--c-text-main)",
+                background: "rgb(var(--bg-background) / <alpha-value>)",
+                surface: "rgb(var(--bg-surface) / <alpha-value>)",
+                primary: "rgb(var(--c-primary) / <alpha-value>)",
+                secondary: "rgb(var(--c-secondary) / <alpha-value>)",
+                accent: "rgb(var(--c-accent) / <alpha-value>)",
+                muted: "rgb(var(--c-muted) / <alpha-value>)",
+                border: "rgb(var(--c-border) / <alpha-value>)",
+                'text-main': "rgb(var(--c-text-main) / <alpha-value>)",
             },
             fontFamily: {
                 orbitron: ['Orbitron', 'sans-serif'],
