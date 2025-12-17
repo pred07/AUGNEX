@@ -1,57 +1,145 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronRight, Globe, AlertTriangle, Database } from 'lucide-react';
+import { ChevronRight, Globe, AlertTriangle, Database, Shield } from 'lucide-react';
+import Parser from 'rss-parser';
 
-const NEWS_ITEMS = [
-    {
-        id: 1,
-        category: "Vulnerability",
-        title: "Zero-Day in popular RDP client detected",
-        date: "2 HOURS AGO",
-        icon: AlertTriangle,
-        color: "text-accent"
-    },
-    {
-        id: 2,
-        category: "Industry",
-        title: "Global cyber alliance forms new defensive pact",
-        date: "1 DAY AGO",
-        icon: Globe,
-        color: "text-secondary"
-    },
-    {
-        id: 3,
-        category: "Patch Note",
-        title: "Platform Update v2.4: New 'Red Team' tools added",
-        date: "12 HOURS AGO",
-        icon: Database,
-        color: "text-primary"
-    }
+const RSS_FEEDS = [
+    { key: "The Hacker News", url: "https://feeds.feedburner.com/TheHackersNews" },
+    { key: "Bleeping Computer", url: "https://www.bleepingcomputer.com/feed/" }
 ];
 
+// CORS proxy to bypass browser restrictions
+const CORS_PROXY = "https://api.allorigins.win/get?url=";
+
 const NewsCarousel = () => {
+    const [newsItems, setNewsItems] = useState([]);
     const [currentIndex, setCurrentIndex] = useState(0);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
     useEffect(() => {
-        const timer = setInterval(() => {
-            setCurrentIndex((prev) => (prev + 1) % NEWS_ITEMS.length);
-        }, 5000);
-        return () => clearInterval(timer);
+        const fetchNews = async () => {
+            try {
+                const parser = new Parser();
+                const allNews = [];
+
+                for (const feed of RSS_FEEDS) {
+                    try {
+                        const response = await fetch(`${CORS_PROXY}${encodeURIComponent(feed.url)}`);
+                        const data = await response.json();
+
+                        // Parse the XML content returned by the proxy
+                        const feedData = await parser.parseString(data.contents);
+
+                        feedData.items.forEach(item => {
+                            allNews.push({
+                                title: item.title,
+                                link: item.link,
+                                date: new Date(item.pubDate),
+                                source: feed.key,
+                                snippet: item.contentSnippet || item.content,
+                                category: "Cyber Intel",
+                                icon: Shield,
+                                color: "text-primary"
+                            });
+                        });
+                    } catch (err) {
+                        console.error(`Failed to fetch ${feed.key}:`, err);
+                        // Continue fetching other feeds even if one fails
+                    }
+                }
+
+                // Sort by date (newest first) and take top 5
+                const sortedNews = allNews
+                    .sort((a, b) => b.date - a.date)
+                    .slice(0, 5);
+
+                if (sortedNews.length > 0) {
+                    setNewsItems(sortedNews);
+                } else {
+                    setError("No news feeds available");
+                }
+            } catch (err) {
+                setError("Failed to initialize intelligence feed");
+                console.error(err);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchNews();
     }, []);
 
-    const currentItem = NEWS_ITEMS[currentIndex];
-    // Helper to get Icon component
+    useEffect(() => {
+        if (newsItems.length === 0) return;
+
+        const timer = setInterval(() => {
+            setCurrentIndex((prev) => (prev + 1) % newsItems.length);
+        }, 8000); // 8 seconds per slide for reading time
+        return () => clearInterval(timer);
+    }, [newsItems]);
+
+    const formatTimeAgo = (date) => {
+        const seconds = Math.floor((new Date() - date) / 1000);
+        let interval = seconds / 31536000;
+        if (interval > 1) return Math.floor(interval) + " YEARS AGO";
+        interval = seconds / 2592000;
+        if (interval > 1) return Math.floor(interval) + " MONTHS AGO";
+        interval = seconds / 86400;
+        if (interval > 1) return Math.floor(interval) + " DAYS AGO";
+        interval = seconds / 3600;
+        if (interval > 1) return Math.floor(interval) + " HOURS AGO";
+        interval = seconds / 60;
+        if (interval > 1) return Math.floor(interval) + " MINS AGO";
+        return "JUST NOW";
+    };
+
+    if (loading) {
+        return (
+            <div className="bg-surface/30 border border-white/5 rounded-xl p-4 md:p-6 h-full flex items-center justify-center">
+                <div className="flex flex-col items-center gap-2">
+                    <div className="w-8 h-8 relative">
+                        <motion.div
+                            className="absolute inset-0 border-2 border-primary/30 rounded-full"
+                            animate={{ scale: [1, 1.2, 1], opacity: [0.5, 0, 0.5] }}
+                            transition={{ duration: 2, repeat: Infinity }}
+                        />
+                        <div className="absolute inset-0 border-2 border-t-primary rounded-full animate-spin" />
+                    </div>
+                    <span className="text-xs font-mono text-primary/70 animate-pulse">ESTABLISHING UPLINK...</span>
+                </div>
+            </div>
+        );
+    }
+
+    if (error || newsItems.length === 0) {
+        return (
+            <div className="bg-surface/30 border border-white/5 rounded-xl p-4 md:p-6 h-full flex items-center justify-center">
+                <div className="text-center">
+                    <AlertTriangle className="w-8 h-8 text-accent mx-auto mb-2" />
+                    <p className="text-xs font-mono text-muted">FEED DISCONNECTED</p>
+                </div>
+            </div>
+        );
+    }
+
+    const currentItem = newsItems[currentIndex];
     const Icon = currentItem.icon;
 
     return (
         <div className="bg-surface/30 border border-white/5 rounded-xl p-4 md:p-6 relative overflow-hidden h-full flex flex-col">
             <div className="flex justify-between items-center mb-4">
-                <h3 className="text-sm font-rajdhani font-bold text-muted uppercase tracking-wider">Intel Feed</h3>
+                <h3 className="text-sm font-rajdhani font-bold text-muted uppercase tracking-wider flex items-center gap-2">
+                    <Globe size={14} className="text-primary animate-pulse" />
+                    Global Intel
+                </h3>
                 <div className="flex gap-1">
-                    {NEWS_ITEMS.map((_, idx) => (
+                    {newsItems.map((_, idx) => (
                         <div
                             key={idx}
-                            className={`w-8 h-1 rounded-full transition-colors duration-300 ${idx === currentIndex ? 'bg-primary' : 'bg-white/10'}`}
+                            onClick={() => setCurrentIndex(idx)}
+                            className={`h-1 rounded-full transition-colors duration-300 cursor-pointer ${idx === currentIndex ? 'bg-primary w-6' : 'bg-white/10 w-2 hover:bg-white/30'
+                                }`}
                         />
                     ))}
                 </div>
@@ -67,19 +155,34 @@ const NewsCarousel = () => {
                         transition={{ duration: 0.4 }}
                         className="flex flex-col gap-3 h-full justify-center"
                     >
-                        <div className={`p-2 w-fit rounded bg-white/5 ${currentItem.color}`}>
-                            <Icon size={24} />
+                        <div className="flex items-start justify-between">
+                            <div className="flex items-center gap-2 text-xs font-mono text-primary/80">
+                                <span>{currentItem.source}</span>
+                                <span className="w-1 h-1 rounded-full bg-current opacity-50" />
+                                <span>{formatTimeAgo(currentItem.date)}</span>
+                            </div>
                         </div>
-                        <span className={`text-xs font-mono mb-1 ${currentItem.color}`}>{currentItem.category} • {currentItem.date}</span>
-                        <h4 className="text-lg md:text-xl font-bold font-orbitron text-text-main leading-snug hover:text-primary transition-colors cursor-pointer">
+
+                        <h4
+                            onClick={() => window.open(currentItem.link, '_blank')}
+                            className="text-lg md:text-xl font-bold font-orbitron text-text-main leading-snug hover:text-primary transition-colors cursor-pointer line-clamp-3"
+                        >
                             {currentItem.title}
                         </h4>
+
+                        <div
+                            className="text-sm text-muted line-clamp-2 font-inter opacity-70"
+                            dangerouslySetInnerHTML={{ __html: currentItem.snippet }} // Note: RSS snippets can contain HTML
+                        />
                     </motion.div>
                 </AnimatePresence>
             </div>
 
-            <div className="mt-4 pt-4 border-t border-white/5 flex gap-2 items-center text-xs text-muted hover:text-text-main transition-colors cursor-pointer group">
-                <span>READ FULL REPORT</span>
+            <div
+                onClick={() => window.open(currentItem.link, '_blank')}
+                className="mt-4 pt-4 border-t border-white/5 flex gap-2 items-center text-xs text-muted hover:text-text-main transition-colors cursor-pointer group"
+            >
+                <span>ACCESS FULL INTELLIGENCE</span>
                 <ChevronRight size={14} className="group-hover:translate-x-1 transition-transform" />
             </div>
         </div>
