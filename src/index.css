@@ -35,7 +35,11 @@
   body {
     background-color: rgb(var(--bg-background));
     color: rgb(var(--c-text-main));
-    @apply font-inter antialiased selection:bg-primary/20 selection:text-primary transition-colors duration-300;
+    @apply font-inter antialiased transition-colors duration-300;
+  }
+
+  ::selection {
+    @apply bg-primary/20 text-primary;
   }
 
 
