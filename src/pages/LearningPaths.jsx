@@ -1,233 +1,157 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { LEARNING_PATHS } from '../data/learningPaths';
-import { ChevronRight, ChevronLeft, ArrowRight, Lock, LockOpen, CheckCircle2, Circle, Award } from 'lucide-react';
+import {
+    ChevronRight, ChevronDown, Lock, CheckCircle2, Circle,
+    Shield, Terminal, Play, FileCode, MonitorPlay, Flag,
+    ArrowRight, Globe
+} from 'lucide-react';
 import { cn } from '../lib/utils';
 import Button from '../components/ui/Button';
-import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useProgress } from '../context/ProgressContext';
-import Certificate from '../components/social/Certificate';
+import { useNavigate } from 'react-router-dom';
 
 const PathCard = ({ path, isSelected, onClick }) => {
     const Icon = path.icon;
 
     return (
-        <motion.div
-            layout
+        <div
             onClick={onClick}
             className={cn(
-                "cursor-pointer group relative overflow-hidden rounded-xl border p-6 transition-all duration-300",
+                "group relative cursor-pointer border rounded-lg p-6 transition-all duration-300 overflow-hidden",
                 isSelected
-                    ? `bg-surface/80 ${path.borderColor} shadow-[0_0_30px_-10px_rgba(0,0,0,0.5)]`
+                    ? `bg-surface border-${path.color.split('-')[1]}-500/50`
                     : "bg-surface/30 border-white/5 hover:border-white/10 hover:bg-surface/50"
             )}
         >
             {isSelected && (
-                <div className={cn("absolute inset-0 opacity-10 pointer-events-none bg-gradient-to-br from-transparent via-transparent to-current", path.color)} />
+                <div className={cn("absolute inset-0 opacity-5 bg-gradient-to-r pointer-events-none", path.color.replace('text-', 'from-'))} />
             )}
 
-            <div className="flex items-start justify-between mb-4">
-                <div className={cn("p-3 rounded-lg bg-surface border border-white/5 transition-colors", isSelected ? path.color : "text-gray-500 group-hover:text-gray-300")}>
-                    <Icon size={24} />
+            <div className="flex items-start justify-between relative z-10">
+                <div className="flex items-center gap-4">
+                    <div className={cn(
+                        "p-3 rounded-md bg-black/50 border border-white/10 transition-colors",
+                        isSelected ? path.color : "text-gray-500 group-hover:text-gray-300"
+                    )}>
+                        <Icon size={24} />
+                    </div>
+                    <div>
+                        <h3 className={cn(
+                            "text-xl font-bold font-rajdhani uppercase tracking-wide",
+                            isSelected ? "text-white" : "text-gray-400 group-hover:text-white"
+                        )}>
+                            {path.title}
+                        </h3>
+                        <p className="text-xs font-mono text-gray-500">{path.subtitle}</p>
+                    </div>
                 </div>
-                {path.label && (
-                    <span className={cn("text-[10px] uppercase font-mono tracking-widest px-2 py-1 rounded border border-white/5", path.color)}>
-                        {path.label}
-                    </span>
-                )}
+
+                {isSelected ? <ChevronDown className="text-primary animate-bounce" /> : <ChevronRight className="text-gray-600 group-hover:text-gray-400" />}
+            </div>
+        </div>
+    );
+};
+
+// Module Item Component for the HUD List
+const ModuleItem = ({ module, status, pathColor, index }) => {
+    const navigate = useNavigate();
+    const getIcon = () => {
+        switch (module.type) {
+            case 'lab': return <MonitorPlay size={14} />;
+            case 'ctf': return <Flag size={14} />;
+            case 'theory':
+            default: return <FileCode size={14} />;
+        }
+    };
+
+    return (
+        <motion.div
+            initial={{ opacity: 0, x: -10 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: index * 0.05 }}
+            onClick={() => status !== 'locked' && navigate(`/modules/${module.id}`)}
+            className={cn(
+                "flex items-center justify-between p-3 border-b border-white/5 last:border-0 hover:bg-white/5 transition-colors group",
+                status === 'locked' ? "opacity-50 cursor-not-allowed" : "cursor-pointer"
+            )}
+        >
+            <div className="flex items-center gap-3">
+                <div className={cn(
+                    "w-6 h-6 rounded flex items-center justify-center border",
+                    status === 'completed' ? "bg-primary/20 border-primary text-primary" :
+                        status === 'locked' ? "border-white/10 text-gray-600 bg-black/20" :
+                            `border-white/20 text-white bg-black/40`
+                )}>
+                    {status === 'completed' ? <CheckCircle2 size={12} /> :
+                        status === 'locked' ? <Lock size={12} /> :
+                            <span className={cn("w-1.5 h-1.5 rounded-full", pathColor.replace('text-', 'bg-'))} />}
+                </div>
+                <div>
+                    <div className="text-sm font-medium text-gray-300 group-hover:text-white transition-colors">
+                        {module.title}
+                    </div>
+                    <div className="flex items-center gap-2 text-[10px] font-mono text-gray-500">
+                        <span className="flex items-center gap-1 uppercase">{getIcon()} {module.type || 'THEORY'}</span>
+                        <span>•</span>
+                        <span>{module.duration}</span>
+                    </div>
+                </div>
             </div>
 
-            <h3 className={cn("text-xl font-bold mb-1 transition-colors", isSelected ? "text-white" : "text-gray-400 group-hover:text-gray-200")}>
-                {path.title}
-            </h3>
-            <p className="text-xs font-mono text-gray-500 uppercase tracking-wider mb-4">{path.subtitle}</p>
-
-            {isSelected && (
-                <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: 'auto' }}
-                    className="space-y-4"
-                >
-                    <p className={cn("text-sm font-mono tracking-wide", path.color)}>"{path.philosophy}"</p>
-                    <p className="text-gray-400 text-sm leading-relaxed">{path.description}</p>
-
-                    <div className="pt-4 flex items-center gap-4">
-                        <Button variant="ghost" className={cn("border w-full md:w-auto justify-center", path.borderColor, path.color, "hover:bg-white/5")} size="sm">
-                            ENTER PATH
-                        </Button>
-                    </div>
-                </motion.div>
-            )}
+            <div className="flex items-center gap-4">
+                <div className={cn(
+                    "text-[10px] font-mono px-1.5 py-0.5 rounded border border-white/5",
+                    status === 'completed' ? "text-primary border-primary/20" : "text-gray-600"
+                )}>
+                    {module.xp} XP
+                </div>
+                {status === 'active' && <Play size={14} className={cn("animate-pulse", pathColor)} />}
+            </div>
         </motion.div>
     );
 };
 
-const ModuleList = ({ path }) => {
-    const { isModuleLocked, isModuleCompleted } = useProgress();
-    const { user } = useAuth();
-    const isAdmin = user?.role === 'admin';
-    const navigate = useNavigate();
-
-    return (
-        <div className="space-y-8 pl-4 border-l border-white/5 ml-4 md:ml-0 md:pl-0 md:border-l-0">
-            {path.sections.map((section, idx) => (
-                <div key={idx} className="relative">
-                    <h4 className="text-sm font-bold text-gray-500 uppercase tracking-widest mb-4 flex items-center gap-3">
-                        <span className="w-8 h-[1px] bg-white/10" />
-                        {section.title}
-                    </h4>
-
-                    <div className="grid gap-3">
-                        {section.modules.map((module) => {
-                            const locked = isModuleLocked(path.id, module.id);
-                            const completed = isModuleCompleted(path.id, module.id);
-
-                            return (
-                                <div
-                                    key={module.id}
-                                    onClick={() => !locked && navigate(`/modules/${module.id}`)}
-                                    className={cn(
-                                        "p-4 rounded border flex items-center justify-between group transition-all",
-                                        !locked ? "cursor-pointer hover:border-primary/50" : "cursor-not-allowed",
-                                        completed ? "bg-primary/5 border-primary/20 text-gray-300" :
-                                            !locked ? "bg-surface border-white/10 text-white shadow-lg" :
-                                                "bg-transparent border-transparent text-gray-600 opacity-60"
-                                    )}
-                                >
-                                    <div className="flex items-center gap-3">
-                                        {completed && <CheckCircle2 size={16} className="text-primary" />}
-                                        {!completed && !locked && <Circle size={16} className={cn("animate-pulse", path.color)} />}
-                                        {locked && <Lock size={16} />}
-                                        <span className="font-mono text-sm">{module.title}</span>
-                                    </div>
-
-                                    {!locked && !completed && (
-                                        <Button size="sm" variant="ghost" className="h-8 text-[10px] border border-white/10 hover:border-white/30">
-                                            START
-                                        </Button>
-                                    )}
-                                    {!locked && completed && (
-                                        <Button size="sm" variant="ghost" className="h-8 text-[10px] text-primary hover:bg-primary/10">
-                                            REVIEW
-                                        </Button>
-                                    )}
-                                    {locked && isAdmin && (
-                                        <span className="text-[10px] text-red-500 font-mono border border-red-500/30 px-2 py-0.5 rounded">
-                                            ADMIN UNLOCKED
-                                        </span>
-                                    )}
-                                </div>
-                            );
-                        })}
-                    </div>
-                </div>
-            ))}
-        </div>
-    );
-};
-
-const PathOverview = ({ path, onEnter }) => (
-    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-        <div className="space-y-4">
-            <h3 className="text-xl text-primary font-mono uppercase tracking-widest">Mission Briefing</h3>
-            <p className={cn("text-2xl font-rajdhani font-medium leading-relaxed text-gray-300", path.color)}>
-                "{path.philosophy}"
-            </p>
-        </div>
-
-        <div className="p-6 bg-white/5 rounded-xl border border-white/10 space-y-4">
-            <h4 className="text-sm font-bold text-gray-400 uppercase tracking-widest">Operational Context</h4>
-            <p className="text-gray-300 leading-relaxed text-lg">
-                {path.description}
-            </p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="p-4 bg-surface rounded-lg border border-white/5 text-center">
-                <div className="text-2xl font-bold text-white">{path.sections.flatMap(s => s.modules).length}</div>
-                <div className="text-[10px] text-gray-500 uppercase tracking-widest mt-1">Modules</div>
-            </div>
-            <div className="p-4 bg-surface rounded-lg border border-white/5 text-center flex flex-col items-center justify-center">
-                <div className="text-lg md:text-xl font-bold text-white flex items-center gap-2 justify-center flex-wrap">
-                    {path.role.includes('→') ? (
-                        <>
-                            <span>{path.role.split('→')[0].trim()}</span>
-                            <ArrowRight size={14} className="text-gray-500" />
-                            <span>{path.role.split('→')[1].trim()}</span>
-                        </>
-                    ) : (
-                        path.role
-                    )}
-                </div>
-                <div className="text-[10px] text-gray-500 uppercase tracking-widest mt-1">Role</div>
-            </div>
-            <div className="p-4 bg-surface rounded-lg border border-white/5 text-center">
-                <div className="text-2xl font-bold text-white">
-                    {path.id === 'forge' ? 'BEGINNER' : path.id === 'overwatch' ? 'EXPERT' : 'ADVANCED'}
-                </div>
-                <div className="text-[10px] text-gray-500 uppercase tracking-widest mt-1">Difficulty</div>
-            </div>
-        </div>
-
-        <div className="pt-4 pb-4 md:pb-0">
-            <Button onClick={onEnter} className="w-full py-6 text-sm md:text-lg tracking-widest font-bold shadow-[0_0_20px_rgba(0,255,157,0.2)] hover:shadow-[0_0_40px_rgba(0,255,157,0.4)] transition-all justify-center">
-                ACCESS CURRICULUM
-            </Button>
-        </div>
-    </div>
-);
-
 const LearningPaths = () => {
     const [selectedPathId, setSelectedPathId] = useState('forge');
-    const [viewMode, setViewMode] = useState('overview'); // 'overview' | 'modules'
-    const [showCert, setShowCert] = useState(false);
     const { user } = useAuth();
-    const { isModuleCompleted } = useProgress();
-    const detailRef = useRef(null);
+    const { isModuleLocked, isModuleCompleted, progress } = useProgress();
+    const scrollRef = useRef(null);
 
     const selectedPath = LEARNING_PATHS.find(p => p.id === selectedPathId);
 
-    // Calculate completion for selected path
+    // Stats
     const totalModules = selectedPath?.sections.flatMap(s => s.modules).length || 0;
     const completedCount = selectedPath?.sections.flatMap(s => s.modules).filter(m => isModuleCompleted(selectedPath.id, m.id)).length || 0;
-    const completionPercent = totalModules > 0 ? Math.round((completedCount / totalModules) * 100) : 0;
-    const isPathComplete = completionPercent === 100;
-
-    // Reset view when path changes
-    useEffect(() => {
-        setViewMode('overview');
-        setShowCert(false);
-    }, [selectedPathId]);
-
-    // Auto-scroll to details on mobile when path changes
-    useEffect(() => {
-        if (window.innerWidth < 1024 && detailRef.current) {
-            setTimeout(() => {
-                detailRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }, 100);
-        }
-    }, [selectedPathId]);
+    const progressPercent = totalModules > 0 ? Math.round((completedCount / totalModules) * 100) : 0;
 
     return (
-        <div className="max-w-6xl mx-auto space-y-10">
-            {showCert && (
-                <Certificate
-                    user={user}
-                    path={selectedPath}
-                    date={new Date().toLocaleDateString()}
-                    onClose={() => setShowCert(false)}
-                />
-            )}
-
-            <div className="space-y-2">
-                <h1 className="text-4xl font-bold text-white">LEARNING PATHS</h1>
-                <p className="text-gray-400 font-mono text-sm">Select a specialization. Progress is independent per path.</p>
+        <div className="max-w-7xl mx-auto min-h-screen pb-20">
+            {/* Header */}
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 gap-4">
+                <div>
+                    <h1 className="text-4xl font-bold font-orbitron text-white mb-2">OPERATIONAL PATHWAYS</h1>
+                    <p className="text-gray-400 font-mono text-sm uppercase tracking-widest">
+                        Select Protocol // Init Sequence
+                    </p>
+                </div>
+                <div className="flex gap-4 text-xs font-mono text-gray-500">
+                    <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 rounded-full bg-cyan-400"></div> FORGE
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 rounded-full bg-red-500"></div> EXPLOIT
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 rounded-full bg-blue-500"></div> PROTECT
+                    </div>
+                </div>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-                {/* Path Selection List */}
-                <div className="lg:col-span-4 flex flex-col gap-4">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                {/* Left Panel: Path Selection */}
+                <div className="lg:col-span-4 space-y-4">
                     {LEARNING_PATHS.map((path) => (
                         <PathCard
                             key={path.id}
@@ -236,82 +160,102 @@ const LearningPaths = () => {
                             onClick={() => setSelectedPathId(path.id)}
                         />
                     ))}
+
+                    <div className="mt-8 p-6 rounded-lg border border-white/5 bg-black/20 backdrop-blur-sm">
+                        <h4 className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-4">Global Status</h4>
+                        <div className="space-y-4">
+                            <div className="flex justify-between text-xs text-gray-400 font-mono">
+                                <span>TOTAL XP EARNED</span>
+                                <span className="text-white">1,250</span>
+                            </div>
+                            <div className="flex justify-between text-xs text-gray-400 font-mono">
+                                <span>MODULES CLEARED</span>
+                                <span className="text-white">12</span>
+                            </div>
+                            <div className="flex justify-between text-xs text-gray-400 font-mono">
+                                <span>CURRENT RANK</span>
+                                <span className="text-cyan-400">SCRIPT KIDDIE</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-                {/* Path Detail View */}
-                <div className="lg:col-span-8" ref={detailRef}>
+                {/* Right Panel: HUD/Content */}
+                <div className="lg:col-span-8">
                     <AnimatePresence mode="wait">
                         {selectedPath && (
                             <motion.div
-                                key={`${selectedPath.id}-${viewMode}`}
+                                key={selectedPath.id}
                                 initial={{ opacity: 0, x: 20 }}
                                 animate={{ opacity: 1, x: 0 }}
                                 exit={{ opacity: 0, x: -20 }}
-                                transition={{ duration: 0.3 }}
-                                className="bg-surface/30 border border-white/5 rounded-2xl p-4 md:p-8 min-h-[600px] relative overflow-hidden"
+                                className="bg-surface/40 backdrop-blur-md border border-white/10 rounded-xl overflow-hidden shadow-2xl"
                             >
-                                {/* Admin Indicator */}
-                                {user?.role === 'admin' && (
-                                    <div className="mb-4 md:mb-0 md:absolute md:top-4 md:right-4 z-10 px-3 py-1 bg-red-500/10 text-red-400 border border-red-500/20 text-[10px] font-mono rounded inline-flex items-center gap-2">
-                                        <LockOpen size={12} />
-                                        ADMIN OVERRIDE
-                                    </div>
-                                )}
-                                {/* Decorative Backdrops */}
-                                <div className={cn("absolute top-0 right-0 w-64 h-64 bg-gradient-to-bl opacity-10 rounded-bl-[100px] pointer-events-none", selectedPath.color.replace('text-', 'from-'))} />
+                                {/* HUD Header */}
+                                <div className="p-8 border-b border-white/10 relative overflow-hidden">
+                                    <div className={cn("absolute top-0 right-0 p-32 opacity-10 blur-3xl rounded-full translate-x-12 -translate-y-12", selectedPath.color.replace('text-', 'bg-'))} />
 
-                                <div className="mb-10">
-                                    <div className={cn("font-mono text-xs border p-2 rounded mb-4 inline-flex flex-col items-start gap-1 max-w-full", selectedPath.borderColor, selectedPath.color)}>
-                                        <span className="whitespace-nowrap font-bold opacity-70">CURRENT STATUS:</span>
-                                        <span className="whitespace-normal leading-tight flex items-center flex-wrap gap-2">
-                                            {selectedPath.role.includes('→') ? (
-                                                <>
-                                                    {selectedPath.role.split('→')[0].trim()}
-                                                    <ArrowRight size={12} />
-                                                    {selectedPath.role.split('→')[1].trim()}
-                                                </>
-                                            ) : (
-                                                selectedPath.role
-                                            )}
-                                        </span>
-                                    </div>
-                                    <h2 className="text-3xl font-bold text-white mb-2">{selectedPath.title}</h2>
-
-                                    {/* Progress Bar (Always visible) */}
-                                    <div className="w-full bg-white/5 h-1 rounded-full overflow-hidden flex gap-0.5 mt-4">
-                                        <div
-                                            className={cn("h-full transition-all duration-1000", selectedPath.color.replace('text-', 'bg-'))}
-                                            style={{ width: `${completionPercent}%` }}
-                                        />
-                                    </div>
-
-                                    {isPathComplete && (
-                                        <div className="mt-4 animate-in fade-in slide-in-from-top-2">
-                                            <Button onClick={() => setShowCert(true)} className="w-full bg-gradient-to-r from-yellow-600 to-yellow-400 text-black font-bold shadow-[0_0_20px_rgba(255,215,0,0.3)] hover:shadow-[0_0_30px_rgba(255,215,0,0.5)] border-0">
-                                                <Award className="mr-2" /> CLAIM {selectedPath.title.toUpperCase()} CERTIFICATE
-                                            </Button>
+                                    <div className="relative z-10">
+                                        <div className="flex justify-between items-start mb-6">
+                                            <div>
+                                                <div className={cn("inline-flex items-center gap-2 px-2 py-0.5 rounded border border-white/10 text-[10px] font-mono uppercase tracking-widest mb-2", selectedPath.color, selectedPath.borderColor)}>
+                                                    <Globe size={10} />
+                                                    <span>ACTIVE PROTOCOL</span>
+                                                </div>
+                                                <h2 className="text-3xl font-bold text-white mb-2">{selectedPath.title}</h2>
+                                                <p className="text-gray-400 text-sm max-w-xl">{selectedPath.description}</p>
+                                            </div>
+                                            <div className="text-right hidden md:block">
+                                                <div className="text-3xl font-bold font-mono text-white">{progressPercent}%</div>
+                                                <div className="text-[10px] text-gray-500 uppercase tracking-widest">COMPLETION</div>
+                                            </div>
                                         </div>
-                                    )}
+
+                                        {/* Progress Line */}
+                                        <div className="h-[2px] w-full bg-white/10 rounded-full overflow-hidden">
+                                            <motion.div
+                                                className={cn("h-full", selectedPath.color.replace('text-', 'bg-'))}
+                                                initial={{ width: 0 }}
+                                                animate={{ width: `${progressPercent}%` }}
+                                                transition={{ duration: 1 }}
+                                            />
+                                        </div>
+                                    </div>
                                 </div>
 
-                                {viewMode === 'overview' ? (
-                                    <PathOverview path={selectedPath} onEnter={() => setViewMode('modules')} />
-                                ) : (
-                                    <div className="animate-in fade-in slide-in-from-right-8 duration-500">
-                                        <Button variant="ghost" size="sm" onClick={() => setViewMode('overview')} className="mb-6 hover:bg-white/5 flex items-center">
-                                            <ChevronLeft className="w-4 h-4 mr-2" /> BACK TO MISSION BRIEF
-                                        </Button>
-                                        <ModuleList path={selectedPath} />
-                                    </div>
-                                )}
+                                {/* Scrollable Module List */}
+                                <div className="max-h-[600px] overflow-y-auto p-6 space-y-8 custom-scrollbar">
+                                    {selectedPath.sections.map((section, sIdx) => (
+                                        <div key={sIdx}>
+                                            <h4 className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-3 flex items-center gap-2">
+                                                <span className="w-1.5 h-1.5 bg-gray-600 rounded-sm" />
+                                                {section.title}
+                                            </h4>
+                                            <div className="bg-black/20 border border-white/5 rounded-lg overflow-hidden">
+                                                {section.modules.map((module, mIdx) => {
+                                                    const locked = isModuleLocked(selectedPath.id, module.id);
+                                                    const completed = isModuleCompleted(selectedPath.id, module.id);
+                                                    const status = completed ? 'completed' : locked ? 'locked' : 'active';
 
-                                <div className="mt-12 p-6 border border-white/5 rounded-xl bg-background/50 text-center">
-                                    <p className="text-gray-500 font-mono text-xs mb-4">PROGRESSION PROTOCOL IN EFFECT</p>
-                                    <p className="text-gray-400 text-sm max-w-lg mx-auto">
-                                        {user?.role === 'admin'
-                                            ? "Command Override Active. You have unrestricted access to all modules."
-                                            : "Modules must be completed in sequence. Master the fundamentals before advancing."}
-                                    </p>
+                                                    return (
+                                                        <ModuleItem
+                                                            key={module.id}
+                                                            module={module}
+                                                            status={status}
+                                                            pathColor={selectedPath.color}
+                                                            index={mIdx}
+                                                        />
+                                                    );
+                                                })}
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+
+                                {/* Footer / Actions */}
+                                <div className="p-4 border-t border-white/10 bg-black/40 flex justify-between items-center text-[10px] font-mono text-gray-500">
+                                    <span>SECURE CONNECTION ESTABLISHED</span>
+                                    <span>ID: {user?.uid || 'ANONYMOUS'}</span>
                                 </div>
                             </motion.div>
                         )}

@@ -77,7 +77,7 @@ export const ProgressProvider = ({ children }) => {
         }
     };
 
-    const markModuleComplete = (pathId, moduleId) => {
+    const markModuleComplete = (pathId, moduleId, xpReward = 100) => {
         setProgress(prev => {
             const pathProgress = prev[pathId] || [];
             if (!pathProgress.includes(moduleId)) {
@@ -86,10 +86,9 @@ export const ProgressProvider = ({ children }) => {
                     [pathId]: [...pathProgress, moduleId]
                 };
 
-                // Award base XP for module completion
-                const MODULE_XP_REWARD = 100;
+                // Award XP for module completion
                 setXp(currentXp => {
-                    const updatedXp = currentXp + MODULE_XP_REWARD;
+                    const updatedXp = currentXp + xpReward;
                     // Check achievements AFTER state update would technically be better with useEffect,
                     // but passing calculated values for immediate feedback
                     checkAchievements(newProgress, updatedXp);
