@@ -3,45 +3,154 @@ import { useAuth } from './AuthContext';
 import { LEARNING_PATHS } from '../data/learningPaths';
 import { RANKS, MEDALS } from '../data/achievements';
 import { BADGES, getBadgeByPathId } from '../data/badges';
+import {
+    getUserProgress,
+    completeModule as firestoreCompleteModule,
+    awardBadge as firestoreAwardBadge,
+    awardMedal as firestoreAwardMedal,
+    updateLastActive
+} from '../lib/firestoreService';
 
 const ProgressContext = createContext(null);
 
 export const ProgressProvider = ({ children }) => {
     const { user } = useAuth();
-    // Map of pathId -> Set of completed moduleIds
+
+    // State
     const [progress, setProgress] = useState({});
     const [xp, setXp] = useState(0);
     const [unlockedMedals, setUnlockedMedals] = useState([]);
     const [unlockedBadges, setUnlockedBadges] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [isSyncing, setIsSyncing] = useState(false);
 
-    // Load progress from local storage on mount
+    // Load progress from Firestore when user logs in
     useEffect(() => {
-        const storedProgress = localStorage.getItem('nytvnt_progress');
-        const storedXp = localStorage.getItem('nytvnt_xp');
-        const storedMedals = localStorage.getItem('nytvnt_medals');
-        const storedBadges = localStorage.getItem('nytvnt_badges');
+        const loadProgress = async () => {
+            if (!user) {
+                // Clear progress when logged out
+                setProgress({});
+                setXp(0);
+                setUnlockedMedals([]);
+                setUnlockedBadges([]);
+                setIsLoading(false);
+                return;
+            }
 
-        if (storedProgress) setProgress(JSON.parse(storedProgress));
-        if (storedXp) setXp(parseInt(storedXp, 10));
-        if (storedMedals) setUnlockedMedals(JSON.parse(storedMedals));
-        if (storedBadges) setUnlockedBadges(JSON.parse(storedBadges));
-    }, []);
+            // For mock users (admin/learner), use localStorage
+            if (user.username === 'admin' || user.username === 'learner') {
+                loadFromLocalStorage();
+                setIsLoading(false);
+                return;
+            }
 
-    // Save progress whenever it changes
+            try {
+                setIsLoading(true);
+
+                // Load from localStorage first for instant UI
+                const cached = loadFromLocalStorage();
+
+                // Then fetch from Firestore
+                const firestoreData = await getUserProgress(user.uid || user.publicId);
+
+                if (firestoreData && firestoreData.progress) {
+                    // Use Firestore data as source of truth
+                    const progressData = firestoreData.progress;
+                    setProgress(progressData.completedModules || {});
+                    setXp(progressData.xp || 0);
+                    setUnlockedMedals(progressData.unlockedMedals || []);
+                    setUnlockedBadges(progressData.unlockedBadges || []);
+
+                    // Update localStorage cache
+                    saveToLocalStorage({
+                        progress: progressData.completedModules || {},
+                        xp: progressData.xp || 0,
+                        unlockedMedals: progressData.unlockedMedals || [],
+                        unlockedBadges: progressData.unlockedBadges || []
+                    });
+
+                    console.log('✅ Progress loaded from Firestore');
+                } else if (cached.hasData) {
+                    // No Firestore data but have localStorage - keep it
+                    console.log('📦 Using cached progress (no Firestore data yet)');
+                }
+
+                // Update last active
+                if (user.uid) {
+                    updateLastActive(user.uid).catch(err =>
+                        console.warn('Could not update last active:', err)
+                    );
+                }
+            } catch (error) {
+                console.error('Error loading progress from Firestore:', error);
+                // Fall back to localStorage on error
+                loadFromLocalStorage();
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        loadProgress();
+    }, [user]);
+
+    // Helper: Load from localStorage
+    const loadFromLocalStorage = () => {
+        try {
+            const storedProgress = localStorage.getItem('nytvnt_progress');
+            const storedXp = localStorage.getItem('nytvnt_xp');
+            const storedMedals = localStorage.getItem('nytvnt_medals');
+            const storedBadges = localStorage.getItem('nytvnt_badges');
+
+            let hasData = false;
+
+            if (storedProgress) {
+                setProgress(JSON.parse(storedProgress));
+                hasData = true;
+            }
+            if (storedXp) {
+                setXp(parseInt(storedXp, 10));
+                hasData = true;
+            }
+            if (storedMedals) {
+                setUnlockedMedals(JSON.parse(storedMedals));
+                hasData = true;
+            }
+            if (storedBadges) {
+                setUnlockedBadges(JSON.parse(storedBadges));
+                hasData = true;
+            }
+
+            return { hasData };
+        } catch (error) {
+            console.error('Error loading from localStorage:', error);
+            return { hasData: false };
+        }
+    };
+
+    // Helper: Save to localStorage (cache)
+    const saveToLocalStorage = (data) => {
+        try {
+            localStorage.setItem('nytvnt_progress', JSON.stringify(data.progress));
+            localStorage.setItem('nytvnt_xp', data.xp.toString());
+            localStorage.setItem('nytvnt_medals', JSON.stringify(data.unlockedMedals));
+            localStorage.setItem('nytvnt_badges', JSON.stringify(data.unlockedBadges));
+        } catch (error) {
+            console.error('Error saving to localStorage:', error);
+        }
+    };
+
+    // Save to localStorage whenever state changes (for cache)
     useEffect(() => {
-        localStorage.setItem('nytvnt_progress', JSON.stringify(progress));
-        localStorage.setItem('nytvnt_xp', xp.toString());
-        localStorage.setItem('nytvnt_medals', JSON.stringify(unlockedMedals));
-        localStorage.setItem('nytvnt_badges', JSON.stringify(unlockedBadges));
-    }, [progress, xp, unlockedMedals, unlockedBadges]);
+        if (!isLoading) {
+            saveToLocalStorage({ progress, xp, unlockedMedals, unlockedBadges });
+        }
+    }, [progress, xp, unlockedMedals, unlockedBadges, isLoading]);
 
     const getCurrentRank = () => {
-        // Find the highest rank where xp >= minXp
         return RANKS.slice().reverse().find(r => xp >= r.minXp) || RANKS[0];
     };
 
-    const checkAchievements = (newProgress, currentXp) => {
-        // Calculate stats for conditions
+    const checkAchievements = async (newProgress, currentXp, userId) => {
         const modulesCompleted = Object.values(newProgress).flat().length;
         const pathProgress = {};
         let pathsCompleted = [];
@@ -59,9 +168,10 @@ export const ProgressProvider = ({ children }) => {
             modulesCompleted,
             pathProgress,
             pathsCompleted,
-            loginStreak: 1 // TODO: Implement real streak
+            loginStreak: 1
         };
 
+        // Check medals
         const newMedals = [];
         let additionalXp = 0;
 
@@ -70,25 +180,45 @@ export const ProgressProvider = ({ children }) => {
                 if (medal.condition(stats)) {
                     newMedals.push(medal.id);
                     additionalXp += medal.xpReward;
-                    // In a real app, trigger a toast here
                     console.log(`🏅 UNLOCKED: ${medal.title}`);
                 }
             }
         });
 
-        // Check for badge unlocks (path completion)
+        // Check badges (path completion)
         const newBadges = [];
-        pathsCompleted.forEach(pathId => {
+        for (const pathId of pathsCompleted) {
             const badge = getBadgeByPathId(pathId);
             if (badge && !unlockedBadges.includes(badge.id)) {
                 newBadges.push(badge.id);
                 console.log(`🎖️ BADGE UNLOCKED: ${badge.title}`);
-            }
-        });
 
+                // Award badge in Firestore if real user
+                if (userId && user.username !== 'admin' && user.username !== 'learner') {
+                    try {
+                        await firestoreAwardBadge(userId, badge.id);
+                    } catch (error) {
+                        console.error('Error awarding badge in Firestore:', error);
+                    }
+                }
+            }
+        }
+
+        // Update state
         if (newMedals.length > 0) {
             setUnlockedMedals(prev => [...prev, ...newMedals]);
             setXp(prev => prev + additionalXp);
+
+            // Award medals in Firestore if real user
+            if (userId && user.username !== 'admin' && user.username !== 'learner') {
+                for (const medalId of newMedals) {
+                    try {
+                        await firestoreAwardMedal(userId, medalId);
+                    } catch (error) {
+                        console.error('Error awarding medal in Firestore:', error);
+                    }
+                }
+            }
         }
 
         if (newBadges.length > 0) {
@@ -96,27 +226,43 @@ export const ProgressProvider = ({ children }) => {
         }
     };
 
-    const markModuleComplete = (pathId, moduleId, xpReward = 100) => {
+    const markModuleComplete = async (pathId, moduleId, xpReward = 100) => {
+        // Optimistic update
         setProgress(prev => {
             const pathProgress = prev[pathId] || [];
-            if (!pathProgress.includes(moduleId)) {
-                const newProgress = {
-                    ...prev,
-                    [pathId]: [...pathProgress, moduleId]
-                };
-
-                // Award XP for module completion
-                setXp(currentXp => {
-                    const updatedXp = currentXp + xpReward;
-                    // Check achievements AFTER state update would technically be better with useEffect,
-                    // but passing calculated values for immediate feedback
-                    checkAchievements(newProgress, updatedXp);
-                    return updatedXp;
-                });
-
-                return newProgress;
+            if (pathProgress.includes(moduleId)) {
+                return prev; // Already completed
             }
-            return prev;
+
+            const newProgress = {
+                ...prev,
+                [pathId]: [...pathProgress, moduleId]
+            };
+
+            // Award XP immediately
+            setXp(currentXp => currentXp + xpReward);
+
+            // Check achievements
+            const userId = user?.uid || user?.publicId;
+            checkAchievements(newProgress, xp + xpReward, userId);
+
+            // Sync to Firestore if real user
+            if (userId && user.username !== 'admin' && user.username !== 'learner') {
+                setIsSyncing(true);
+                firestoreCompleteModule(userId, pathId, moduleId, xpReward)
+                    .then(() => {
+                        console.log('✅ Progress synced to Firestore');
+                    })
+                    .catch(error => {
+                        console.error('❌ Failed to sync to Firestore:', error);
+                        // TODO: Add retry logic or queue for later
+                    })
+                    .finally(() => {
+                        setIsSyncing(false);
+                    });
+            }
+
+            return newProgress;
         });
     };
 
@@ -125,17 +271,16 @@ export const ProgressProvider = ({ children }) => {
     };
 
     const isModuleLocked = (pathId, moduleId) => {
-        // 1. Admins bypass everything
+        // Admins bypass everything
         if (user?.role === 'admin') return false;
 
-        // 2. Completed modules are never locked
+        // Completed modules are never locked
         if (isModuleCompleted(pathId, moduleId)) return false;
 
-        // 3. Check sequence structure
+        // Check sequence structure
         const path = LEARNING_PATHS.find(p => p.id === pathId);
-        if (!path) return true; // Invalid path
+        if (!path) return true;
 
-        // Flatten all modules in the path to find the index
         let allModules = [];
         path.sections.forEach(section => {
             allModules = [...allModules, ...section.modules];
@@ -172,6 +317,8 @@ export const ProgressProvider = ({ children }) => {
             currentRank: getCurrentRank(),
             unlockedMedals,
             unlockedBadges,
+            isLoading,
+            isSyncing,
             markModuleComplete,
             isModuleCompleted,
             isModuleLocked,

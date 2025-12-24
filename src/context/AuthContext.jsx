@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { auth, googleProvider, signInWithPopup } from '../lib/firebase';
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile } from 'firebase/auth';
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile, sendEmailVerification } from 'firebase/auth';
+import { createUserDocument, getUserProgress } from '../lib/firestoreService';
 
 const AuthContext = createContext(null);
 
@@ -94,7 +95,16 @@ export const AuthProvider = ({ children }) => {
                 displayName: username
             });
 
+            // Send email verification
+            try {
+                await sendEmailVerification(user);
+                console.log('✉️ Verification email sent');
+            } catch (verifyError) {
+                console.warn('Could not send verification email:', verifyError);
+            }
+
             const userData = {
+                uid: user.uid,
                 username: username,
                 role: 'learner',
                 rank: 'Neophyte',
@@ -104,8 +114,18 @@ export const AuthProvider = ({ children }) => {
                 socials: { twitter: '', linkedin: '', website: '' },
                 lastUsernameChange: null,
                 authProvider: 'email',
-                email: email
+                email: email,
+                emailVerified: user.emailVerified
             };
+
+            // Create Firestore user document
+            try {
+                await createUserDocument(user.uid, userData);
+                console.log('✅ User document created in Firestore');
+            } catch (firestoreError) {
+                console.error('Failed to create Firestore document:', firestoreError);
+                // Continue anyway - user is created in Auth
+            }
 
             setUser(userData);
             localStorage.setItem('user', JSON.stringify(userData));
@@ -121,26 +141,46 @@ export const AuthProvider = ({ children }) => {
             const result = await signInWithPopup(auth, googleProvider);
             const user = result.user;
 
+            // Check if user document exists in Firestore
+            let firestoreData = null;
+            try {
+                firestoreData = await getUserProgress(user.uid);
+            } catch (error) {
+                console.warn('Could not fetch user from Firestore:', error);
+            }
+
             // Map Firebase user to App user structure
             const userData = {
-                username: user.displayName || user.email.split('@')[0], // Fallback if no display name
-                role: 'learner', // Default role for new users
-                rank: 'Neophyte',
-                xp: 0,
-                publicId: user.uid.slice(0, 8).toUpperCase(), // Generate a short ID from UID
+                uid: user.uid,
+                username: firestoreData?.username || user.displayName || user.email.split('@')[0],
+                role: firestoreData?.role || 'learner',
+                rank: firestoreData?.rank || 'Neophyte',
+                xp: firestoreData?.progress?.xp || 0,
+                publicId: user.uid.slice(0, 8).toUpperCase(),
                 avatar: user.photoURL || `https://api.dicebear.com/9.x/dylan/svg?seed=${user.email}`,
-                socials: { twitter: '', linkedin: '', website: '' },
-                lastUsernameChange: null,
+                socials: firestoreData?.socials || { twitter: '', linkedin: '', website: '' },
+                lastUsernameChange: firestoreData?.lastUsernameChange || null,
                 authProvider: 'google',
-                email: user.email // Store email for real users
+                email: user.email,
+                emailVerified: user.emailVerified
             };
+
+            // Create Firestore document if it doesn't exist
+            if (!firestoreData) {
+                try {
+                    await createUserDocument(user.uid, userData);
+                    console.log('✅ New Google user document created in Firestore');
+                } catch (firestoreError) {
+                    console.error('Failed to create Firestore document:', firestoreError);
+                }
+            }
 
             setUser(userData);
             localStorage.setItem('user', JSON.stringify(userData));
             return userData;
         } catch (error) {
             console.error("Firebase Login Error:", error);
-            throw error; // Propagate error to UI
+            throw error;
         }
     };
 

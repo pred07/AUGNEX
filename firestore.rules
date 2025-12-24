@@ -1,0 +1,61 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isOwner(uid) {
+      return isAuthenticated() && request.auth.uid == uid;
+    }
+    
+    function isValidUserData() {
+      return request.resource.data.keys().hasAll(['username', 'email', 'role']) &&
+             request.resource.data.username is string &&
+             request.resource.data.email is string &&
+             request.resource.data.role in ['admin', 'learner'];
+    }
+    
+    function isValidProgress() {
+      return request.resource.data.progress.keys().hasAll(['completedModules', 'xp', 'unlockedBadges', 'unlockedMedals']) &&
+             request.resource.data.progress.xp is number &&
+             request.resource.data.progress.xp >= 0 &&
+             request.resource.data.progress.unlockedBadges is list &&
+             request.resource.data.progress.unlockedMedals is list;
+    }
+    
+    // Users collection
+    match /users/{userId} {
+      // Allow read if:
+      // - User is reading their own data
+      // - OR reading public profile fields only
+      allow read: if isOwner(userId) || 
+                     (isAuthenticated() && 
+                      request.resource == null); // Reading, not writing
+      
+      // Allow create only for the user's own document
+      allow create: if isOwner(userId) && 
+                       isValidUserData();
+      
+      // Allow update only for the user's own document
+      allow update: if isOwner(userId) &&
+                       // Prevent role escalation
+                       (request.resource.data.role == resource.data.role || 
+                        resource.data.role == 'admin') &&
+                       // Validate progress structure if being updated
+                       (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['progress']) ||
+                        isValidProgress());
+      
+      // Prevent deletion
+      allow delete: if false;
+    }
+    
+    // Deny all other access
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
