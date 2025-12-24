@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { useProgress } from '../context/ProgressContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import Button from '../components/ui/Button';
 import Input from '../components/ui/Input';
-import { User, Globe, Twitter, Linkedin, Save, AlertCircle, CheckCircle, Camera } from 'lucide-react';
+import Badge from '../components/ui/Badge';
+import { User, Globe, Twitter, Linkedin, Save, AlertCircle, CheckCircle, Camera, Award } from 'lucide-react';
+import { BADGES } from '../data/badges';
 
 const AVATAR_SEEDS = [
     'Felix', 'Aneka', 'Zack', 'Midnight', 'Cyber',
@@ -12,6 +15,7 @@ const AVATAR_SEEDS = [
 
 const Profile = () => {
     const { user, updateUserProfile } = useAuth();
+    const { unlockedBadges } = useProgress();
 
     // Form state
     const [username, setUsername] = useState(user?.username || '');
@@ -159,8 +163,8 @@ const Profile = () => {
                                         animate={{ opacity: 1, y: 0 }}
                                         exit={{ opacity: 0, y: -10 }}
                                         className={`p-3 rounded-lg flex items-center gap-3 border ${message.type === 'error'
-                                                ? 'bg-red-500/10 border-red-500/30 text-red-500'
-                                                : 'bg-primary/10 border-primary/30 text-primary'
+                                            ? 'bg-red-500/10 border-red-500/30 text-red-500'
+                                            : 'bg-primary/10 border-primary/30 text-primary'
                                             }`}
                                     >
                                         {message.type === 'error' ? <AlertCircle size={18} /> : <CheckCircle size={18} />}
@@ -229,6 +233,57 @@ const Profile = () => {
                     </div>
                 </motion.div>
             </div>
+
+            {/* Badges Section */}
+            <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+                className="mt-12"
+            >
+                <div className="glass-card p-8 rounded-xl border border-white/10 relative overflow-hidden">
+                    <div className="absolute top-0 right-0 p-4 opacity-10">
+                        <Award size={120} />
+                    </div>
+
+                    <div className="relative z-10">
+                        <h2 className="text-2xl font-orbitron font-bold text-white mb-2 flex items-center gap-3">
+                            <Award className="text-primary" size={28} />
+                            ACHIEVEMENTS
+                        </h2>
+                        <p className="text-gray-400 font-mono text-sm mb-8">
+                            Complete learning paths to unlock badges
+                        </p>
+
+                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
+                            {BADGES.map((badge) => (
+                                <Badge
+                                    key={badge.id}
+                                    badge={badge}
+                                    unlocked={unlockedBadges.includes(badge.id)}
+                                />
+                            ))}
+                        </div>
+
+                        {unlockedBadges.length === 0 && (
+                            <div className="mt-8 p-6 border border-white/5 rounded-lg bg-black/20 text-center">
+                                <p className="text-gray-500 font-mono text-sm">
+                                    No badges unlocked yet. Complete your first learning path to earn your first badge!
+                                </p>
+                            </div>
+                        )}
+
+                        {unlockedBadges.length > 0 && (
+                            <div className="mt-8 p-4 border border-primary/20 rounded-lg bg-primary/5">
+                                <div className="flex items-center justify-between">
+                                    <span className="text-sm font-mono text-gray-400">BADGES UNLOCKED</span>
+                                    <span className="text-2xl font-bold text-primary">{unlockedBadges.length} / {BADGES.length}</span>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            </motion.div>
         </div>
     );
 };

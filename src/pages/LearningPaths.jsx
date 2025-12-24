@@ -121,6 +121,18 @@ const LearningPaths = () => {
 
     const selectedPath = LEARNING_PATHS.find(p => p.id === selectedPathId);
 
+    // Auto-scroll to module list on mobile when path is selected
+    const handlePathSelect = (pathId) => {
+        setSelectedPathId(pathId);
+
+        // On mobile, scroll to the module list after selecting a path
+        if (window.innerWidth < 1024 && scrollRef.current) {
+            setTimeout(() => {
+                scrollRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 100);
+        }
+    };
+
     // Stats
     const totalModules = selectedPath?.sections.flatMap(s => s.modules).length || 0;
     const completedCount = selectedPath?.sections.flatMap(s => s.modules).filter(m => isModuleCompleted(selectedPath.id, m.id)).length || 0;
@@ -157,7 +169,7 @@ const LearningPaths = () => {
                             key={path.id}
                             path={path}
                             isSelected={selectedPathId === path.id}
-                            onClick={() => setSelectedPathId(path.id)}
+                            onClick={() => handlePathSelect(path.id)}
                         />
                     ))}
 
@@ -181,7 +193,7 @@ const LearningPaths = () => {
                 </div>
 
                 {/* Right Panel: HUD/Content */}
-                <div className="lg:col-span-8">
+                <div className="lg:col-span-8" ref={scrollRef}>
                     <AnimatePresence mode="wait">
                         {selectedPath && (
                             <motion.div

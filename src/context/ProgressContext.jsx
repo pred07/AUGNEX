@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useAuth } from './AuthContext';
 import { LEARNING_PATHS } from '../data/learningPaths';
 import { RANKS, MEDALS } from '../data/achievements';
+import { BADGES, getBadgeByPathId } from '../data/badges';
 
 const ProgressContext = createContext(null);
 
@@ -11,16 +12,19 @@ export const ProgressProvider = ({ children }) => {
     const [progress, setProgress] = useState({});
     const [xp, setXp] = useState(0);
     const [unlockedMedals, setUnlockedMedals] = useState([]);
+    const [unlockedBadges, setUnlockedBadges] = useState([]);
 
     // Load progress from local storage on mount
     useEffect(() => {
         const storedProgress = localStorage.getItem('nytvnt_progress');
         const storedXp = localStorage.getItem('nytvnt_xp');
         const storedMedals = localStorage.getItem('nytvnt_medals');
+        const storedBadges = localStorage.getItem('nytvnt_badges');
 
         if (storedProgress) setProgress(JSON.parse(storedProgress));
         if (storedXp) setXp(parseInt(storedXp, 10));
         if (storedMedals) setUnlockedMedals(JSON.parse(storedMedals));
+        if (storedBadges) setUnlockedBadges(JSON.parse(storedBadges));
     }, []);
 
     // Save progress whenever it changes
@@ -28,7 +32,8 @@ export const ProgressProvider = ({ children }) => {
         localStorage.setItem('nytvnt_progress', JSON.stringify(progress));
         localStorage.setItem('nytvnt_xp', xp.toString());
         localStorage.setItem('nytvnt_medals', JSON.stringify(unlockedMedals));
-    }, [progress, xp, unlockedMedals]);
+        localStorage.setItem('nytvnt_badges', JSON.stringify(unlockedBadges));
+    }, [progress, xp, unlockedMedals, unlockedBadges]);
 
     const getCurrentRank = () => {
         // Find the highest rank where xp >= minXp
@@ -71,9 +76,23 @@ export const ProgressProvider = ({ children }) => {
             }
         });
 
+        // Check for badge unlocks (path completion)
+        const newBadges = [];
+        pathsCompleted.forEach(pathId => {
+            const badge = getBadgeByPathId(pathId);
+            if (badge && !unlockedBadges.includes(badge.id)) {
+                newBadges.push(badge.id);
+                console.log(`🎖️ BADGE UNLOCKED: ${badge.title}`);
+            }
+        });
+
         if (newMedals.length > 0) {
             setUnlockedMedals(prev => [...prev, ...newMedals]);
             setXp(prev => prev + additionalXp);
+        }
+
+        if (newBadges.length > 0) {
+            setUnlockedBadges(prev => [...prev, ...newBadges]);
         }
     };
 
@@ -152,6 +171,7 @@ export const ProgressProvider = ({ children }) => {
             xp,
             currentRank: getCurrentRank(),
             unlockedMedals,
+            unlockedBadges,
             markModuleComplete,
             isModuleCompleted,
             isModuleLocked,
