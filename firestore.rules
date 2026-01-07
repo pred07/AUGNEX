@@ -24,7 +24,20 @@ service cloud.firestore {
              request.resource.data.progress.xp is number &&
              request.resource.data.progress.xp >= 0 &&
              request.resource.data.progress.unlockedBadges is list &&
-             request.resource.data.progress.unlockedMedals is list;
+             request.resource.data.progress.unlockedMedals is list &&
+             // [NEW] Wallet & Purchases
+             (!request.resource.data.progress.keys().hasAny(['purchasedModules']) || request.resource.data.progress.purchasedModules is list);
+    }
+
+    // [NEW] Validate Wallet Transactions
+    // Ideally, only Cloud Functions should increment wallet (recharge).
+    // Decrement allowed if purchasing a module (balance - 1).
+    function isValidWalletUpdate() {
+        // If balance is not changing, it's valid (regarding wallet)
+        // If balance is changing:
+        return !request.resource.data.diff(resource.data).affectedKeys().hasAny(['walletBalance']) ||
+               (request.resource.data.walletBalance is number && 
+                request.resource.data.walletBalance >= 0);
     }
     
     // Users collection
@@ -32,22 +45,29 @@ service cloud.firestore {
       // Allow read if:
       // - User is reading their own data
       // - OR reading public profile fields only
+      // - OR requester is an admin
       allow read: if isOwner(userId) || 
-                     (isAuthenticated() && 
-                      request.resource == null); // Reading, not writing
+                     (isAuthenticated() && request.resource == null) ||
+                     get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
       
       // Allow create only for the user's own document
       allow create: if isOwner(userId) && 
                        isValidUserData();
       
-      // Allow update only for the user's own document
-      allow update: if isOwner(userId) &&
-                       // Prevent role escalation
+      // Allow update only for the user's own document OR if admin (for wallet)
+      allow update: if (isOwner(userId) &&
+                       // Prevent role escalation (Allow exception for Bootstrap Admin)
                        (request.resource.data.role == resource.data.role || 
-                        resource.data.role == 'admin') &&
+                        resource.data.role == 'admin' ||
+                        request.auth.token.email == 'admin@nytvnt.dev') &&
                        // Validate progress structure if being updated
                        (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['progress']) ||
-                        isValidProgress());
+                        isValidProgress()) &&
+                       // Validate wallet
+                       isValidWalletUpdate()) 
+                       ||
+                       // Admin Override (specifically for wallet/management)
+                       (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin');
       
       // Prevent deletion
       allow delete: if false;

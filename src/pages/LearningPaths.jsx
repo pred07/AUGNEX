@@ -116,8 +116,9 @@ const ModuleItem = ({ module, status, pathColor, index }) => {
 const LearningPaths = () => {
     const [selectedPathId, setSelectedPathId] = useState('forge');
     const { user } = useAuth();
-    const { isModuleLocked, isModuleCompleted, progress } = useProgress();
+    const { isModuleLocked, isModuleCompleted, progress, lastAccessedModule } = useProgress();
     const scrollRef = useRef(null);
+    const navigate = useNavigate();
 
     const selectedPath = LEARNING_PATHS.find(p => p.id === selectedPathId);
 
@@ -222,6 +223,36 @@ const LearningPaths = () => {
                                                 <div className="text-[10px] text-gray-500 uppercase tracking-widest">COMPLETION</div>
                                             </div>
                                         </div>
+
+                                        {/* Smart Resume/Start Button */}
+                                        {(() => {
+                                            const allPathModules = selectedPath.sections.flatMap(s => s.modules);
+                                            const nextModule = allPathModules.find(m => !isModuleCompleted(selectedPath.id, m.id));
+
+                                            if (nextModule) {
+                                                return (
+                                                    <div className="mb-6">
+                                                        <Button
+                                                            onClick={() => navigate(`/modules/${nextModule.id}`)}
+                                                            variant="primary"
+                                                            className="w-full md:w-auto"
+                                                        >
+                                                            <span className="flex items-center gap-2">
+                                                                <Play size={16} className="fill-current" />
+                                                                <span>CONTINUE: {nextModule.title}</span>
+                                                            </span>
+                                                        </Button>
+                                                    </div>
+                                                );
+                                            } else if (progressPercent === 100) {
+                                                return (
+                                                    <div className="mb-6 inline-block px-6 py-3 bg-primary/20 border border-primary text-primary rounded font-mono font-bold tracking-widest">
+                                                        PATH COMPLETED
+                                                    </div>
+                                                );
+                                            }
+                                            return null;
+                                        })()}
 
                                         {/* Progress Line */}
                                         <div className="h-[2px] w-full bg-white/10 rounded-full overflow-hidden">

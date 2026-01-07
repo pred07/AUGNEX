@@ -13,6 +13,8 @@ import Profile from './pages/Profile';
 import ServiceRecord from './pages/ServiceRecord';
 import ModulesLibrary from './pages/ModulesLibrary';
 import PublicProfile from './pages/PublicProfile';
+import AdminDashboard from './pages/AdminDashboard';
+import Bootstrap from './pages/Bootstrap';
 // const Modules = () => <h1 className="text-2xl font-orbitron">Modules</h1>;
 
 import { ThemeProvider } from './context/ThemeContext';
@@ -58,13 +60,7 @@ function App() {
                 </ProtectedRoute>
               } />
 
-              <Route path="/profile" element={
-                <ProtectedRoute>
-                  <MainLayout>
-                    <ServiceRecord />
-                  </MainLayout>
-                </ProtectedRoute>
-              } />
+              <Route path="/profile" element={<ProtectedRoute><MainLayout><Profile /></MainLayout></ProtectedRoute>} />
 
               <Route path="/service-record" element={
                 <ProtectedRoute>
@@ -80,6 +76,16 @@ function App() {
                   <PublicProfile />
                 </MainLayout>
               } />
+
+              <Route path="/admin" element={
+                <ProtectedRoute>
+                  <MainLayout>
+                    <AdminDashboard />
+                  </MainLayout>
+                </ProtectedRoute>
+              } />
+
+              <Route path="/bootstrap" element={<Bootstrap />} />
 
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>

@@ -4,7 +4,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import {
     CheckCircle, Lock, AlertTriangle, Terminal, Clock, Award,
-    ArrowRight, Shield, MonitorPlay, FileCode, List, ChevronRight, CheckCircle2, Check
+    ArrowRight, Shield, MonitorPlay, FileCode, List, ChevronRight, CheckCircle2, Check, Coins, Unlock
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { LEARNING_PATHS } from '../data/learningPaths';
@@ -12,16 +12,19 @@ import { QUIZZES } from '../data/quizzes';
 import Quiz from '../components/quiz/Quiz';
 import { useProgress } from '../context/ProgressContext';
 import { useAuth } from '../context/AuthContext';
+import { useWallet } from '../context/WalletContext'; // [NEW]
 import { cn } from '../lib/utils';
 import CyberButton from '../components/ui/CyberButton';
+import Button from '../components/ui/Button';
 
 const ModuleDetail = () => {
     const { moduleId } = useParams();
     const navigate = useNavigate();
     const [content, setContent] = useState('');
     const [loading, setLoading] = useState(true);
-    const { markModuleComplete, isModuleCompleted, getNextModuleId, isModuleLocked } = useProgress();
+    const { markModuleComplete, isModuleCompleted, getNextModuleId, isModuleLocked, updateLastAccessed, addPurchasedModule } = useProgress();
     const { user } = useAuth();
+    const { balance, unlockModule, isProcessing: isWalletProcessing } = useWallet(); // [NEW]
 
     // Find module metadata
     const path = LEARNING_PATHS.find(p => p.sections.some(s => s.modules.some(m => m.id === moduleId)));
@@ -33,13 +36,16 @@ const ModuleDetail = () => {
 
     const quizData = QUIZZES[moduleId];
 
-    useEffect(() => {
-        if (!moduleData) return;
+    // Check lock state
+    const locked = isModuleLocked(path?.id, moduleId);
 
-        if (isModuleLocked(path.id, moduleId)) {
-            navigate('/paths');
+    useEffect(() => {
+        if (!moduleData || locked) {
+            setLoading(false);
             return;
         }
+
+        updateLastAccessed(path.id, moduleId);
 
         const loadContent = async () => {
             try {
@@ -54,7 +60,17 @@ const ModuleDetail = () => {
         };
 
         loadContent();
-    }, [moduleId, moduleData, path, isModuleLocked, navigate]);
+    }, [moduleId, moduleData, path, locked, navigate]); // Removed isModuleLocked from dep to avoid loop if state changes
+
+    const handleUnlock = async () => {
+        if (balance < 1) return;
+
+        const success = await unlockModule(path.id, moduleId);
+        if (success) {
+            addPurchasedModule(moduleId);
+            // State update will trigger re-render efficiently
+        }
+    };
 
     if (!moduleData || !path) {
         return (
@@ -64,6 +80,63 @@ const ModuleDetail = () => {
                 <button onClick={() => navigate('/paths')} className="text-primary hover:text-white transition-colors underline decoration-dotted underline-offset-4 mt-4">
                     // RETURN TO BASE
                 </button>
+            </div>
+        );
+    }
+
+    // [NEW] Lock Screen
+    if (locked) {
+        return (
+            <div className="max-w-4xl mx-auto py-20 px-6 text-center">
+                <div className="glass-card p-12 border border-white/10 relative overflow-hidden backdrop-blur-xl bg-black/40">
+                    <div className="absolute top-0 w-full h-1 bg-gradient-to-r from-transparent via-red-500/50 to-transparent"></div>
+
+                    <Lock className="w-16 h-16 text-red-500 mx-auto mb-6" />
+
+                    <h1 className="text-3xl font-bold text-white mb-2 tracking-widest">ENCRYPTED MODULE</h1>
+                    <p className="text-gray-400 font-mono mb-8 uppercase text-sm tracking-wider">
+                        Clearance-Level 4 Required to Decrypt
+                    </p>
+
+                    <div className="flex flex-col items-center gap-6">
+                        <div className="flex items-center gap-4 bg-black/40 px-6 py-3 rounded border border-white/5">
+                            <span className="text-gray-400 font-mono text-xs uppercase">Your Balance</span>
+                            <div className="flex items-center gap-2 text-primary font-bold font-mono">
+                                <Coins size={16} />
+                                <span>{balance} COINS</span>
+                            </div>
+                        </div>
+
+                        {balance > 0 ? (
+                            <div className="space-y-4">
+                                <Button
+                                    onClick={handleUnlock}
+                                    isLoading={isWalletProcessing}
+                                    icon={Unlock}
+                                    className="bg-primary text-black hover:bg-primary/90 px-8 py-4 text-sm font-bold tracking-widest"
+                                >
+                                    UNLOCK MODULE (-1 COIN)
+                                </Button>
+                                <p className="text-xs text-gray-500 font-mono animate-pulse">
+                                    Decrypting will consume 1 database credit.
+                                </p>
+                            </div>
+                        ) : (
+                            <div className="space-y-4">
+                                <div className="p-4 bg-red-500/10 border border-red-500/20 rounded text-red-400 text-xs font-mono">
+                                    INSUFFICIENT FUNDS. PLEASE RECHARGE WALLET.
+                                </div>
+                                <Button
+                                    onClick={() => navigate('/profile')}
+                                    variant="outline"
+                                    icon={ArrowRight}
+                                >
+                                    GO TO WALLET
+                                </Button>
+                            </div>
+                        )}
+                    </div>
+                </div>
             </div>
         );
     }
@@ -172,6 +245,11 @@ const ModuleDetail = () => {
                             {nextModuleId && (
                                 <button
                                     onClick={() => navigate(`/modules/${nextModuleId}`)}
+                                    // disabled={!isCompleted && !isAdmin} 
+                                    // PERMISSION FIX: Allow checking next module even if not completed, 
+                                    // if it's locked they'll just hit the lock screen.
+                                    // But typically "Next" should be sequential?
+                                    // Let's keep it sequential.
                                     disabled={!isCompleted && !isAdmin}
                                     className={cn(
                                         "flex-1 flex items-center justify-between px-6 py-4 rounded border text-sm font-mono tracking-widest uppercase transition-all",
@@ -213,11 +291,11 @@ const ModuleDetail = () => {
                                 return (
                                     <div
                                         key={mod.id}
-                                        onClick={() => !isModLocked && navigate(`/modules/${mod.id}`)}
+                                        onClick={() => navigate(`/modules/${mod.id}`)}
                                         className={cn(
                                             "p-4 transition-colors relative group",
                                             isActive ? "bg-white/5" : "hover:bg-white/5 cursor-pointer",
-                                            isModLocked && "opacity-50 cursor-not-allowed hover:bg-transparent"
+                                            isModLocked && "opacity-75" // Less opacity for locked but clickable
                                         )}
                                         ref={isActive ? (el) => el?.scrollIntoView({ behavior: 'smooth', block: 'center' }) : null}
                                     >
@@ -231,7 +309,7 @@ const ModuleDetail = () => {
                                                         <Check size={10} className="text-black stroke-[3]" />
                                                     </div>
                                                 ) : isModLocked ? (
-                                                    <Lock size={14} className="text-gray-600" />
+                                                    <Lock size={14} className="text-gray-500" />
                                                 ) : isActive ? (
                                                     <div className={cn("w-3.5 h-3.5 rounded-full border-2 animate-pulse", path.color.replace('text-', 'border-'))} />
                                                 ) : (

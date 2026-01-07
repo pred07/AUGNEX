@@ -1,7 +1,8 @@
 import React from 'react';
 import { useAuth } from '../context/AuthContext';
 import { motion } from 'framer-motion';
-import { LogOut, Home, Map, Box, Award, Settings, User } from 'lucide-react';
+import { LogOut, Home, Map, Box, Award, Settings, User, Shield } from 'lucide-react';
+
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '../lib/utils';
 import Button from '../components/ui/Button';
@@ -22,7 +23,6 @@ const SidebarItem = ({ icon: Icon, label, path, isActive }) => (
     </Link>
 );
 
-// import ThemeToggle from '../components/ui/ThemeToggle'; // Removed per user request
 import BackgroundEffects from '../components/layout/BackgroundEffects';
 
 const MainLayout = ({ children }) => {
@@ -51,6 +51,12 @@ const MainLayout = ({ children }) => {
                     <SidebarItem icon={Map} label="Learning Paths" path="/paths" isActive={location.pathname === '/paths'} />
                     <SidebarItem icon={Box} label="Library" path="/modules" isActive={location.pathname === '/modules'} />
                     <SidebarItem icon={Award} label="Service Record" path="/service-record" isActive={location.pathname === '/service-record'} />
+
+                    {user?.role === 'admin' && (
+                        <div className="mt-4 pt-4 border-t border-white/5">
+                            <SidebarItem icon={Shield} label="Admin Console" path="/admin" isActive={location.pathname === '/admin'} />
+                        </div>
+                    )}
                 </nav>
 
                 <div className="p-4 border-t border-white/5 space-y-4">
@@ -92,10 +98,10 @@ const MainLayout = ({ children }) => {
                         <span className="hidden xl:block text-sm font-medium">Disconnect</span>
                     </button>
                 </div>
-            </motion.aside>
+            </motion.aside >
 
             {/* Mobile Bottom Navigation - Visible < md */}
-            <div className="md:hidden fixed bottom-0 left-0 right-0 h-16 bg-surface/90 backdrop-blur-xl border-t border-white/10 z-50 flex items-center justify-around px-2 transition-colors duration-500">
+            < div className="md:hidden fixed bottom-0 left-0 right-0 h-16 bg-surface/90 backdrop-blur-xl border-t border-white/10 z-50 flex items-center justify-around px-2 transition-colors duration-500" >
                 <Link to="/" className={cn("p-2 rounded-lg flex flex-col items-center gap-1", location.pathname === '/' ? "text-primary" : "text-muted")}>
                     <Home size={20} />
                     <span className="text-[10px] font-mono">Home</span>
@@ -123,14 +129,24 @@ const MainLayout = ({ children }) => {
                     <Box size={20} />
                     <span className="text-[10px] font-mono">Lib</span>
                 </Link>
+
+                {
+                    user?.role === 'admin' && (
+                        <Link to="/admin" className={cn("p-2 rounded-lg flex flex-col items-center gap-1", location.pathname === '/admin' ? "text-primary" : "text-muted")}>
+                            <Shield size={20} />
+                            <span className="text-[10px] font-mono">Admin</span>
+                        </Link>
+                    )
+                }
+
                 <button onClick={logout} className="p-2 rounded-lg flex flex-col items-center gap-1 text-red-400">
                     <LogOut size={20} />
                     <span className="text-[10px] font-mono">Exit</span>
                 </button>
-            </div>
+            </div >
 
             {/* Mobile Top Bar (Branding) */}
-            <div className="md:hidden fixed top-0 left-0 right-0 h-14 bg-background/80 backdrop-blur-md border-b border-white/5 z-40 flex items-center justify-between px-4 transition-colors duration-500">
+            < div className="md:hidden fixed top-0 left-0 right-0 h-14 bg-background/80 backdrop-blur-md border-b border-white/5 z-40 flex items-center justify-between px-4 transition-colors duration-500" >
                 <Link to="/" className="flex items-center gap-2">
                     <div className="w-6 h-6 rounded bg-primary/20 flex items-center justify-center text-primary border border-primary/50 p-0.5">
                         <span className="font-mono font-bold text-sm leading-none pt-0.5">&gt;</span>
@@ -138,17 +154,17 @@ const MainLayout = ({ children }) => {
                     <span className="font-orbitron font-bold tracking-wider text-lg text-text-main whitespace-nowrap">NYTVNT-OPS</span>
                 </Link>
                 {/* ThemeToggle Removed */}
-            </div>
+            </div >
 
             {/* Main Content Area */}
-            <main className="flex-1 ml-0 md:ml-20 xl:ml-64 relative min-h-screen overflow-y-auto overflow-x-hidden pb-32 md:pb-0 pt-16 md:pt-0">
+            < main className="flex-1 ml-0 md:ml-20 xl:ml-64 relative min-h-screen overflow-y-auto overflow-x-hidden pb-32 md:pb-0 pt-16 md:pt-0" >
                 {/* Remove old static grid, replaced by BackgroundEffects */}
                 {/* <div className="absolute inset-0 bg-grid-pattern opacity-5 pointer-events-none fixed" /> */}
                 <div className="relative z-10 p-4 md:p-6 xl:p-10 max-w-7xl mx-auto">
                     {children}
                 </div>
-            </main>
-        </div>
+            </main >
+        </div >
     );
 };
 

@@ -15,22 +15,7 @@
     /* indigo-50 */
   }
 
-  .light {
-    --bg-background: 240 253 244;
-    /* Very faint green tint white */
-    --bg-surface: 255 255 255;
-    --c-primary: 5 150 105;
-    /* Emerald 600 */
-    --c-secondary: 2 132 199;
-    /* Sky 600 */
-    --c-accent: 220 38 38;
-    /* Red 600 */
-    --c-muted: 100 116 139;
-    --c-border: 203 213 225;
-    /* Slate 300 */
-    --c-text-main: 15 23 42;
-    /* Slate 900 */
-  }
+  /* .light class removed to enforce dark mode */
 
   body {
     background-color: rgb(var(--bg-background));

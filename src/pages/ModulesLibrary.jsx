@@ -98,9 +98,8 @@ const ModulesLibrary = () => {
                     return (
                         <div
                             key={module.id}
-                            onClick={() => !isLocked && navigate(`/modules/${module.id}`)}
-                            className={`group relative bg-surface/30 border border-white/5 rounded-xl p-5 hover:border-primary/30 transition-all duration-300 ${isLocked ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer hover:-translate-y-1 hover:shadow-[0_0_20px_-10px_rgba(0,255,157,0.3)]'
-                                }`}
+                            onClick={() => navigate(`/modules/${module.id}`)}
+                            className={`group relative bg-surface/30 border border-white/5 rounded-xl p-5 hover:border-primary/30 transition-all duration-300 ${isLocked ? 'hover:shadow-[0_0_20px_-10px_rgba(255,50,50,0.3)]' : 'cursor-pointer hover:-translate-y-1 hover:shadow-[0_0_20px_-10px_rgba(0,255,157,0.3)]'} cursor-pointer`}
                         >
                             <div className="flex justify-between items-start mb-3">
                                 <span className={`text-[10px] font-mono px-2 py-0.5 rounded border ${module.pathBorder} ${module.pathColor} bg-black/40`}>

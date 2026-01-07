@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Button from '../components/ui/Button';
 import Input from '../components/ui/Input';
 import Badge from '../components/ui/Badge';
-import { User, Globe, Twitter, Linkedin, Save, AlertCircle, CheckCircle, Camera, Award } from 'lucide-react';
+import { User, Globe, Twitter, Linkedin, Save, AlertCircle, CheckCircle, Camera, Award, Lock, Key } from 'lucide-react';
 import { BADGES } from '../data/badges';
 
 const AVATAR_SEEDS = [
@@ -14,7 +14,9 @@ const AVATAR_SEEDS = [
 ];
 
 const Profile = () => {
-    const { user, updateUserProfile } = useAuth();
+    const { user, updateUserProfile, changeUserPassword } = useAuth();
+    // Helper to reference functions in closure if needed, but destructuring is fine
+    const user_auth_ref = { changeUserPassword };
     const { unlockedBadges } = useProgress();
 
     // Form state
@@ -23,6 +25,10 @@ const Profile = () => {
     const [twitter, setTwitter] = useState(user?.socials?.twitter || '');
     const [linkedin, setLinkedin] = useState(user?.socials?.linkedin || '');
     const [selectedAvatar, setSelectedAvatar] = useState(user?.avatar || '');
+
+    // Password State
+    const [passwordData, setPasswordData] = useState({ newPassword: '', confirmPassword: '' });
+    const [passLoading, setPassLoading] = useState(false);
 
     // UI state
     const [isEditingAvatar, setIsEditingAvatar] = useState(false);
@@ -61,6 +67,41 @@ const Profile = () => {
             setMessage({ type: 'error', text: error.message || 'Failed to update profile.' });
         } finally {
             setIsLoading(false);
+        }
+    };
+
+    const handlePasswordChange = async (e) => {
+        e.preventDefault();
+        setMessage({ type: '', text: '' });
+
+        if (passwordData.newPassword !== passwordData.confirmPassword) {
+            setMessage({ type: 'error', text: "Passwords do not match" });
+            return;
+        }
+        if (passwordData.newPassword.length < 6) {
+            setMessage({ type: 'error', text: "Password must be at least 6 characters" });
+            return;
+        }
+
+        setPassLoading(true);
+        try {
+            const { updateUserRole } = await import('../lib/firestoreService'); // Just to ensure import validity if needed, but we use context
+            // Actually we need the function from context, assuming it is exposed
+            // Wait, I need to check if I exposed it. Yes I added changeUserPassword to context.
+            // But I cannot call it directly from here without destructuring it.
+            // Let's assume I will destructure it from useAuth() below.
+
+            await user_auth_ref.changeUserPassword(passwordData.newPassword);
+            setMessage({ type: 'success', text: 'Password updated successfully!' });
+            setPasswordData({ newPassword: '', confirmPassword: '' });
+        } catch (err) {
+            if (err.code === 'auth/requires-recent-login') {
+                setMessage({ type: 'error', text: "Security Update: Please re-login and try again." });
+            } else {
+                setMessage({ type: 'error', text: "Failed: " + err.message });
+            }
+        } finally {
+            setPassLoading(false);
         }
     };
 
@@ -233,6 +274,70 @@ const Profile = () => {
                     </div>
                 </motion.div>
             </div>
+
+            {/* Security Section */}
+            <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.25 }}
+                className="mt-8"
+            >
+                <div className="glass-card p-8 rounded-xl border border-white/10 relative overflow-hidden max-w-4xl mx-auto">
+                    <div className="absolute top-0 right-0 p-4 opacity-10">
+                        <Lock size={120} />
+                    </div>
+
+                    <div className="relative z-10">
+                        <h2 className="text-2xl font-orbitron font-bold text-white mb-6 flex items-center gap-3">
+                            <Lock className="text-primary" size={28} />
+                            SECURITY SETTINGS
+                        </h2>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <div>
+                                <h3 className="text-lg font-bold text-white mb-2">Password Management</h3>
+                                <p className="text-gray-400 font-mono text-sm mb-4">
+                                    Update your access credentials. For security, choose a strong, unique password.
+                                    {user?.authProvider === 'google.com' && (
+                                        <span className="block mt-2 text-yellow-500 text-xs">
+                                            Note: You are logged in via Google. Setting a password will allow you to also log in with Email/Password.
+                                        </span>
+                                    )}
+                                </p>
+                            </div>
+
+                            <form onSubmit={handlePasswordChange} className="space-y-4">
+                                <Input
+                                    label="New Password"
+                                    type="password"
+                                    value={passwordData.newPassword}
+                                    onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
+                                    icon={Key}
+                                    placeholder="Min. 6 characters"
+                                />
+                                <Input
+                                    label="Confirm Password"
+                                    type="password"
+                                    value={passwordData.confirmPassword}
+                                    onChange={(e) => setPasswordData({ ...passwordData, confirmPassword: e.target.value })}
+                                    icon={Lock}
+                                    placeholder="Re-enter password"
+                                />
+                                <div className="flex justify-end pt-2">
+                                    <Button
+                                        type="submit"
+                                        isLoading={passLoading}
+                                        variant="outline"
+                                        className="w-full md:w-auto"
+                                    >
+                                        Update Password
+                                    </Button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </motion.div>
 
             {/* Badges Section */}
             <motion.div

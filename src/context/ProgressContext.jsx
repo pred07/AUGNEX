@@ -8,7 +8,8 @@ import {
     completeModule as firestoreCompleteModule,
     awardBadge as firestoreAwardBadge,
     awardMedal as firestoreAwardMedal,
-    updateLastActive
+    updateLastActive,
+    updateLastAccessedModule
 } from '../lib/firestoreService';
 
 const ProgressContext = createContext(null);
@@ -18,9 +19,11 @@ export const ProgressProvider = ({ children }) => {
 
     // State
     const [progress, setProgress] = useState({});
+    const [purchasedModules, setPurchasedModules] = useState([]); // [NEW] Track purchases
     const [xp, setXp] = useState(0);
     const [unlockedMedals, setUnlockedMedals] = useState([]);
     const [unlockedBadges, setUnlockedBadges] = useState([]);
+    const [lastAccessedModule, setLastAccessedModule] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
     const [isSyncing, setIsSyncing] = useState(false);
 
@@ -30,9 +33,11 @@ export const ProgressProvider = ({ children }) => {
             if (!user) {
                 // Clear progress when logged out
                 setProgress({});
+                setPurchasedModules([]);
                 setXp(0);
                 setUnlockedMedals([]);
                 setUnlockedBadges([]);
+                setLastAccessedModule(null);
                 setIsLoading(false);
                 return;
             }
@@ -57,21 +62,24 @@ export const ProgressProvider = ({ children }) => {
                     // Use Firestore data as source of truth
                     const progressData = firestoreData.progress;
                     setProgress(progressData.completedModules || {});
+                    setPurchasedModules(progressData.purchasedModules || []);
                     setXp(progressData.xp || 0);
                     setUnlockedMedals(progressData.unlockedMedals || []);
                     setUnlockedBadges(progressData.unlockedBadges || []);
+                    setLastAccessedModule(progressData.lastAccessedModule || null);
 
                     // Update localStorage cache
                     saveToLocalStorage({
                         progress: progressData.completedModules || {},
+                        purchasedModules: progressData.purchasedModules || [],
                         xp: progressData.xp || 0,
                         unlockedMedals: progressData.unlockedMedals || [],
-                        unlockedBadges: progressData.unlockedBadges || []
+                        unlockedBadges: progressData.unlockedBadges || [],
+                        lastAccessedModule: progressData.lastAccessedModule || null
                     });
 
                     console.log('✅ Progress loaded from Firestore');
                 } else if (cached.hasData) {
-                    // No Firestore data but have localStorage - keep it
                     console.log('📦 Using cached progress (no Firestore data yet)');
                 }
 
@@ -97,15 +105,20 @@ export const ProgressProvider = ({ children }) => {
     const loadFromLocalStorage = () => {
         try {
             const storedProgress = localStorage.getItem('nytvnt_progress');
+            const storedPurchased = localStorage.getItem('nytvnt_purchased');
             const storedXp = localStorage.getItem('nytvnt_xp');
             const storedMedals = localStorage.getItem('nytvnt_medals');
             const storedBadges = localStorage.getItem('nytvnt_badges');
+            const storedLastAccessed = localStorage.getItem('nytvnt_last_accessed_module');
 
             let hasData = false;
 
             if (storedProgress) {
                 setProgress(JSON.parse(storedProgress));
                 hasData = true;
+            }
+            if (storedPurchased) {
+                setPurchasedModules(JSON.parse(storedPurchased));
             }
             if (storedXp) {
                 setXp(parseInt(storedXp, 10));
@@ -117,6 +130,10 @@ export const ProgressProvider = ({ children }) => {
             }
             if (storedBadges) {
                 setUnlockedBadges(JSON.parse(storedBadges));
+                hasData = true;
+            }
+            if (storedLastAccessed) {
+                setLastAccessedModule(JSON.parse(storedLastAccessed));
                 hasData = true;
             }
 
@@ -131,9 +148,13 @@ export const ProgressProvider = ({ children }) => {
     const saveToLocalStorage = (data) => {
         try {
             localStorage.setItem('nytvnt_progress', JSON.stringify(data.progress));
+            localStorage.setItem('nytvnt_purchased', JSON.stringify(data.purchasedModules));
             localStorage.setItem('nytvnt_xp', data.xp.toString());
             localStorage.setItem('nytvnt_medals', JSON.stringify(data.unlockedMedals));
             localStorage.setItem('nytvnt_badges', JSON.stringify(data.unlockedBadges));
+            if (data.lastAccessedModule) {
+                localStorage.setItem('nytvnt_last_accessed_module', JSON.stringify(data.lastAccessedModule));
+            }
         } catch (error) {
             console.error('Error saving to localStorage:', error);
         }
@@ -142,9 +163,9 @@ export const ProgressProvider = ({ children }) => {
     // Save to localStorage whenever state changes (for cache)
     useEffect(() => {
         if (!isLoading) {
-            saveToLocalStorage({ progress, xp, unlockedMedals, unlockedBadges });
+            saveToLocalStorage({ progress, purchasedModules, xp, unlockedMedals, unlockedBadges, lastAccessedModule });
         }
-    }, [progress, xp, unlockedMedals, unlockedBadges, isLoading]);
+    }, [progress, purchasedModules, xp, unlockedMedals, unlockedBadges, lastAccessedModule, isLoading]);
 
     const getCurrentRank = () => {
         return RANKS.slice().reverse().find(r => xp >= r.minXp) || RANKS[0];
@@ -255,7 +276,6 @@ export const ProgressProvider = ({ children }) => {
                     })
                     .catch(error => {
                         console.error('❌ Failed to sync to Firestore:', error);
-                        // TODO: Add retry logic or queue for later
                     })
                     .finally(() => {
                         setIsSyncing(false);
@@ -264,6 +284,29 @@ export const ProgressProvider = ({ children }) => {
 
             return newProgress;
         });
+    };
+
+    // Optimistically unlock module (called after wallet success)
+    const addPurchasedModule = (moduleId) => {
+        if (!purchasedModules.includes(moduleId)) {
+            setPurchasedModules(prev => [...prev, moduleId]);
+            // Localpersist effect handles cache
+        }
+    };
+
+    const updateLastAccessed = async (pathId, moduleId) => {
+        const entry = { pathId, moduleId, timestamp: new Date().toISOString() };
+        setLastAccessedModule(entry);
+
+        // Sync to Firestore if real user
+        const userId = user?.uid;
+        if (userId && user.username !== 'admin' && user.username !== 'learner') {
+            try {
+                await updateLastAccessedModule(userId, entry);
+            } catch (e) {
+                console.error("Failed to sync last accessed", e);
+            }
+        }
     };
 
     const isModuleCompleted = (pathId, moduleId) => {
@@ -277,6 +320,9 @@ export const ProgressProvider = ({ children }) => {
         // Completed modules are never locked
         if (isModuleCompleted(pathId, moduleId)) return false;
 
+        // [NEW] Check if purchased
+        if (purchasedModules.includes(moduleId)) return false;
+
         // Check sequence structure
         const path = LEARNING_PATHS.find(p => p.id === pathId);
         if (!path) return true;
@@ -286,12 +332,23 @@ export const ProgressProvider = ({ children }) => {
             allModules = [...allModules, ...section.modules];
         });
 
+        // First module of first section open? 
+        // Or wait, "1 coin = access to one Module". Strict mode = EVERYTHING locked unless purchased?
+        // Usually introduction is free. 
+        // Let's assume the very first module of the entire path is open, OR they need to buy it.
+        // Prompt says: "Coins are deducted only on first access to a locked module".
+        // This implies some modules MIGHT NOT be locked.
+        // Assuming Logic: If sequential, maybe "unlocking" one by one is natural? 
+        // NO, Prompt says "1 coin = access to one Module". This suggests a pay-wall model, not just sequential.
+        // BUT, logic also says "Resume from last accessed module".
+        // Let's assume: Logic = Must be Purchased OR Default Open.
+        // I will make the First Module of ANY Path free.
+
         const currentIndex = allModules.findIndex(m => m.id === moduleId);
         if (currentIndex === 0) return false; // First module always open
 
-        // Check if previous module is completed
-        const prevModule = allModules[currentIndex - 1];
-        return !isModuleCompleted(pathId, prevModule.id);
+        // If not purchased, it is locked.
+        return true;
     };
 
     const getNextModuleId = (pathId, currentModuleId) => {
@@ -313,10 +370,14 @@ export const ProgressProvider = ({ children }) => {
     return (
         <ProgressContext.Provider value={{
             progress,
+            purchasedModules,
+            addPurchasedModule, // Expose for WalletContext
             xp,
             currentRank: getCurrentRank(),
             unlockedMedals,
             unlockedBadges,
+            lastAccessedModule,
+            updateLastAccessed,
             isLoading,
             isSyncing,
             markModuleComplete,

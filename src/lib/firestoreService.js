@@ -6,12 +6,18 @@ import {
     updateDoc,
     arrayUnion,
     serverTimestamp,
-    increment
+    increment,
+    runTransaction,
+    collection,
+    getDocs,
+    query,
+    where,
+    limit
 } from 'firebase/firestore';
 
 /**
  * Firestore Service Layer
- * Handles all Firestore operations for user progress tracking
+ * Handles all Firestore operations for user progress tracking and wallet
  */
 
 /**
@@ -48,8 +54,10 @@ export const createUserDocument = async (uid, userData) => {
             createdAt: serverTimestamp(),
             lastActive: serverTimestamp(),
             emailVerified: false,
+            walletBalance: 20, // Sign-up bonus (Updated per requirements)
             progress: {
                 completedModules: {},
+                purchasedModules: [], // Track unlocked modules
                 unlockedBadges: [],
                 unlockedMedals: [],
                 xp: 0,
@@ -77,7 +85,7 @@ export const updateLastActive = async (uid) => {
             lastActive: serverTimestamp()
         });
     } catch (error) {
-        console.error('Error updating last active:', error);
+        // console.error('Error updating last active:', error);
         // Don't throw - this is non-critical
     }
 };
@@ -192,6 +200,24 @@ export const syncLocalToFirestore = async (uid, localProgress) => {
 };
 
 /**
+ * Update user's last accessed module
+ * @param {string} uid - User ID
+ * @param {Object} moduleData - { pathId, moduleId, timestamp }
+ * @returns {Promise<void>}
+ */
+export const updateLastAccessedModule = async (uid, moduleData) => {
+    try {
+        const userRef = doc(db, 'users', uid);
+        await updateDoc(userRef, {
+            'progress.lastAccessedModule': moduleData,
+            lastActive: serverTimestamp()
+        });
+    } catch (error) {
+        console.error('Error updating last accessed module:', error);
+    }
+};
+
+/**
  * Update user profile information
  * @param {string} uid - User ID
  * @param {Object} updates - Profile updates
@@ -210,5 +236,179 @@ export const updateUserProfile = async (uid, updates) => {
     } catch (error) {
         console.error('Error updating profile:', error);
         throw error;
+    }
+};
+
+/**
+ * Update user role (Admin only via rules)
+ * @param {string} uid - User ID
+ * @param {string} newRole - New role ('admin' or 'learner')
+ * @returns {Promise<boolean>}
+ */
+export const updateUserRole = async (uid, newRole) => {
+    try {
+        const userRef = doc(db, 'users', uid);
+        await updateDoc(userRef, {
+            role: newRole,
+            lastActive: serverTimestamp()
+        });
+        return true;
+    } catch (error) {
+        console.error('Error updating role:', error);
+        return false;
+    }
+};
+
+// --- WALLET FUNCTIONS ---
+
+export const getWalletBalance = async (uid) => {
+    try {
+        const userRef = doc(db, 'users', uid);
+        const snap = await getDoc(userRef);
+        if (snap.exists()) {
+            return snap.data().walletBalance || 0;
+        }
+        return 0;
+    } catch (error) {
+        console.error("Error getting balance", error);
+        return 0;
+    }
+};
+
+export const rechargeWallet = async (uid, amount = 80) => {
+    try {
+        const userRef = doc(db, 'users', uid);
+        await runTransaction(db, async (transaction) => {
+            const sfDoc = await transaction.get(userRef);
+            if (!sfDoc.exists()) throw "User does not exist!";
+
+            const newBalance = (sfDoc.data().walletBalance || 0) + amount;
+            transaction.update(userRef, { walletBalance: newBalance });
+        });
+        return await getWalletBalance(uid); // Return new balance
+    } catch (error) {
+        console.error("Recharge failed", error);
+        throw error;
+    }
+};
+
+export const deductCoin = async (uid, pathId, moduleId) => {
+    const userRef = doc(db, 'users', uid);
+    try {
+        return await runTransaction(db, async (transaction) => {
+            const sfDoc = await transaction.get(userRef);
+            if (!sfDoc.exists()) throw "User does not exist!";
+
+            const data = sfDoc.data();
+            const balance = data.walletBalance || 0;
+            const purchased = data.progress?.purchasedModules || [];
+
+            // 1. Check if already purchased
+            if (purchased.includes(moduleId)) {
+                return true; // Already unlocked
+            }
+
+            // 2. Check Balance
+            if (balance < 1) {
+                throw new Error("Insufficient Funds");
+            }
+
+            // 3. Deduct & Unlock
+            transaction.update(userRef, {
+                walletBalance: balance - 1,
+                'progress.purchasedModules': arrayUnion(moduleId)
+            });
+
+            return true;
+        });
+    } catch (error) {
+        console.error("Transaction failed: ", error);
+        return false;
+    }
+};
+
+/**
+ * Get email from username for login
+ * @param {string} username 
+ * @returns {Promise<string|null>} Email or null if not found
+ */
+export const getEmailFromUsername = async (username) => {
+    try {
+        const usersRef = collection(db, 'users');
+        const q = query(usersRef, where("username", "==", username), limit(1));
+        const querySnapshot = await getDocs(q);
+
+        if (!querySnapshot.empty) {
+            return querySnapshot.docs[0].data().email;
+        }
+        return null;
+    } catch (error) {
+        console.error("Error finding user by username:", error);
+        return null;
+    }
+};
+
+/**
+ * Deduct 1 coin for session cost (login/refresh)
+ * @param {string} uid - User ID
+ * @returns {Promise<number|null>} New balance or null if failed
+ */
+export const deductSessionCost = async (uid) => {
+    const userRef = doc(db, 'users', uid);
+    try {
+        return await runTransaction(db, async (transaction) => {
+            const sfDoc = await transaction.get(userRef);
+            if (!sfDoc.exists()) throw "User does not exist!";
+
+            const currentBalance = sfDoc.data().walletBalance || 0;
+
+            // Only deduct if they have coins
+            if (currentBalance > 0) {
+                const newBalance = currentBalance - 1;
+                transaction.update(userRef, { walletBalance: newBalance });
+                return newBalance;
+            }
+            return currentBalance; // No deduction if 0
+        });
+    } catch (error) {
+        console.error("Session deduction failed:", error);
+        return null;
+    }
+};
+
+// [ADMIN] Get All Users
+export const getAllUsers = async () => {
+    try {
+        const usersRef = collection(db, 'users');
+        const snapshot = await getDocs(usersRef);
+        return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    } catch (error) {
+        console.error('Error fetching users:', error);
+        throw error;
+    }
+};
+
+// [ADMIN] Add Coins to User
+export const adminAddCoins = async (targetUid, amount) => {
+    try {
+        const userRef = doc(db, 'users', targetUid);
+
+        await runTransaction(db, async (transaction) => {
+            const userDoc = await transaction.get(userRef);
+            if (!userDoc.exists()) {
+                throw new Error("User does not exist!");
+            }
+
+            const currentBalance = userDoc.data().walletBalance || 0;
+            const newBalance = currentBalance + parseInt(amount);
+
+            transaction.update(userRef, {
+                walletBalance: newBalance
+            });
+        });
+        return true;
+    } catch (error) {
+        console.error('Error adding coins:', error);
+        return false;
     }
 };
