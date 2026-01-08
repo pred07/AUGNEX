@@ -44,7 +44,7 @@ export const AuthProvider = ({ children }) => {
                         const userData = {
                             uid: firebaseUser.uid,
                             username: firestoreData?.username || firebaseUser.displayName || firebaseUser.email.split('@')[0],
-                            role: firestoreData?.role || 'learner',
+                            role: (firebaseUser.email === 'admin@nytvnt.dev') ? 'admin' : (firestoreData?.role || 'learner'),
                             rank: firestoreData?.rank || 'Neophyte',
                             xp: firestoreData?.progress?.xp || 0,
                             publicId: firebaseUser.uid.slice(0, 8).toUpperCase(),
@@ -61,27 +61,7 @@ export const AuthProvider = ({ children }) => {
                     console.error("Error setting user context:", error);
                     // Don't clear user here, just might have partial data
                 }
-            } else {
-                // Check for mock session only if no firebase user
-                const storedUser = localStorage.getItem('user');
-                if (storedUser) {
-                    try {
-                        const parsed = JSON.parse(storedUser);
-                        // Only allow specific mock credentials
-                        if (parsed.username === 'admin' || parsed.username === 'learner') {
-                            if (mounted) setUser(parsed);
-                        } else {
-                            // Invalid local storage for real auth
-                            localStorage.removeItem('user');
-                            if (mounted) setUser(null);
-                        }
-                    } catch (e) {
-                        localStorage.removeItem('user');
-                        if (mounted) setUser(null);
-                    }
-                } else {
-                    if (mounted) setUser(null);
-                }
+                if (mounted) setUser(null);
             }
             if (mounted) setIsLoading(false);
         });
@@ -93,39 +73,6 @@ export const AuthProvider = ({ children }) => {
     }, []);
 
     const login = async (usernameOrEmail, password) => {
-        // 1. Try Mock Credentials (legacy/demo)
-        if (usernameOrEmail === 'admin' && password === 'nytvnt@207') {
-            const userData = {
-                username: 'admin',
-                role: 'admin',
-                rank: 'Architect',
-                xp: 99999,
-                publicId: 'AG-88X1',
-                avatar: 'https://api.dicebear.com/9.x/dylan/svg?seed=admin',
-                socials: { twitter: '', linkedin: '', website: '' },
-                lastUsernameChange: null,
-            };
-            setUser(userData);
-            localStorage.setItem('user', JSON.stringify(userData));
-            return userData;
-        }
-
-        if (usernameOrEmail === 'learner' && password === 'learner') {
-            const userData = {
-                username: 'learner',
-                role: 'learner',
-                rank: 'Neophyte',
-                xp: 0,
-                publicId: 'AG-22B9',
-                avatar: 'https://api.dicebear.com/9.x/dylan/svg?seed=learner',
-                socials: { twitter: '', linkedin: '', website: '' },
-                lastUsernameChange: null,
-            };
-            setUser(userData);
-            localStorage.setItem('user', JSON.stringify(userData));
-            return userData;
-        }
-
         // 2. Try Firebase Auth (Real Users)
         try {
             let emailToUse = usernameOrEmail;
@@ -243,10 +190,7 @@ export const AuthProvider = ({ children }) => {
                         newUser.lastUsernameChange = now.toISOString();
                     }
 
-                    // If mock user, update localstorage
-                    if (prev.username === 'admin' || prev.username === 'learner') {
-                        localStorage.setItem('user', JSON.stringify(newUser));
-                    }
+
 
                     resolve(newUser);
                     return newUser;

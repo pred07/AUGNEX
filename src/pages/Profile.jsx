@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Button from '../components/ui/Button';
 import Input from '../components/ui/Input';
 import Badge from '../components/ui/Badge';
-import { User, Globe, Twitter, Linkedin, Save, AlertCircle, CheckCircle, Camera, Award, Lock, Key } from 'lucide-react';
+import { User, Globe, Twitter, Linkedin, Save, AlertCircle, CheckCircle, Camera, Award, Lock, Key, Ticket, Coins } from 'lucide-react';
 import { BADGES } from '../data/badges';
 
 const AVATAR_SEEDS = [
@@ -28,7 +28,9 @@ const Profile = () => {
 
     // Password State
     const [passwordData, setPasswordData] = useState({ newPassword: '', confirmPassword: '' });
-    const [passLoading, setPassLoading] = useState(false);
+    // Coupon State
+    const [couponCode, setCouponCode] = useState('');
+    const [redeemLoading, setRedeemLoading] = useState(false);
 
     // UI state
     const [isEditingAvatar, setIsEditingAvatar] = useState(false);
@@ -102,6 +104,32 @@ const Profile = () => {
             }
         } finally {
             setPassLoading(false);
+        }
+    };
+
+    const handleRedeemCoupon = async (e) => {
+        e.preventDefault();
+        if (!couponCode) return;
+        setRedeemLoading(true);
+        setMessage({ type: '', text: '' });
+        try {
+            const { redeemCoupon } = await import('../lib/firestoreService');
+            const result = await redeemCoupon(user.uid, couponCode);
+            if (result.success) {
+                setMessage({ type: 'success', text: result.message });
+                setCouponCode('');
+                // Ideally refresh user wallet balance immediately, 
+                // but AuthContext listener might catch it if we triggered a balance update via other means, 
+                // or we can manually update local state if needed. 
+                // For now, rely on standard data flow.
+            } else {
+                setMessage({ type: 'error', text: result.message });
+            }
+        } catch (error) {
+            console.error(error);
+            setMessage({ type: 'error', text: "Error redeeming coupon" });
+        } finally {
+            setRedeemLoading(false);
         }
     };
 
@@ -274,6 +302,64 @@ const Profile = () => {
                     </div>
                 </motion.div>
             </div>
+
+            {/* Wallet & Coupons Section */}
+            <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.22 }}
+                className="mt-8"
+            >
+                <div className="glass-card p-8 rounded-xl border border-white/10 relative overflow-hidden max-w-4xl mx-auto">
+                    <div className="absolute top-0 right-0 p-4 opacity-10">
+                        <Coins size={120} />
+                    </div>
+
+                    <div className="relative z-10">
+                        <h2 className="text-2xl font-orbitron font-bold text-white mb-6 flex items-center gap-3">
+                            <Coins className="text-primary" size={28} />
+                            WALLET OPERATIONS
+                        </h2>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                            <div>
+                                <h3 className="text-lg font-bold text-white mb-2">Current Balance</h3>
+                                <div className="text-4xl font-mono text-primary font-bold flex items-center gap-2">
+                                    <Coins size={32} />
+                                    {user?.walletBalance || 0}
+                                </div>
+                                <p className="text-gray-400 font-mono text-sm mt-4">
+                                    Use coupons to recharge your balance and unlock more modules.
+                                </p>
+                            </div>
+
+                            <div className="bg-black/30 p-6 rounded-xl border border-white/5">
+                                <h3 className="text-sm font-bold text-white mb-4 flex items-center gap-2">
+                                    <Ticket size={16} className="text-primary" /> REDEEM COUPON
+                                </h3>
+                                <form onSubmit={handleRedeemCoupon} className="flex gap-2">
+                                    <div className="flex-1">
+                                        <Input
+                                            placeholder="ENTER CODE"
+                                            value={couponCode}
+                                            onChange={e => setCouponCode(e.target.value.toUpperCase())}
+                                            className="uppercase font-mono"
+                                        />
+                                    </div>
+                                    <Button
+                                        type="submit"
+                                        isLoading={redeemLoading}
+                                        disabled={!couponCode}
+                                        icon={CheckCircle}
+                                    >
+                                        CLAIM
+                                    </Button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </motion.div>
 
             {/* Security Section */}
             <motion.div

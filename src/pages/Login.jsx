@@ -8,14 +8,14 @@ import { Shield, User, Lock, AlertCircle, ChevronRight, Terminal, Mail } from 'l
 import { motion, AnimatePresence } from 'framer-motion';
 
 const Login = () => {
-    const [isLogin, setIsLogin] = useState(true);
+
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    const { login, register, loginWithGoogle, isAuthenticated } = useAuth();
+    const { login, loginWithGoogle, isAuthenticated } = useAuth();
     const navigate = useNavigate();
     const location = useLocation();
     const from = location.state?.from?.pathname || '/';
@@ -32,14 +32,8 @@ const Login = () => {
         setIsSubmitting(true);
 
         try {
-            if (isLogin) {
-                // For login, username field can be username OR email
-                await login(username, password);
-            } else {
-                // For registration, we need all fields
-                if (!email) throw new Error("Email is required for registration");
-                await register(email, password, username);
-            }
+            // Login with username/email and password
+            await login(username, password);
         } catch (err) {
             setError(err.message || 'Authentication failed');
             setIsSubmitting(false);
@@ -100,9 +94,9 @@ const Login = () => {
 
                     <div className="space-y-4">
                         <Input
-                            label={isLogin ? "Identity" : "Username"}
+                            label="Identity"
                             type="text"
-                            placeholder={isLogin ? "Username or Email" : "Choose a username"}
+                            placeholder="Username or Email"
                             value={username}
                             onChange={(e) => setUsername(e.target.value)}
                             icon={User}
@@ -110,36 +104,14 @@ const Login = () => {
                             required
                         />
 
-                        <AnimatePresence>
-                            {!isLogin && (
-                                <motion.div
-                                    initial={{ height: 0, opacity: 0 }}
-                                    animate={{ height: 'auto', opacity: 1 }}
-                                    exit={{ height: 0, opacity: 0 }}
-                                    className="overflow-hidden"
-                                >
-                                    <Input
-                                        label="Email"
-                                        type="email"
-                                        placeholder="Enter your email"
-                                        value={email}
-                                        onChange={(e) => setEmail(e.target.value)}
-                                        icon={Mail}
-                                        autoComplete="email"
-                                        required={!isLogin}
-                                    />
-                                </motion.div>
-                            )}
-                        </AnimatePresence>
-
                         <Input
                             label="Key"
                             type="password"
-                            placeholder={isLogin ? "Enter password" : "Create password"}
+                            placeholder="Enter password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             icon={Lock}
-                            autoComplete={isLogin ? "current-password" : "new-password"}
+                            autoComplete="current-password"
                             required
                         />
                     </div>
@@ -150,21 +122,10 @@ const Login = () => {
                         isLoading={isSubmitting}
                         icon={ChevronRight}
                     >
-                        {isLogin ? 'Authenticate' : 'Initialize Protocol'}
+                        Authenticate
                     </Button>
 
-                    <div className="text-center mt-4">
-                        <button
-                            type="button"
-                            onClick={() => {
-                                setIsLogin(!isLogin);
-                                setError('');
-                            }}
-                            className="text-primary/70 hover:text-primary text-xs font-mono tracking-wider uppercase transition-colors"
-                        >
-                            {isLogin ? "New User? Create Account" : "Already have access? Login"}
-                        </button>
-                    </div>
+
 
                     <div className="mt-6 pt-6 border-t border-white/5">
                         <p className="text-center text-xs text-gray-500 font-mono mb-3">EXTERNAL PROTOCOLS</p>

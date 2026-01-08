@@ -14,7 +14,7 @@ import ServiceRecord from './pages/ServiceRecord';
 import ModulesLibrary from './pages/ModulesLibrary';
 import PublicProfile from './pages/PublicProfile';
 import AdminDashboard from './pages/AdminDashboard';
-import Bootstrap from './pages/Bootstrap';
+
 // const Modules = () => <h1 className="text-2xl font-orbitron">Modules</h1>;
 
 import { ThemeProvider } from './context/ThemeContext';
@@ -85,7 +85,7 @@ function App() {
                 </ProtectedRoute>
               } />
 
-              <Route path="/bootstrap" element={<Bootstrap />} />
+
 
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>

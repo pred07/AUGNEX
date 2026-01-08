@@ -10,6 +10,7 @@ import {
     runTransaction,
     collection,
     getDocs,
+    deleteDoc,
     query,
     where,
     limit
@@ -410,5 +411,106 @@ export const adminAddCoins = async (targetUid, amount) => {
     } catch (error) {
         console.error('Error adding coins:', error);
         return false;
+    }
+}
+
+
+// --- COUPON SYSTEM ---
+
+/**
+ * Create a new coupon
+ * @param {string} code - Coupon code (will be uppercased)
+ * @param {number} amount - Coin amount
+ * @returns {Promise<boolean>}
+ */
+export const createCoupon = async (code, amount) => {
+    try {
+        const cleanCode = code.toUpperCase().trim();
+        const couponRef = doc(db, 'coupons', cleanCode);
+        await setDoc(couponRef, {
+            code: cleanCode,
+            amount: parseInt(amount),
+            createdAt: serverTimestamp(),
+            usedBy: [] // Track UIDs who claimed it
+        });
+        return true;
+    } catch (error) {
+        console.error("Error creating coupon:", error);
+        return false;
+    }
+};
+
+/**
+ * Get all coupons
+ * @returns {Promise<Array>} List of coupons
+ */
+export const getCoupons = async () => {
+    try {
+        const q = query(collection(db, 'coupons'));
+        const snapshot = await getDocs(q);
+        return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    } catch (error) {
+        console.error("Error fetching coupons:", error);
+        return [];
+    }
+};
+
+/**
+ * Delete a coupon
+ * @param {string} code 
+ */
+export const deleteCoupon = async (code) => {
+    try {
+        await deleteDoc(doc(db, 'coupons', code));
+        return true;
+    } catch (error) {
+        console.error("Error deleting coupon", error);
+        return false;
+    }
+};
+
+/**
+ * Redeem a coupon
+ * @param {string} uid - User ID
+ * @param {string} code - Coupon Code
+ * @returns {Promise<{success: boolean, message: string, amount?: number}>}
+ */
+export const redeemCoupon = async (uid, code) => {
+    const cleanCode = code.toUpperCase().trim();
+    const couponRef = doc(db, 'coupons', cleanCode);
+    const userRef = doc(db, 'users', uid);
+
+    try {
+        return await runTransaction(db, async (transaction) => {
+            const couponSnap = await transaction.get(couponRef);
+            if (!couponSnap.exists()) {
+                throw "Invalid coupon code.";
+            }
+
+            const couponData = couponSnap.data();
+            const usedBy = couponData.usedBy || [];
+
+            if (usedBy.includes(uid)) {
+                throw "You have already redeemed this coupon.";
+            }
+
+            // Award coins
+            const userSnap = await transaction.get(userRef);
+            if (!userSnap.exists()) throw "User not found.";
+
+            const currentBalance = userSnap.data().walletBalance || 0;
+            const newBalance = currentBalance + couponData.amount;
+
+            // Updates
+            transaction.update(userRef, { walletBalance: newBalance });
+            transaction.update(couponRef, { usedBy: arrayUnion(uid) });
+
+            return { success: true, message: `Redeemed ${couponData.amount} coins!`, amount: couponData.amount };
+        });
+    } catch (error) {
+        let msg = "Redemption failed";
+        if (typeof error === 'string') msg = error;
+        console.error("Redeem error:", error);
+        return { success: false, message: msg };
     }
 };
