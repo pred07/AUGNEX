@@ -57,6 +57,23 @@ export const AuthProvider = ({ children }) => {
 
     const login = async (email, password) => {
         try {
+            // TEMPORARY: Local test admin user (remove later)
+            if (email === 'kuthG' && password === 'kuthG') {
+                const testUser = {
+                    uid: 'test-admin-local',
+                    email: 'kuthG@local.test',
+                    displayName: 'kuthG',
+                    photoURL: 'https://api.dicebear.com/9.x/dylan/svg?seed=kuthG',
+                    providerData: [{ providerId: 'password' }],
+                    role: 'admin'
+                };
+
+                localStorageService.saveUserData(testUser);
+                setUser(localStorageService.getUserData());
+                setIsLoading(false);
+                return;
+            }
+
             await signInWithEmailAndPassword(auth, email, password);
             // Auth listener will handle state update
         } catch (error) {
