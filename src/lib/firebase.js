@@ -11,6 +11,8 @@ const firebaseConfig = {
     appId: "1:740646755042:web:7694c6a5b578044a091cbb"
 };
 
+// Force rebuild - localStorage migration
+
 
 
 const app = initializeApp(firebaseConfig);
