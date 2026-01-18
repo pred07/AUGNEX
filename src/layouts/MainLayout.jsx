@@ -64,36 +64,43 @@ const MainLayout = ({ children }) => {
                     {/* Theme Toggle Removed */}
 
                     {user && (
-                        <Link to="/service-record">
-                            <div className="bg-surface/50 rounded-xl p-3 border border-white/5 mb-4 group hover:border-white/10 transition-colors cursor-pointer">
-                                <div className="flex items-center gap-3">
-                                    <img src={user.avatar} alt="Avatar" className="w-10 h-10 rounded-lg border border-white/10 group-hover:border-primary/50 transition-colors" />
-                                    <div className="hidden xl:block overflow-hidden">
-                                        <p className="text-sm font-bold font-rajdhani truncate text-text-main">{user.username}</p>
-                                        <div className="flex items-center justify-between">
-                                            <p className="text-xs text-primary font-mono">{user.rank}</p>
-                                            <Link to="/subscription" className="text-xs text-yellow-400 font-mono flex items-center gap-1 hover:text-yellow-300">
-                                                <Coins size={10} /> {user.walletBalance || 0}
-                                            </Link>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className="mt-3 hidden xl:block">
-                                    <div className="flex justify-between text-[10px] text-muted mb-1 uppercase tracking-wider">
-                                        <span>XP Progress</span>
-                                        <span>{user.xp} / 2000</span>
-                                    </div>
-                                    <div className="h-1 w-full bg-white/5 rounded-full overflow-hidden">
-                                        <motion.div
-                                            initial={{ width: 0 }}
-                                            animate={{ width: `${(user.xp / 2000) * 100}%` }}
-                                            className="h-full bg-primary shadow-[0_0_10px_rgba(0,255,157,0.5)]"
-                                        />
+                        <div
+                            onClick={() => window.location.href = '/service-record'}
+                            className="bg-surface/50 rounded-xl p-3 border border-white/5 mb-4 group hover:border-white/10 transition-colors cursor-pointer"
+                        >
+                            <div className="flex items-center gap-3">
+                                <img src={user.avatar} alt="Avatar" className="w-10 h-10 rounded-lg border border-white/10 group-hover:border-primary/50 transition-colors" />
+                                <div className="hidden xl:block overflow-hidden">
+                                    <p className="text-sm font-bold font-rajdhani truncate text-text-main">{user.username}</p>
+                                    <div className="flex items-center justify-between">
+                                        <p className="text-xs text-primary font-mono">{user.rank}</p>
+                                        <span
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                window.location.href = '/subscription';
+                                            }}
+                                            className="text-xs text-yellow-400 font-mono flex items-center gap-1 hover:text-yellow-300 cursor-pointer"
+                                        >
+                                            <Coins size={10} /> {user.walletBalance || 0}
+                                        </span>
                                     </div>
                                 </div>
                             </div>
-                        </Link>
+
+                            <div className="mt-3 hidden xl:block">
+                                <div className="flex justify-between text-[10px] text-muted mb-1 uppercase tracking-wider">
+                                    <span>XP Progress</span>
+                                    <span>{user.xp} / 2000</span>
+                                </div>
+                                <div className="h-1 w-full bg-white/5 rounded-full overflow-hidden">
+                                    <motion.div
+                                        initial={{ width: 0 }}
+                                        animate={{ width: `${(user.xp / 2000) * 100}%` }}
+                                        className="h-full bg-primary shadow-[0_0_10px_rgba(0,255,157,0.5)]"
+                                    />
+                                </div>
+                            </div>
+                        </div>
                     )}
 
                     <button

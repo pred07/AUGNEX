@@ -155,6 +155,27 @@ export const unlockMedal = (medalId) => {
 };
 
 /**
+ * Update last accessed module (for analytics/UX)
+ */
+export const updateLastAccessed = (pathId, moduleId) => {
+    try {
+        const progress = getProgress();
+
+        progress.lastAccessed = {
+            pathId,
+            moduleId,
+            timestamp: new Date().toISOString()
+        };
+
+        localStorage.setItem(STORAGE_KEYS.PROGRESS, JSON.stringify(progress));
+        return progress;
+    } catch (error) {
+        console.error('Error updating last accessed:', error);
+        return null;
+    }
+};
+
+/**
  * Initialize wallet data
  */
 const initializeWallet = () => ({

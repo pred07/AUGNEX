@@ -146,6 +146,15 @@ export const ProgressProvider = ({ children }) => {
         }
     };
 
+    const updateLastAccessed = (pathId, moduleId) => {
+        // Track last accessed module for analytics/UX
+        try {
+            localStorageService.updateLastAccessed(pathId, moduleId);
+        } catch (error) {
+            console.error('Error updating last accessed:', error);
+        }
+    };
+
     const isModuleCompleted = (pathId, moduleId) => {
         return progress[pathId]?.includes(moduleId) || false;
     };
@@ -197,6 +206,7 @@ export const ProgressProvider = ({ children }) => {
             progress,
             purchasedModules,
             addPurchasedModule,
+            updateLastAccessed,
             xp,
             currentRank: getCurrentRank(),
             unlockedMedals,
