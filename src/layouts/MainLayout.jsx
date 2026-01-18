@@ -1,7 +1,7 @@
 import React from 'react';
 import { useAuth } from '../context/AuthContext';
 import { motion } from 'framer-motion';
-import { LogOut, Home, Map, Box, Award, Settings, User, Shield } from 'lucide-react';
+import { LogOut, Home, Map, Box, Award, Settings, User, Shield, Coins } from 'lucide-react';
 
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '../lib/utils';
@@ -50,6 +50,7 @@ const MainLayout = ({ children }) => {
                     <SidebarItem icon={Home} label="Dashboard" path="/" isActive={location.pathname === '/'} />
                     <SidebarItem icon={Map} label="Learning Paths" path="/paths" isActive={location.pathname === '/paths'} />
                     <SidebarItem icon={Box} label="Library" path="/modules" isActive={location.pathname === '/modules'} />
+                    <SidebarItem icon={Coins} label="Coins" path="/subscription" isActive={location.pathname === '/subscription'} />
                     <SidebarItem icon={Award} label="Service Record" path="/service-record" isActive={location.pathname === '/service-record'} />
 
                     {user?.role === 'admin' && (
@@ -69,7 +70,12 @@ const MainLayout = ({ children }) => {
                                     <img src={user.avatar} alt="Avatar" className="w-10 h-10 rounded-lg border border-white/10 group-hover:border-primary/50 transition-colors" />
                                     <div className="hidden xl:block overflow-hidden">
                                         <p className="text-sm font-bold font-rajdhani truncate text-text-main">{user.username}</p>
-                                        <p className="text-xs text-primary font-mono">{user.rank}</p>
+                                        <div className="flex items-center justify-between">
+                                            <p className="text-xs text-primary font-mono">{user.rank}</p>
+                                            <Link to="/subscription" className="text-xs text-yellow-400 font-mono flex items-center gap-1 hover:text-yellow-300">
+                                                <Coins size={10} /> {user.walletBalance || 0}
+                                            </Link>
+                                        </div>
                                     </div>
                                 </div>
 

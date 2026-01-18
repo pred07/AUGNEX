@@ -40,37 +40,25 @@ service cloud.firestore {
                 request.resource.data.walletBalance >= 0);
     }
     
-    // Users collection
+    // Users collection (ADMIN ONLY - user data now in localStorage)
     match /users/{userId} {
-      // Allow read if:
-      // - User is reading their own data
-      // - OR reading public profile fields only
-      // - OR requester is an admin
-      allow read: if isOwner(userId) || 
-                     (isAuthenticated() && request.resource == null) ||
-                     get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
-      
-      // Allow create only for the user's own document
-      allow create: if isOwner(userId) && 
-                       isValidUserData();
-      
-      // Allow update only for the user's own document OR if admin (for wallet)
-      allow update: if (isOwner(userId) &&
-                       // Prevent role escalation (Allow exception for Bootstrap Admin)
-                       (request.resource.data.role == resource.data.role || 
-                        resource.data.role == 'admin' ||
-                        request.auth.token.email == 'admin@nytvnt.dev') &&
-                       // Validate progress structure if being updated
-                       (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['progress']) ||
-                        isValidProgress()) &&
-                       // Validate wallet
-                       isValidWalletUpdate()) 
-                       ||
-                       // Admin Override (specifically for wallet/management)
-                       (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin');
-      
-      // Prevent deletion
-      allow delete: if false;
+      // Only admins can read/write user documents
+      allow read, write: if get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+
+    // Coupons Collection
+    match /coupons/{couponId} {
+        allow read: if isAuthenticated();
+        allow create, delete: if get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+        allow update: if get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin' ||
+                      (isAuthenticated() && 
+                       request.resource.data.diff(resource.data).affectedKeys().hasOnly(['usedBy']));
+    }
+
+    // Coin Bundles Collection (Dynamic Pricing)
+    match /coin_bundles/{bundleId} {
+        allow read: if true; // Publicly visible for pricing page
+        allow write: if get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
     }
     
     // Deny all other access

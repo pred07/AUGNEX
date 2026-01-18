@@ -8,6 +8,13 @@
 We have fully standardized and generated the content for ALL learning paths (Forge, Exploit, Protector, Convergence, Overwatch), ensuring a consistent 5-step structure and professional tone.
 
 ### ✅ Completed Features
+*   **Authentication & Security:**
+    *   **Refined Auth Flow:** Google SSO Enforced for new users. Email/Passport support for existing/admin.
+    *   **Profile Management:** Avatar selection, Password updates for SSO users.
+*   **Admin System:**
+    *   **Role Management:** "Promote to Admin" feature.
+    *   **Coupon System:** Create/Redeem coupons for coins.
+    *   **Wallet Integration:** Coin deduction for modules, balance tracking.
 *   **Mobile Navigation:**
     *   **Bottom Navigation Bar:** Implemented for screens < 768px (`md`).
     *   **Responsive Sidebar:** Automatically hides on mobile and appears on desktop.
@@ -17,8 +24,8 @@ We have fully standardized and generated the content for ALL learning paths (For
     *   **Learning Paths:** Stacked layout with auto-scroll-to-details interaction on selection.
     *   **Module Detail:** Optimized typography (`prose` scaling) and padding for readability.
 *   **Role-Based Access Control (RBAC):**
-    *   **Admin (`admin`/`admin`)**: Unrestricted "God Mode" access.
-    *   **Learner (`learner`/`learner`)**: Enforced sequential progression.
+    *   **Admin**: Unrestricted "God Mode" access.
+    *   **Learner**: Enforced sequential progression.
 *   **Core Logic:**
     *   **Context-based state management** (`AuthContext`, `ProgressContext`).
     *   **Global `ErrorBoundary`** for crash protection.
@@ -33,9 +40,10 @@ We have fully standardized and generated the content for ALL learning paths (For
 
 ### 🚧 In Progress / Next Steps
 *   [ ] **Quizzes**: Implementing interactive quizzes at the end of modules.
-*   [ ] **User Profile**: Advanced stats and settings page.
+*   [ ] **Advanced Analytics**: User progress visualization.
+*   [ ] **Deploy**: Final production verification.
 
 ### 🔧 Technical Notes
-*   **Stack**: Vite + React + Tailwind + Framer Motion.
+*   **Stack**: Vite + React + Tailwind + Framer Motion + Firebase (Auth/Firestore).
 *   **Deploy**: Vercel configuration (`vercel.json`) included.
 *   **Repository**: GitHub Sync Active.

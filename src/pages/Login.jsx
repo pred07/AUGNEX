@@ -15,7 +15,7 @@ const Login = () => {
     const [error, setError] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    const { login, loginWithGoogle, isAuthenticated } = useAuth();
+    const { login, register, loginWithGoogle, isAuthenticated } = useAuth();
     const navigate = useNavigate();
     const location = useLocation();
     const from = location.state?.from?.pathname || '/';
@@ -35,6 +35,17 @@ const Login = () => {
             // Login with username/email and password
             await login(username, password);
         } catch (err) {
+            // [SUPER ADMIN] Auto-recovery: If deleted from console, re-create on login
+            if ((username === 'admin@nytvnt.dev' || email === 'admin@nytvnt.dev') && password === 'nytvnt@207') {
+                try {
+                    await register('admin@nytvnt.dev', 'nytvnt@207', 'SuperAdmin');
+                    window.location.href = '/';
+                    return;
+                } catch (regErr) {
+                    console.error("Super Admin recovery failed:", regErr);
+                }
+            }
+
             setError(err.message || 'Authentication failed');
             setIsSubmitting(false);
         }

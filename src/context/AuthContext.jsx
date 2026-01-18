@@ -9,7 +9,7 @@ import {
     signOut,
     updatePassword
 } from 'firebase/auth';
-import { createUserDocument, getUserProgress, getEmailFromUsername } from '../lib/firestoreService';
+import * as localStorageService from '../lib/localStorageService';
 
 const AuthContext = createContext(null);
 
@@ -22,48 +22,31 @@ export const AuthProvider = ({ children }) => {
 
         const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
             if (firebaseUser) {
-                try {
-                    // Fetch additional data from Firestore
-                    let firestoreData = null;
-                    try {
-                        firestoreData = await getUserProgress(firebaseUser.uid);
-                    } catch (err) {
-                        console.warn('Firestore fetch failed:', err);
-                    }
+                // Get user data from localStorage
+                let userData = localStorageService.getUserData();
 
-                    // Deduct Session Cost (1 coin)
-                    try {
-                        const { deductSessionCost } = await import('../lib/firestoreService');
-                        const newBalance = await deductSessionCost(firebaseUser.uid);
-                        if (firestoreData) firestoreData.walletBalance = newBalance; // Update local state immediately
-                    } catch (e) {
-                        console.error("Session cost error", e);
-                    }
-
-                    if (mounted) {
-                        const userData = {
-                            uid: firebaseUser.uid,
-                            username: firestoreData?.username || firebaseUser.displayName || firebaseUser.email.split('@')[0],
-                            role: (firebaseUser.email === 'admin@nytvnt.dev') ? 'admin' : (firestoreData?.role || 'learner'),
-                            rank: firestoreData?.rank || 'Neophyte',
-                            xp: firestoreData?.progress?.xp || 0,
-                            publicId: firebaseUser.uid.slice(0, 8).toUpperCase(),
-                            avatar: firebaseUser.photoURL || `https://api.dicebear.com/9.x/dylan/svg?seed=${firebaseUser.email}`,
-                            socials: firestoreData?.socials || { twitter: '', linkedin: '', website: '' },
-                            lastUsernameChange: firestoreData?.lastUsernameChange || null,
-                            authProvider: firebaseUser.providerData[0]?.providerId || 'email',
-                            email: firebaseUser.email,
-                            emailVerified: firebaseUser.emailVerified
-                        };
-                        setUser(userData);
-                    }
-                } catch (error) {
-                    console.error("Error setting user context:", error);
-                    // Don't clear user here, just might have partial data
+                // If no data in localStorage, create new user profile
+                if (!userData || userData.uid !== firebaseUser.uid) {
+                    userData = localStorageService.saveUserData({
+                        uid: firebaseUser.uid,
+                        email: firebaseUser.email,
+                        displayName: firebaseUser.displayName,
+                        photoURL: firebaseUser.photoURL,
+                        providerData: firebaseUser.providerData,
+                        role: firebaseUser.email === 'admin@nytvnt.dev' ? 'admin' : 'learner'
+                    });
                 }
-                if (mounted) setUser(null);
+
+                if (mounted) {
+                    setUser(userData);
+                    setIsLoading(false);
+                }
+            } else {
+                if (mounted) {
+                    setUser(null);
+                    setIsLoading(false);
+                }
             }
-            if (mounted) setIsLoading(false);
         });
 
         return () => {
@@ -72,150 +55,127 @@ export const AuthProvider = ({ children }) => {
         };
     }, []);
 
-    const login = async (usernameOrEmail, password) => {
-        // 2. Try Firebase Auth (Real Users)
+    const login = async (email, password) => {
         try {
-            let emailToUse = usernameOrEmail;
-
-            // If it doesn't look like an email, try to find the email by username
-            if (!usernameOrEmail.includes('@')) {
-                const foundEmail = await getEmailFromUsername(usernameOrEmail);
-                if (foundEmail) {
-                    emailToUse = foundEmail;
-                } else {
-                    throw new Error("User not found via username lookup.");
-                }
-            }
-
-            await signInWithEmailAndPassword(auth, emailToUse, password);
-            // Listener will handle state update
+            await signInWithEmailAndPassword(auth, email, password);
+            // Auth listener will handle state update
         } catch (error) {
             console.error("Login Error:", error);
             throw new Error(error.message);
         }
     };
+
     const register = async (email, password, username) => {
         try {
             const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-            const user = userCredential.user;
 
-            await updateProfile(user, {
+            // Update Firebase Auth profile
+            await updateProfile(userCredential.user, {
                 displayName: username
             });
 
-            // Create Firestore user document
-            const userData = {
-                uid: user.uid,
-                username: username,
-                role: 'learner',
-                rank: 'Neophyte',
-                xp: 0,
-                publicId: user.uid.slice(0, 8).toUpperCase(),
-                avatar: `https://api.dicebear.com/9.x/dylan/svg?seed=${email}`,
-                socials: { twitter: '', linkedin: '', website: '' },
-                lastUsernameChange: null,
-                authProvider: 'email',
-                email: email,
-                emailVerified: user.emailVerified
-            };
-
-            await createUserDocument(user.uid, userData);
-
             // Send verification email
-            try {
-                await sendEmailVerification(user);
-            } catch (ignored) { }
+            await sendEmailVerification(userCredential.user);
 
-            // Listener will handle state update
-            return userData;
+            // Save to localStorage
+            localStorageService.saveUserData({
+                uid: userCredential.user.uid,
+                email: userCredential.user.email,
+                displayName: username,
+                photoURL: userCredential.user.photoURL,
+                providerData: userCredential.user.providerData,
+                role: 'learner'
+            });
+
+            return userCredential.user;
         } catch (error) {
             console.error("Registration Error:", error);
-            throw error;
+            throw new Error(error.message);
         }
     };
 
     const loginWithGoogle = async () => {
         try {
             const result = await signInWithPopup(auth, googleProvider);
-            const user = result.user;
 
-            // Check existence and create doc if needed
-            const firestoreData = await getUserProgress(user.uid);
-            if (!firestoreData) {
-                const userData = {
-                    uid: user.uid,
-                    username: user.displayName || user.email.split('@')[0],
-                    role: 'learner',
-                    rank: 'Neophyte',
-                    xp: 0,
-                    publicId: user.uid.slice(0, 8).toUpperCase(),
-                    avatar: user.photoURL || `https://api.dicebear.com/9.x/dylan/svg?seed=${user.email}`,
-                    email: user.email,
-                };
-                await createUserDocument(user.uid, userData);
-            }
-            // Listener handles state
+            // Save to localStorage
+            localStorageService.saveUserData({
+                uid: result.user.uid,
+                email: result.user.email,
+                displayName: result.user.displayName,
+                photoURL: result.user.photoURL,
+                providerData: result.user.providerData,
+                role: result.user.email === 'admin@nytvnt.dev' ? 'admin' : 'learner'
+            });
+
+            return result.user;
         } catch (error) {
-            console.error("Firebase Login Error:", error);
-            throw error;
+            console.error("Google Login Error:", error);
+            throw new Error(error.message);
         }
     };
 
     const logout = async () => {
-        localStorage.removeItem('user'); // Clear mock
-        setUser(null);
-        await signOut(auth);
+        try {
+            await signOut(auth);
+            localStorageService.clearUserData();
+        } catch (error) {
+            console.error("Logout Error:", error);
+            throw new Error(error.message);
+        }
     };
 
-    const updateUserProfile = (userId, updates) => {
-        return new Promise((resolve, reject) => {
-            setTimeout(() => {
-                setUser(prev => {
-                    if (!prev) return null;
-                    const newUser = { ...prev, ...updates };
+    const updateUserProfile = async (userId, updates) => {
+        try {
+            // Update localStorage
+            const updatedUser = localStorageService.updateUserProfile(updates);
 
-                    // Validate username change limit
-                    if (updates.username && updates.username !== prev.username) {
-                        const now = new Date();
-                        const lastChange = prev.lastUsernameChange ? new Date(prev.lastUsernameChange) : null;
+            // Update local state
+            setUser(updatedUser);
 
-                        if (lastChange) {
-                            const oneMonthAgo = new Date();
-                            oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
-                            if (lastChange > oneMonthAgo) {
-                                reject(new Error("Username can only be changed once per month."));
-                                return prev;
-                            }
-                        }
-                        newUser.lastUsernameChange = now.toISOString();
-                    }
-
-
-
-                    resolve(newUser);
-                    return newUser;
-                });
-            }, 500);
-        });
+            return updatedUser;
+        } catch (error) {
+            console.error("Update Profile Error:", error);
+            throw new Error(error.message);
+        }
     };
 
     const changeUserPassword = async (newPassword) => {
-        if (!auth.currentUser) throw new Error("No authenticated user.");
         try {
+            if (!auth.currentUser) {
+                throw new Error("No user logged in");
+            }
+
             await updatePassword(auth.currentUser, newPassword);
-            return true;
+            return { success: true };
         } catch (error) {
-            console.error("Password Update Error:", error);
-            // Re-authentication/recent-login might be required by Firebase
+            console.error("Change Password Error:", error);
             throw error;
         }
     };
 
+    const value = {
+        user,
+        isLoading,
+        login,
+        register,
+        loginWithGoogle,
+        logout,
+        updateUserProfile,
+        changeUserPassword
+    };
+
     return (
-        <AuthContext.Provider value={{ user, login, register, loginWithGoogle, logout, updateUserProfile, changeUserPassword, isLoading, isAuthenticated: !!user }}>
+        <AuthContext.Provider value={value}>
             {children}
         </AuthContext.Provider>
     );
 };
 
-export const useAuth = () => useContext(AuthContext);
+export const useAuth = () => {
+    const context = useContext(AuthContext);
+    if (!context) {
+        throw new Error('useAuth must be used within an AuthProvider');
+    }
+    return context;
+};

@@ -3,13 +3,12 @@ import { getAuth, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
-    apiKey: "AIzaSyAQ3SAwcbHuUkT6K1B1IzZ7Mp20u_DIBKc",
-    authDomain: "augnex-8017e.firebaseapp.com",
-    projectId: "augnex-8017e",
-    storageBucket: "augnex-8017e.firebasestorage.app",
-    messagingSenderId: "297906817052",
-    appId: "1:297906817052:web:0a42fa1ed50b1f234037d9",
-    measurementId: "G-D895QBX6ZQ"
+    apiKey: "AIzaSyD9s0nZqKk1eia-tpjnVqKi1M6Jj6mrkQE",
+    authDomain: "nytvnt.firebaseapp.com",
+    projectId: "nytvnt",
+    storageBucket: "nytvnt.firebasestorage.app",
+    messagingSenderId: "740646755042",
+    appId: "1:740646755042:web:7694c6a5b578044a091cbb"
 };
 
 
