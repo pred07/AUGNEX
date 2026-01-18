@@ -73,7 +73,7 @@ export const AuthProvider = ({ children }) => {
                 setIsLoading(false);
                 return;
             }
-            
+
             // TEMPORARY: Local test normal user (remove later)
             if (email === 'kotham' && password === 'kotham') {
                 const testUser = {
@@ -84,7 +84,7 @@ export const AuthProvider = ({ children }) => {
                     providerData: [{ providerId: 'password' }],
                     role: 'learner'
                 };
-                
+
                 localStorageService.saveUserData(testUser);
                 setUser(localStorageService.getUserData());
                 setIsLoading(false);
@@ -191,6 +191,7 @@ export const AuthProvider = ({ children }) => {
     const value = {
         user,
         isLoading,
+        isAuthenticated: !!user,
         login,
         register,
         loginWithGoogle,
