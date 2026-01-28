@@ -3,12 +3,12 @@ import { getAuth, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
-    apiKey: "AIzaSyD9s0nZqKk1eia-tpjnVqKi1M6Jj6mrkQE",
-    authDomain: "nytvnt.firebaseapp.com",
-    projectId: "nytvnt",
-    storageBucket: "nytvnt.firebasestorage.app",
-    messagingSenderId: "740646755042",
-    appId: "1:740646755042:web:7694c6a5b578044a091cbb"
+    apiKey: "AIzaSyCzV8c3txAD7fEj4xEgyw4yZgqn1o-iF28",
+    authDomain: "hacktheplanet-25eb1.firebaseapp.com",
+    projectId: "hacktheplanet-25eb1",
+    storageBucket: "hacktheplanet-25eb1.firebasestorage.app",
+    messagingSenderId: "272938315726",
+    appId: "1:272938315726:web:03dd14b2a7686d2c6bc59f"
 };
 
 // Force rebuild - localStorage migration

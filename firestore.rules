@@ -2,66 +2,69 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-    
-    // Helper functions
+
+    // --- HELPER FUNCTIONS ---
+
+    // Check if the user is authenticated
     function isAuthenticated() {
       return request.auth != null;
     }
-    
-    function isOwner(uid) {
-      return isAuthenticated() && request.auth.uid == uid;
-    }
-    
-    function isValidUserData() {
-      return request.resource.data.keys().hasAll(['username', 'email', 'role']) &&
-             request.resource.data.username is string &&
-             request.resource.data.email is string &&
-             request.resource.data.role in ['admin', 'learner'];
-    }
-    
-    function isValidProgress() {
-      return request.resource.data.progress.keys().hasAll(['completedModules', 'xp', 'unlockedBadges', 'unlockedMedals']) &&
-             request.resource.data.progress.xp is number &&
-             request.resource.data.progress.xp >= 0 &&
-             request.resource.data.progress.unlockedBadges is list &&
-             request.resource.data.progress.unlockedMedals is list &&
-             // [NEW] Wallet & Purchases
-             (!request.resource.data.progress.keys().hasAny(['purchasedModules']) || request.resource.data.progress.purchasedModules is list);
+
+    // Check if the user has the 'admin' custom claim
+    // WHY: Avoids reading an admin document from Firestore (saves 1 read and prevents recursion)
+    function isAdmin() {
+      return isAuthenticated() && request.auth.token.role == 'admin';
     }
 
-    // [NEW] Validate Wallet Transactions
-    // Ideally, only Cloud Functions should increment wallet (recharge).
-    // Decrement allowed if purchasing a module (balance - 1).
-    function isValidWalletUpdate() {
-        // If balance is not changing, it's valid (regarding wallet)
-        // If balance is changing:
-        return !request.resource.data.diff(resource.data).affectedKeys().hasAny(['walletBalance']) ||
-               (request.resource.data.walletBalance is number && 
-                request.resource.data.walletBalance >= 0);
+    // Check if the user is accessing their own data
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
     }
-    
-    // Users collection (ADMIN ONLY - user data now in localStorage)
+
+    // --- COLLECTIONS ---
+
+    // 1. users
+    // - Users can read/write their own profile (e.g., updating display name)
+    // - Admins can manage all users
     match /users/{userId} {
-      // Only admins can read/write user documents
-      allow read, write: if get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+      allow read, write: if isOwner(userId) || isAdmin();
     }
 
-    // Coupons Collection
+    // 2. courses
+    // - Publicly readable (marketing/browsing)
+    // - Only admins can modify content
+    match /courses/{courseId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // 3. coupons
+    // - Authenticated users can view available coupons
+    // - Only admins can manage coupons
     match /coupons/{couponId} {
-        allow read: if isAuthenticated();
-        allow create, delete: if get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
-        allow update: if get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin' ||
-                      (isAuthenticated() && 
-                       request.resource.data.diff(resource.data).affectedKeys().hasOnly(['usedBy']));
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
     }
 
-    // Coin Bundles Collection (Dynamic Pricing)
-    match /coin_bundles/{bundleId} {
-        allow read: if true; // Publicly visible for pricing page
-        allow write: if get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    // 4. purchases
+    // - Users can read only their own purchase history
+    // - No client-side writes allow (purchases must be handled via Cloud Functions/Backend)
+    // - Note: For queries, users must filter by `userId` == auth.uid
+    match /purchases/{purchaseId} {
+      allow read: if isAuthenticated() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow write: if false; 
     }
-    
-    // Deny all other access
+
+    // 5. wallet (or balance)
+    // - Users can read their balance
+    // - No client-side writes allowed (prevents tampering with funds)
+    match /wallet/{userId} {
+      allow read: if isOwner(userId) || isAdmin();
+      allow write: if false;
+    }
+
+    // Default Deny
+    // Prevents accidental exposure of new collections
     match /{document=**} {
       allow read, write: if false;
     }
