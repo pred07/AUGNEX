@@ -43,7 +43,8 @@ service cloud.firestore {
     // - Only admins can manage coupons
     match /coupons/{couponId} {
       allow read: if isAuthenticated();
-      allow write: if isAdmin();
+      allow create, delete: if isAdmin();
+      allow update: if isAdmin() || (isAuthenticated() && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['usedBy']));
     }
 
     // 4. purchases

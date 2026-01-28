@@ -15,7 +15,8 @@ import ServiceRecord from './pages/ServiceRecord';
 import ModulesLibrary from './pages/ModulesLibrary';
 import PublicProfile from './pages/PublicProfile';
 import AdminDashboard from './pages/AdminDashboard';
-import Subscription from './pages/Subscription';
+
+import Pricing from './pages/Pricing';
 
 // const Modules = () => <h1 className="text-2xl font-orbitron">Modules</h1>;
 
@@ -91,7 +92,7 @@ function App() {
                 <Route path="/subscription" element={
                   <ProtectedRoute>
                     <MainLayout>
-                      <Subscription />
+                      <Pricing />
                     </MainLayout>
                   </ProtectedRoute>
                 } />

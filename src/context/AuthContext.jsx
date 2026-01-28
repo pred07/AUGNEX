@@ -10,6 +10,7 @@ import {
     updatePassword
 } from 'firebase/auth';
 import * as localStorageService from '../lib/localStorageService';
+import { getUserProgress, createUserDocument } from '../lib/firestoreService';
 
 const AuthContext = createContext(null);
 
@@ -22,24 +23,48 @@ export const AuthProvider = ({ children }) => {
 
         const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
             if (firebaseUser) {
-                // Get user data from localStorage
-                let userData = localStorageService.getUserData();
+                try {
+                    // 1. Check/Create Firestore Document (Self-healing context)
+                    // We import these from lib/firestoreService which must be added to imports
+                    let firestoreUser = await getUserProgress(firebaseUser.uid);
 
-                // If no data in localStorage, create new user profile
-                if (!userData || userData.uid !== firebaseUser.uid) {
-                    userData = localStorageService.saveUserData({
+                    if (!firestoreUser) {
+                        console.log("Creating missing Firestore document for:", firebaseUser.email);
+                        await createUserDocument(firebaseUser.uid, {
+                            email: firebaseUser.email,
+                            username: firebaseUser.displayName || firebaseUser.email.split('@')[0],
+                            photoURL: firebaseUser.photoURL,
+                            role: firebaseUser.email === 'admin@nytvnt.dev' ? 'admin' : 'learner'
+                        });
+                        // Fetch again after creation to have the full object (wallet, etc)
+                        firestoreUser = await getUserProgress(firebaseUser.uid);
+                    }
+
+                    // 2. Sync LocalStorage
+                    const userData = {
                         uid: firebaseUser.uid,
                         email: firebaseUser.email,
                         displayName: firebaseUser.displayName,
                         photoURL: firebaseUser.photoURL,
                         providerData: firebaseUser.providerData,
-                        role: firebaseUser.email === 'admin@nytvnt.dev' ? 'admin' : 'learner'
-                    });
-                }
+                        role: firestoreUser?.role || (firebaseUser.email === 'admin@nytvnt.dev' ? 'admin' : 'learner'),
+                        walletBalance: firestoreUser?.walletBalance || 0
+                    };
 
-                if (mounted) {
-                    setUser(userData);
-                    setIsLoading(false);
+                    localStorageService.saveUserData(userData);
+
+                    if (mounted) {
+                        setUser(userData);
+                        setIsLoading(false);
+                    }
+
+                } catch (err) {
+                    console.error("Auth State Sync Error:", err);
+                    // Fallback to minimal auth if Firestore fails
+                    if (mounted) {
+                        setUser({ uid: firebaseUser.uid, email: firebaseUser.email });
+                        setIsLoading(false);
+                    }
                 }
             } else {
                 if (mounted) {

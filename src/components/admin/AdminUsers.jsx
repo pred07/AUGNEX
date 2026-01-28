@@ -39,9 +39,9 @@ const AdminUsers = ({ setSelectedUser }) => {
     };
 
     const filteredUsers = users.filter(u =>
-        u.username?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        u.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        u.id?.toLowerCase().includes(searchTerm.toLowerCase())
+        (u.username || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (u.email || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (u.id || '').toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     return (
@@ -121,42 +121,42 @@ const AdminUsers = ({ setSelectedUser }) => {
                                         variant="ghost"
                                         size="sm"
                                         onClick={async () => {
-                                            const amount = prompt(`Add coins to ${user.username}:`, "100");
-                                            if (amount && !isNaN(amount)) {
+                                            const amount = prompt(`Enter Coins to ADD to ${user.username}:`, "100");
+                                            if (amount && !isNaN(amount) && parseInt(amount) > 0) {
                                                 const success = await adminAddCoins(user.id, parseInt(amount));
                                                 if (success) {
                                                     alert("Coins added successfully");
                                                     loadUsers();
-                                                } else {
-                                                    alert("Failed to add coins");
                                                 }
                                             }
                                         }}
-                                        className="ml-2 text-yellow-400 border border-transparent hover:border-yellow-400/50 hover:bg-yellow-400/10"
+                                        className="ml-2 text-green-400 border border-transparent hover:border-green-400/50 hover:bg-green-400/10"
+                                        title="Add Coins"
                                     >
                                         <Coins size={14} className="mr-1" />
-                                        GIFT
+                                        +ADD
                                     </Button>
-                                    {user.role === 'admin' && user.id !== user.uid && (
-                                        <Button
-                                            variant="ghost"
-                                            size="sm"
-                                            onClick={() => handleDemote(user.id)}
-                                            className="ml-2 text-red-500 border border-transparent hover:border-red-500/50 hover:bg-red-500/10"
-                                        >
-                                            DEMOTE
-                                        </Button>
-                                    )}
-                                    {user.role !== 'admin' && (
-                                        <Button
-                                            variant="ghost"
-                                            size="sm"
-                                            onClick={() => handlePromote(user.id)}
-                                            className="ml-2 text-primary border border-transparent hover:border-primary/50 hover:bg-primary/10"
-                                        >
-                                            PROMOTE
-                                        </Button>
-                                    )}
+
+                                    <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={async () => {
+                                            const amount = prompt(`Enter Coins to DEDUCT from ${user.username}:`, "50");
+                                            if (amount && !isNaN(amount) && parseInt(amount) > 0) {
+                                                // Pass negative value to deduct
+                                                const success = await adminAddCoins(user.id, -parseInt(amount));
+                                                if (success) {
+                                                    alert("Coins deducted successfully");
+                                                    loadUsers();
+                                                }
+                                            }
+                                        }}
+                                        className="ml-1 text-red-400 border border-transparent hover:border-red-400/50 hover:bg-red-400/10"
+                                        title="Deduct Coins"
+                                    >
+                                        <Coins size={14} className="mr-1" />
+                                        -REM
+                                    </Button>
                                 </td>
                             </tr>
                         ))}
