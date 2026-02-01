@@ -140,9 +140,21 @@ export const ProgressProvider = ({ children }) => {
         });
     };
 
-    const addPurchasedModule = (moduleId) => {
-        if (!purchasedModules.includes(moduleId)) {
-            setPurchasedModules(prev => [...prev, moduleId]);
+    const addPurchasedModule = (pathId, moduleId) => {
+        const purchaseKey = `${pathId}/${moduleId}`;
+        if (!purchasedModules.includes(purchaseKey)) {
+            setPurchasedModules(prev => {
+                const updated = [...prev, purchaseKey];
+                // Persist to localStorage
+                try {
+                    const progressData = localStorageService.getProgress();
+                    progressData.purchasedModules = updated;
+                    localStorage.setItem('nytvnt_progress', JSON.stringify(progressData));
+                } catch (error) {
+                    console.error('Error persisting purchased module:', error);
+                }
+                return updated;
+            });
         }
     };
 
@@ -166,8 +178,9 @@ export const ProgressProvider = ({ children }) => {
         // Completed modules are never locked
         if (isModuleCompleted(pathId, moduleId)) return false;
 
-        // Check if purchased
-        if (purchasedModules.includes(moduleId)) return false;
+        // Check if purchased (using pathId/moduleId format)
+        const purchaseKey = `${pathId}/${moduleId}`;
+        if (purchasedModules.includes(purchaseKey)) return false;
 
         // Check sequence structure
         const path = LEARNING_PATHS.find(p => p.id === pathId);

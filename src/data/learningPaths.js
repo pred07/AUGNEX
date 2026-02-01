@@ -1,8 +1,9 @@
-import { Hammer, Sword, Shield, GitMerge, Hexagon } from 'lucide-react';
+import { Hammer, Sword, Shield, GitMerge, Hexagon, Eye, Wrench } from 'lucide-react';
 
 export const LEARNING_PATHS = [
     {
         id: 'forge',
+        order: 1,
         title: 'FORGE',
         subtitle: 'Foundation / Preparation',
         icon: Hammer,
@@ -83,7 +84,193 @@ export const LEARNING_PATHS = [
         ]
     },
     {
+        id: 'sentinel',
+        order: 6,
+        title: 'SENTINEL',
+        subtitle: 'Threat Intelligence',
+        icon: Eye,
+        color: 'text-rose-400',
+        borderColor: 'border-rose-400',
+        bgWait: 'bg-rose-400/10',
+        philosophy: "Intelligence drives action. Not the other way around.",
+        description: "Collect, analyze, and operationalize threat intelligence. Turn data into decisions.",
+        role: "CTI Analyst / Intel-led SOC",
+        sections: [
+            {
+                title: "Phase 1: Intelligence Foundations",
+                modules: [
+                    { id: 's-1', title: "Threat Intelligence Mindset", type: "theory", xp: 75, duration: "1h" },
+                    { id: 's-2', title: "The Intelligence Lifecycle (Planning to Dissemination)", type: "theory", xp: 100, duration: "1.5h" },
+                    { id: 's-3', title: "Types of Intelligence (Tactical, Operational, Strategic)", type: "theory", xp: 75, duration: "1h" },
+                    { id: 's-4', title: "Adversary Mindset & Psychology", type: "theory", xp: 75, duration: "1h" },
+                    { id: 's-5', title: "Intel Ethics, Bias, and Reliability (Admiralty Scale)", type: "theory", xp: 100, duration: "1.5h" }
+                ]
+            },
+            {
+                title: "Phase 2: Open Source Intelligence (OSINT)",
+                modules: [
+                    { id: 's-6', title: "OSINT Methodology & OPSEC", type: "lab", xp: 150, duration: "2h" },
+                    { id: 's-7', title: "Advanced Search Engine Techniques (Dorking)", type: "lab", xp: 125, duration: "1.5h" },
+                    { id: 's-8', title: "Social Media Intelligence (SOCMINT)", type: "lab", xp: 150, duration: "2h" },
+                    { id: 's-9', title: "Technical Infrastructure Reconnaissance", type: "lab", xp: 200, duration: "2.5h" },
+                    { id: 's-10', title: "Dark Web & Underground Forums", type: "theory", xp: 150, duration: "2h" },
+                    { id: 's-11', title: "Image & Geospatial Intelligence (IMINT/GEOINT)", type: "ctf", xp: 250, duration: "3h" },
+                    { id: 's-12', title: "Corporate & Business Intelligence", type: "lab", xp: 150, duration: "2h" },
+                    { id: 's-13', title: "OSINT Tooling (Maltego, SpiderFoot, etc)", type: "lab", xp: 200, duration: "2.5h" }
+                ]
+            },
+            {
+                title: "Phase 3: Tactical CTI",
+                modules: [
+                    { id: 's-14', title: "Indicators of Compromise (IOCs) vs TTPs", type: "theory", xp: 75, duration: "1h" },
+                    { id: 's-15', title: "The Pyramid of Pain", type: "theory", xp: 75, duration: "1h" },
+                    { id: 's-16', title: "MITRE ATT&CK Mapping & Usage", type: "lab", xp: 200, duration: "2.5h" },
+                    { id: 's-17', title: "Malware Analysis for Intel Analysts", type: "lab", xp: 250, duration: "3h" },
+                    { id: 's-18', title: "Tracking C2 Infrastructure", type: "lab", xp: 200, duration: "2.5h" },
+                    { id: 's-19', title: "Writing YARA Rules for Hunting", type: "lab", xp: 200, duration: "2.5h" },
+                    { id: 's-20', title: "SIGMA Rules for Detection", type: "lab", xp: 175, duration: "2h" }
+                ]
+            },
+            {
+                title: "Phase 4: Operational Intelligence",
+                modules: [
+                    { id: 's-21', title: "Tracking Threat Actors & Campaigns", type: "theory", xp: 100, duration: "1.5h" },
+                    { id: 's-22', title: "Intrusion Analysis & Diamond Model", type: "lab", xp: 150, duration: "2h" },
+                    { id: 's-23', title: "Attribution: Science and Pitfalls", type: "theory", xp: 100, duration: "1.5h" },
+                    { id: 's-24', title: "Campaign Timeline Analysis", type: "lab", xp: 150, duration: "2h" },
+                    { id: 's-25', title: "Cyber Kill Chain Analysis", type: "lab", xp: 125, duration: "1.5h" }
+                ]
+            },
+            {
+                title: "Phase 5: Strategic Intelligence",
+                modules: [
+                    { id: 's-26', title: "Geopolitics and Cyber Warfare", type: "theory", xp: 150, duration: "2h" },
+                    { id: 's-27', title: "Cyber Risk Analysis for Executives", type: "theory", xp: 100, duration: "1.5h" },
+                    { id: 's-28', title: "Strategic Reporting & Briefings", type: "lab", xp: 150, duration: "2h" },
+                    { id: 's-29', title: "Sector-Specific Threat Landscapes", type: "theory", xp: 100, duration: "1.5h" },
+                    { id: 's-30', title: "Emerging Threats & Forecasting", type: "theory", xp: 75, duration: "1h" }
+                ]
+            },
+            {
+                title: "Phase 6: Tooling & Automation",
+                modules: [
+                    { id: 's-31', title: "Threat Intelligence Platforms (MISP, OpenCTI)", type: "lab", xp: 200, duration: "2.5h" },
+                    { id: 's-32', title: "Python for Threat Intelligence", type: "lab", xp: 200, duration: "2.5h" },
+                    { id: 's-33', title: "Automating Collection with APIs", type: "lab", xp: 175, duration: "2h" },
+                    { id: 's-34', title: "Data Enrichment & Correlation", type: "lab", xp: 150, duration: "2h" },
+                    { id: 's-35', title: "Integrating Intel into SIEM/SOAR", type: "lab", xp: 200, duration: "2.5h" }
+                ]
+            },
+            {
+                title: "Phase 7: Advanced Sentinel Operations",
+                modules: [
+                    { id: 's-36', title: "AI-Assisted Threat Intelligence", type: "theory", xp: 150, duration: "2h" },
+                    { id: 's-37', title: "Deception Operations for Intelligence", type: "theory", xp: 125, duration: "1.5h" },
+                    { id: 's-38', title: "Counter-Intelligence Fundamentals", type: "theory", xp: 100, duration: "1.5h" },
+                    { id: 's-39', title: "Feedback Loops: Intel to Defense", type: "theory", xp: 75, duration: "1h" },
+                    { id: 's-40', title: "Building a CTI Program", type: "theory", xp: 100, duration: "1.5h" }
+                ]
+            }
+        ]
+    },
+    {
+        id: 'builder',
+        order: 7,
+        title: 'BUILDER',
+        subtitle: 'Security Engineering',
+        icon: Wrench,
+        color: 'text-orange-400',
+        borderColor: 'border-orange-400',
+        bgWait: 'bg-orange-400/10',
+        philosophy: "Secure by design. Not by accident.",
+        description: "Build, harden, and automate secure systems. Engineering-grade security.",
+        role: "Security Engineer / DevSecOps",
+        sections: [
+            {
+                title: "Phase 1: Security Engineering Foundations",
+                modules: [
+                    { id: 'b-1', title: "Security Engineering Mindset & Principles", type: "theory", xp: 75, duration: "1h" },
+                    { id: 'b-2', title: "Secure Software Development Life Cycle (S-SDLC)", type: "theory", xp: 100, duration: "1.5h" },
+                    { id: 'b-3', title: "Threat Modeling for Engineers", type: "lab", xp: 150, duration: "2h" },
+                    { id: 'b-4', title: "Design Principles (Least Privilege, Defense in Depth)", type: "theory", xp: 75, duration: "1h" },
+                    { id: 'b-5', title: "Cryptography Engineering Basics", type: "lab", xp: 150, duration: "2h" }
+                ]
+            },
+            {
+                title: "Phase 2: OS & System Hardening",
+                modules: [
+                    { id: 'b-6', title: "Linux Hardening & Secure Configuration", type: "lab", xp: 200, duration: "2.5h" },
+                    { id: 'b-7', title: "Windows Hardening & GPO Security", type: "lab", xp: 200, duration: "2.5h" },
+                    { id: 'b-8', title: "Active Directory Secure Design", type: "theory", xp: 150, duration: "2h" },
+                    { id: 'b-9', title: "Kernel Security & Modules", type: "theory", xp: 125, duration: "1.5h" },
+                    { id: 'b-10', title: "Virtualization Security Engineering", type: "lab", xp: 150, duration: "2h" }
+                ]
+            },
+            {
+                title: "Phase 3: Programming for Security",
+                modules: [
+                    { id: 'b-11', title: "Advanced Python for Security Automation", type: "lab", xp: 250, duration: "3h" },
+                    { id: 'b-12', title: "Secure Bash Scripting & Automation", type: "lab", xp: 175, duration: "2h" },
+                    { id: 'b-13', title: "PowerShell for Security Engineers", type: "lab", xp: 200, duration: "2.5h" },
+                    { id: 'b-14', title: "Secure Coding Principles (OWASP Top 10)", type: "lab", xp: 150, duration: "2h" },
+                    { id: 'b-15', title: "Code Review & Static Analysis (SAST)", type: "lab", xp: 200, duration: "2.5h" }
+                ]
+            },
+            {
+                title: "Phase 4: Infrastructure as Code (IaC)",
+                modules: [
+                    { id: 'b-16', title: "Infrastructure as Code Concepts", type: "theory", xp: 75, duration: "1h" },
+                    { id: 'b-17', title: "Terraform for Security Engineers", type: "lab", xp: 250, duration: "3h" },
+                    { id: 'b-18', title: "Ansible for Security Automation", type: "lab", xp: 200, duration: "2.5h" },
+                    { id: 'b-19', title: "Immutable Infrastructure Design", type: "theory", xp: 125, duration: "1.5h" },
+                    { id: 'b-20', title: "Policy-as-Code (OPA/Sentinel)", type: "lab", xp: 200, duration: "2.5h" }
+                ]
+            },
+            {
+                title: "Phase 5: Cloud Security Engineering",
+                modules: [
+                    { id: 'b-21', title: "AWS Security Engineering Fundamentals", type: "lab", xp: 200, duration: "2.5h" },
+                    { id: 'b-22', title: "Azure Security Engineering Fundamentals", type: "lab", xp: 200, duration: "2.5h" },
+                    { id: 'b-23', title: "GCP Security Engineering Fundamentals", type: "lab", xp: 200, duration: "2.5h" },
+                    { id: 'b-24', title: "Cloud Identity & IAM Architecture", type: "lab", xp: 250, duration: "3h" },
+                    { id: 'b-25', title: "Cloud Networking & VPC Design", type: "lab", xp: 200, duration: "2.5h" }
+                ]
+            },
+            {
+                title: "Phase 6: DevSecOps & Pipeline Security",
+                modules: [
+                    { id: 'b-26', title: "CI/CD Pipeline Security", type: "lab", xp: 200, duration: "2.5h" },
+                    { id: 'b-27', title: "Container Security (Docker)", type: "lab", xp: 175, duration: "2h" },
+                    { id: 'b-28', title: "Kubernetes Security Engineering", type: "lab", xp: 300, duration: "3h" },
+                    { id: 'b-29', title: "Service Mesh Security (Istio/Linkerd)", type: "theory", xp: 150, duration: "2h" },
+                    { id: 'b-30', title: "Secrets Management (Vault)", type: "lab", xp: 200, duration: "2.5h" }
+                ]
+            },
+            {
+                title: "Phase 7: Detection & Automation Engineering",
+                modules: [
+                    { id: 'b-31', title: "Detection-as-Code Engineering", type: "lab", xp: 200, duration: "2.5h" },
+                    { id: 'b-32', title: "Building SOAR Playbooks", type: "lab", xp: 200, duration: "2.5h" },
+                    { id: 'b-33', title: "Logging Pipeline Architecture (ELK/Splunk)", type: "lab", xp: 250, duration: "3h" },
+                    { id: 'b-34', title: "SIEM Engineering & Optimization", type: "lab", xp: 200, duration: "2.5h" },
+                    { id: 'b-35', title: "Telemetry Engineering & ETL", type: "theory", xp: 150, duration: "2h" }
+                ]
+            },
+            {
+                title: "Phase 8: Advanced Engineering",
+                modules: [
+                    { id: 'b-36', title: "Secure AI/ML Pipeline Design", type: "theory", xp: 150, duration: "2h" },
+                    { id: 'b-37', title: "Zero Trust Implementation Strategies", type: "theory", xp: 150, duration: "2h" },
+                    { id: 'b-38', title: "Reliability Engineering & Chaos Testing", type: "lab", xp: 200, duration: "2.5h" },
+                    { id: 'b-39', title: "Hardware Security Modules (HSM) & KMS", type: "theory", xp: 125, duration: "1.5h" },
+                    { id: 'b-40', title: "Engineering for Resilience", type: "theory", xp: 100, duration: "1.5h" }
+                ]
+            }
+        ]
+    },
+    {
         id: 'exploit',
+        order: 2,
         title: 'ATTACK MODE',
         subtitle: 'Offensive Security',
         label: 'EXPLOIT',
@@ -194,6 +381,7 @@ export const LEARNING_PATHS = [
     },
     {
         id: 'protector',
+        order: 3,
         title: 'DEFENSE MODE',
         subtitle: 'Defensive Security',
         label: 'PROTECTOR',
@@ -294,6 +482,7 @@ export const LEARNING_PATHS = [
     },
     {
         id: 'convergence',
+        order: 4,
         title: 'CONVERGENCE',
         subtitle: 'Purple Team / Engineer',
         icon: GitMerge,
@@ -388,6 +577,7 @@ export const LEARNING_PATHS = [
     },
     {
         id: 'overwatch',
+        order: 5,
         title: 'ARCHITECT',
         subtitle: 'Advanced / System Design',
         label: 'OVERWATCH',

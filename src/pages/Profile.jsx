@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useProgress } from '../context/ProgressContext';
+import { useWallet } from '../context/WalletContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import Button from '../components/ui/Button';
 import Input from '../components/ui/Input';
@@ -18,6 +19,7 @@ const Profile = () => {
     // Helper to reference functions in closure if needed, but destructuring is fine
     const user_auth_ref = { changeUserPassword };
     const { unlockedBadges } = useProgress();
+    const { balance } = useWallet();
 
     // Form state
     const [username, setUsername] = useState(user?.username || '');
@@ -326,7 +328,7 @@ const Profile = () => {
                                 <h3 className="text-lg font-bold text-white mb-2">Current Balance</h3>
                                 <div className="text-4xl font-mono text-primary font-bold flex items-center gap-2">
                                     <Coins size={32} />
-                                    {user?.walletBalance || 0}
+                                    {balance}
                                 </div>
                                 <p className="text-gray-400 font-mono text-sm mt-4">
                                     Use coupons to recharge your balance and unlock more modules.

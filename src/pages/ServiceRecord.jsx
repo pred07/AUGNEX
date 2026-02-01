@@ -12,6 +12,16 @@ const ServiceRecord = () => {
     const { xp, currentRank, unlockedMedals, progress } = useProgress();
     const { user, updateUserProfile } = useAuth();
 
+    // Helper for avatar with fallback
+    const getAvatarUrl = () => {
+        if (user?.avatar && user.avatar.trim() !== '') {
+            return user.avatar;
+        }
+        // Fallback to DiceBear with username or email
+        const seed = user?.username || user?.email || 'default';
+        return `https://api.dicebear.com/9.x/dylan/svg?seed=${seed}`;
+    };
+
     // Edit Profile State
     const [isEditing, setIsEditing] = useState(false);
     const [editForm, setEditForm] = useState({
@@ -117,7 +127,7 @@ const ServiceRecord = () => {
                     {/* User Avatar with Rank Icon Overlay */}
                     <div className="shrink-0 relative">
                         <div className="w-32 h-32 rounded-full border-4 border-primary/20 flex items-center justify-center bg-black/50 shadow-[0_0_50px_rgba(0,255,157,0.1)] overflow-hidden relative group/avatar">
-                            <img src={user?.avatar} alt={user?.username} className="w-full h-full object-cover" />
+                            <img src={getAvatarUrl()} alt={user?.username} className="w-full h-full object-cover" onError={(e) => { e.target.src = `https://api.dicebear.com/9.x/dylan/svg?seed=fallback`; }} />
                             {/* Overlay for rank icon context */}
                             <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover/avatar:opacity-100 transition-opacity">
                                 {React.createElement(Icons[currentRank.icon], { size: 40, className: "text-primary drop-shadow-[0_0_10px_rgba(0,255,157,0.8)]" })}
@@ -227,7 +237,7 @@ const ServiceRecord = () => {
                                             placeholder="https://..."
                                         />
                                         <div className="w-12 h-12 rounded-lg border border-white/10 overflow-hidden shrink-0">
-                                            <img src={editForm.avatar} alt="Preview" className="w-full h-full object-cover" />
+                                            <img src={editForm.avatar || `https://api.dicebear.com/9.x/dylan/svg?seed=${editForm.username}`} alt="Preview" className="w-full h-full object-cover" onError={(e) => { e.target.src = `https://api.dicebear.com/9.x/dylan/svg?seed=fallback`; }} />
                                         </div>
                                     </div>
                                     <div className="flex gap-2 mt-2 overflow-x-auto pb-2 no-scrollbar">

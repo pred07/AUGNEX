@@ -13,7 +13,7 @@ const ModulesLibrary = () => {
 
     // Flatten all modules into a single array with path metadata
     const allModules = useMemo(() => {
-        return LEARNING_PATHS.flatMap(path =>
+        return [...LEARNING_PATHS].sort((a, b) => a.order - b.order).flatMap(path =>
             path.sections.flatMap(section =>
                 section.modules.map(module => ({
                     ...module,
@@ -74,7 +74,7 @@ const ModulesLibrary = () => {
                     >
                         ALL MODULES
                     </button>
-                    {LEARNING_PATHS.map(path => (
+                    {[...LEARNING_PATHS].sort((a, b) => a.order - b.order).map(path => (
                         <button
                             key={path.id}
                             onClick={() => setSelectedPath(path.id)}

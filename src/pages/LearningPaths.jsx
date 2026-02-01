@@ -165,7 +165,7 @@ const LearningPaths = () => {
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
                 {/* Left Panel: Path Selection */}
                 <div className="lg:col-span-4 space-y-4">
-                    {LEARNING_PATHS.map((path) => (
+                    {[...LEARNING_PATHS].sort((a, b) => a.order - b.order).map((path) => (
                         <PathCard
                             key={path.id}
                             path={path}

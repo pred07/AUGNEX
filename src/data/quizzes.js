@@ -34,6 +34,76 @@ export const QUIZZES = {
             }
         ]
     },
+    'f-2': {
+        title: "What is Virtualization",
+        questions: [
+            {
+                question: "What is the primary function of a Hypervisor?",
+                options: [
+                    "To increase internet speed.",
+                    "To create a software layer that allows running multiple OSs on one machine.",
+                    "To bypass firewalls.",
+                    "To clean viruses from the system."
+                ],
+                correct: 1
+            },
+            {
+                question: "What is the security benefit of using a VM for malware analysis?",
+                options: [
+                    "It makes the malware run faster.",
+                    "It isolates the malware in a sandbox, protecting the host machine.",
+                    "It automatically deletes the malware.",
+                    "It encrypts the malware source code."
+                ],
+                correct: 1
+            },
+            {
+                question: "Where must you check if Virtualization is enabled if it shows as 'Disabled'?",
+                options: [
+                    "Windows Registry",
+                    "BIOS / UEFI Firmware Settings",
+                    "Browser Settings",
+                    "System32 Folder"
+                ],
+                correct: 1
+            }
+        ]
+    },
+    'f-3': {
+        title: "Hypervisors: Type 1 vs Type 2",
+        questions: [
+            {
+                question: "Which type of Hypervisor installs directly on bare metal hardware?",
+                options: [
+                    "Type 1",
+                    "Type 2",
+                    "Type 3",
+                    "Hybrid Type"
+                ],
+                correct: 0
+            },
+            {
+                question: "VirtualBox and VMware Workstation are examples of which type?",
+                options: [
+                    "Type 1 (Bare Metal)",
+                    "Type 2 (Hosted)",
+                    "Cloud Hypervisors",
+                    "Container Engines"
+                ],
+                correct: 1
+            },
+            {
+                question: "Why is a Type 2 Hypervisor recommended for the FORGE learning path?",
+                options: [
+                    "It is faster than Type 1.",
+                    "It requires a dedicated server.",
+                    "It allows you to run labs on your existing laptop/desktop along with other apps.",
+                    "It is the only one that supports Linux."
+                ],
+                correct: 2
+            }
+        ]
+    },
     'e-1': {
         title: "Red Team Fundamentals",
         questions: [

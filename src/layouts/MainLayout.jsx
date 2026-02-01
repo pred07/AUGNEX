@@ -1,5 +1,6 @@
 import React from 'react';
 import { useAuth } from '../context/AuthContext';
+import { useWallet } from '../context/WalletContext';
 import { motion } from 'framer-motion';
 import { LogOut, Home, Map, Box, Award, Settings, User, Shield, Coins } from 'lucide-react';
 
@@ -27,7 +28,18 @@ import BackgroundEffects from '../components/layout/BackgroundEffects';
 
 const MainLayout = ({ children }) => {
     const { user, logout } = useAuth();
+    const { balance } = useWallet();
     const location = useLocation();
+
+    // Helper for avatar with fallback
+    const getAvatarUrl = () => {
+        if (user?.avatar && user.avatar.trim() !== '') {
+            return user.avatar;
+        }
+        // Fallback to DiceBear with username or email
+        const seed = user?.username || user?.email || 'default';
+        return `https://api.dicebear.com/9.x/dylan/svg?seed=${seed}`;
+    };
 
     return (
         <div className="min-h-screen bg-background flex text-gray-100 overflow-hidden font-inter transition-colors duration-500">
@@ -69,7 +81,7 @@ const MainLayout = ({ children }) => {
                             className="bg-surface/50 rounded-xl p-3 border border-white/5 mb-4 group hover:border-white/10 transition-colors cursor-pointer"
                         >
                             <div className="flex items-center gap-3">
-                                <img src={user.avatar} alt="Avatar" className="w-10 h-10 rounded-lg border border-white/10 group-hover:border-primary/50 transition-colors" />
+                                <img src={getAvatarUrl()} alt="Avatar" className="w-10 h-10 rounded-lg border border-white/10 group-hover:border-primary/50 transition-colors object-cover" onError={(e) => { e.target.src = `https://api.dicebear.com/9.x/dylan/svg?seed=fallback`; }} />
                                 <div className="hidden xl:block overflow-hidden">
                                     <p className="text-sm font-bold font-rajdhani truncate text-text-main">{user.username}</p>
                                     <div className="flex items-center justify-between">
@@ -81,7 +93,7 @@ const MainLayout = ({ children }) => {
                                             }}
                                             className="text-xs text-yellow-400 font-mono flex items-center gap-1 hover:text-yellow-300 cursor-pointer"
                                         >
-                                            <Coins size={10} /> {user.walletBalance || 0}
+                                            <Coins size={10} /> {balance}
                                         </span>
                                     </div>
                                 </div>
@@ -133,7 +145,7 @@ const MainLayout = ({ children }) => {
                                 ? "bg-primary/20 border-primary"
                                 : "bg-surface border-primary/50"
                         )}>
-                            <img src={user?.avatar} alt="Me" className="w-10 h-10 rounded-full" />
+                            <img src={getAvatarUrl()} alt="Me" className="w-10 h-10 rounded-full object-cover" onError={(e) => { e.target.src = `https://api.dicebear.com/9.x/dylan/svg?seed=fallback`; }} />
                         </div>
                     </Link>
                 </div>

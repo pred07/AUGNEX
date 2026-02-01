@@ -47,6 +47,13 @@ const GreetingHeader = () => {
         }).toUpperCase();
     };
 
+    const getDisplayName = () => {
+        if (user?.username) return user.username;
+        if (user?.displayName) return user.displayName;
+        if (user?.email) return user.email.split('@')[0];
+        return 'OPERATOR';
+    };
+
     return (
         <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-8 border-b border-white/5 pb-6">
             <div className="space-y-2">
@@ -56,10 +63,10 @@ const GreetingHeader = () => {
                     className="flex items-baseline gap-3"
                 >
                     <h1 className="text-3xl md:text-4xl font-orbitron font-bold text-text-main tracking-wide">
-                        WELCOME BACK, <Link to="/profile" className="text-primary glow-text hover:text-text-main transition-colors">{user?.username}</Link>
+                        WELCOME BACK, <Link to="/profile" className="text-primary glow-text hover:text-text-main transition-colors">{getDisplayName()}</Link>
                     </h1>
                     <span className="text-xs font-mono py-1 px-2 border border-primary/30 text-primary bg-primary/5 rounded">
-                        {user?.rank}
+                        {user?.rank || 'NEOPHYTE'}
                     </span>
                 </motion.div>
 

@@ -67,7 +67,7 @@ const ModuleDetail = () => {
 
         const success = await unlockModule(path.id, moduleId);
         if (success) {
-            addPurchasedModule(moduleId);
+            addPurchasedModule(path.id, moduleId);
             // State update will trigger re-render efficiently
         }
     };
