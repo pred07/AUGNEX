@@ -24,3 +24,5 @@ dist-ssr
 *.sw?
 scripts/service-account-key.json
 .env
+.vercel
+.env*.local
