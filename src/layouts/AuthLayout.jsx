@@ -1,12 +1,21 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import CyberVideoBackground from '../components/layout/CyberBackgroundSlides';
 
 const AuthLayout = ({ children }) => {
     return (
         <div className="min-h-screen w-full flex items-center justify-center relative overflow-hidden bg-background">
-            {/* Animated Cyber Video Background */}
-            <CyberVideoBackground />
+            {/* Anonymous Mask GIF Background */}
+            <div
+                className="absolute inset-0 z-0"
+                style={{
+                    backgroundImage: 'url(/anonymous-bg.gif)',
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                    backgroundRepeat: 'no-repeat',
+                }}
+            />
+            {/* Dark Overlay for Readability */}
+            <div className="absolute inset-0 bg-black/60 z-[1]" />
 
             {/* Background Grid */}
             <div className="absolute inset-0 bg-grid-pattern opacity-10 pointer-events-none" />
