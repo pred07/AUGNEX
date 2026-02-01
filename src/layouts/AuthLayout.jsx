@@ -6,7 +6,7 @@ const AuthLayout = ({ children }) => {
         <div className="min-h-screen w-full flex items-center justify-center relative overflow-hidden bg-background">
             {/* Anonymous Mask GIF Background */}
             <div
-                className="absolute inset-0 z-0 opacity-40 mix-blend-luminosity"
+                className="absolute inset-0 z-0 opacity-40 mix-blend-luminosity animate-pulse-slow scale-[1.05]"
                 style={{
                     backgroundImage: 'url(/anonymous-bg.gif)',
                     backgroundSize: 'cover',
