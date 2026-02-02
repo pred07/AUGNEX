@@ -51,11 +51,8 @@ const STATS = [
 ];
 
 const SimpleLoader = () => (
-    <div className="fixed inset-0 bg-white z-[100] flex flex-col items-center justify-center font-sans p-8">
-        <div className="flex flex-col items-center gap-4">
-            <Loader2 className="w-10 h-10 text-blue-600 animate-spin" />
-            <div className="text-gray-500 font-medium tracking-wide">Connecting to Secure Gateway...</div>
-        </div>
+    <div className="fixed inset-0 bg-black z-[100] flex items-center justify-center">
+        <Loader2 className="w-8 h-8 text-primary animate-spin" />
     </div>
 );
 
