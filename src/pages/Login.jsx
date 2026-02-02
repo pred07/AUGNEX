@@ -78,7 +78,7 @@ const Login = () => {
             // Login with username/email and password
             await login(username, password);
             // Explicitly navigate after successful login
-            navigate(from);
+            navigate(from, { replace: true });
         } catch (err) {
             // [SUPER ADMIN] Auto-recovery: REMOVED for Security Security.
             // Admin accounts must be managed via Firebase Console only.
@@ -94,7 +94,7 @@ const Login = () => {
         try {
             await loginWithGoogle();
             // Explicitly navigate after successful login
-            navigate(from);
+            navigate(from, { replace: true });
         } catch (err) {
             setError(err.message || 'Google Sign-In failed');
             setIsSubmitting(false);
