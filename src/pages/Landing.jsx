@@ -1,115 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, Globe, Menu, Shield, Lock, ExternalLink, BookOpen, Clock, Edit3, MessageSquare } from 'lucide-react';
+import { Search, Globe, Menu, Shield, Lock, ExternalLink, BookOpen, Clock, Edit3, MessageSquare, Loader2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
 
-const HackerLoader = ({ onComplete }) => {
-    const [progress, setProgress] = useState(0);
-    const [logs, setLogs] = useState([]);
-
-    // Hacker-style boot logs
-    const bootLogs = [
-        "Initializing handshake protocol...",
-        "Bypassing perimeter firewalls...",
-        " rerouting connection via node [127.8.4.2]...",
-        "Accessing shadow gateway...",
-        "Decrypting payload...",
-        " verifying key signature...",
-        "CONNECTION ESTABLISHED.",
-        " welcome to the operators network."
-    ];
-
-    useEffect(() => {
-        // Log generation
-        let logIndex = 0;
-        const logInterval = setInterval(() => {
-            if (logIndex < bootLogs.length) {
-                setLogs(prev => [...prev, bootLogs[logIndex]]);
-                logIndex++;
-            }
-        }, 600);
-
-        // Progress bar
-        const progressInterval = setInterval(() => {
-            setProgress(prev => {
-                if (prev >= 100) {
-                    clearInterval(progressInterval);
-                    return 100;
-                }
-                return prev + Math.random() * 5;
-            });
-        }, 150);
-
-        // Completion
-        const timeout = setTimeout(() => {
-            onComplete();
-        }, 6000);
-
-        return () => {
-            clearInterval(logInterval);
-            clearInterval(progressInterval);
-            clearTimeout(timeout);
-        };
-    }, []);
-
-    return (
-        <div className="fixed inset-0 bg-white z-[100] flex flex-col items-center justify-center text-gray-800 font-sans p-8">
-            <div className="w-full max-w-2xl">
-                {/* Connection Window */}
-                <div className="border-2 border-gray-300 bg-white p-8 rounded-lg shadow-xl">
-                    {/* Header */}
-                    <div className="flex items-center gap-3 mb-6 pb-4 border-b border-gray-200">
-                        <div className="w-3 h-3 bg-blue-500 rounded-full animate-pulse"></div>
-                        <h2 className="text-xl font-semibold text-gray-900">Establishing Connection</h2>
-                    </div>
-
-                    {/* Logs */}
-                    <div className="h-48 overflow-y-auto mb-6 space-y-2">
-                        {logs.map((log, i) => (
-                            <div key={i} className="flex items-start gap-3">
-                                <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
-                                <div className="text-gray-700 text-sm">{log}</div>
-                            </div>
-                        ))}
-                        {logs.length < bootLogs.length && (
-                            <div className="flex items-start gap-3">
-                                <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 animate-pulse"></div>
-                                <div className="text-gray-400 text-sm animate-pulse">Processing...</div>
-                            </div>
-                        )}
-                    </div>
-
-                    {/* Progress */}
-                    <div className="w-full h-3 bg-gray-200 rounded-full mb-3 overflow-hidden">
-                        <div
-                            className="h-full bg-blue-500 transition-all duration-300 rounded-full"
-                            style={{ width: `${Math.min(progress, 100)}%` }}
-                        />
-                    </div>
-                    <div className="flex justify-between text-xs text-gray-500">
-                        <span>Connecting to NYTVNT Network</span>
-                        <span className="font-semibold">{Math.floor(progress)}%</span>
-                    </div>
-                </div>
-
-                {/* Success Message */}
-                {progress > 95 && (
-                    <motion.div
-                        initial={{ scale: 0.9, opacity: 0 }}
-                        animate={{ scale: 1, opacity: 1 }}
-                        className="text-center mt-8"
-                    >
-                        <div className="inline-flex items-center gap-2 bg-green-50 border border-green-200 px-6 py-3 rounded-lg">
-                            <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                            <span className="text-green-700 font-semibold">Connection Established</span>
-                        </div>
-                    </motion.div>
-                )}
-            </div>
-        </div>
-    );
-};
 
 // Testimonials Data - Hacker Forum Style
 const TESTIMONIALS = [
@@ -156,6 +50,15 @@ const STATS = [
     { value: '∞', label: 'Skill Ceiling', suffix: '' },
 ];
 
+const SimpleLoader = () => (
+    <div className="fixed inset-0 bg-white z-[100] flex flex-col items-center justify-center font-sans p-8">
+        <div className="flex flex-col items-center gap-4">
+            <Loader2 className="w-10 h-10 text-blue-600 animate-spin" />
+            <div className="text-gray-500 font-medium tracking-wide">Connecting to Secure Gateway...</div>
+        </div>
+    </div>
+);
+
 const Landing = () => {
     const navigate = useNavigate();
     const { isAuthenticated } = useAuth();
@@ -174,14 +77,13 @@ const Landing = () => {
     // Navigation handler
     const handleEntry = () => {
         setIsEntering(true);
-    };
-
-    const handleHackerLoadComplete = () => {
-        navigate('/login');
+        setTimeout(() => {
+            navigate('/login');
+        }, 2500);
     };
 
     if (isEntering) {
-        return <HackerLoader onComplete={handleHackerLoadComplete} />;
+        return <SimpleLoader />;
     }
 
     return (
