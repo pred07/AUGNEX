@@ -5,51 +5,6 @@ import { motion } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
 
 
-// Testimonials Data - Hacker Forum Style
-const TESTIMONIALS = [
-    {
-        username: "ajay_dev",
-        role: "App Developer",
-        timestamp: "2 weeks ago",
-        reputation: "★★★★☆",
-        quote: "Attack Mode path is no joke. Went from pushing broken code to actually understanding how my apps get exploited. Now I patch before deploy.",
-    },
-    {
-        username: "shirdi_v",
-        role: "Python Developer",
-        timestamp: "1 month ago",
-        reputation: "★★★★★",
-        quote: "Builder path automation modules hit different. IaC finally clicked. My pipelines are locked down and I sleep better.",
-    },
-    {
-        username: "brijith_sec",
-        role: "AppSec Engineer",
-        timestamp: "3 weeks ago",
-        reputation: "★★★★★",
-        quote: "Convergence path bridged the gap I didn't know existed. Purple teaming makes sense now. Red and blue aren't enemies anymore.",
-    },
-    {
-        username: "g_gautham",
-        role: "DevOps Admin",
-        timestamp: "1 week ago",
-        reputation: "★★★★☆",
-        quote: "K8s security modules saved my job. Production hasn't been breached since. Worth every hour.",
-    },
-    {
-        username: "joyal_data",
-        role: "Data Analyst",
-        timestamp: "2 months ago",
-        reputation: "★★★★★",
-        quote: "Sentinel taught me OSINT isn't just googling. Real methodology. Real results. Opened doors I didn't know existed.",
-    },
-];
-
-const STATS = [
-    { value: '7', label: 'Operational Paths', suffix: '' },
-    { value: '292', label: 'Combat Modules', suffix: '' },
-    { value: '∞', label: 'Skill Ceiling', suffix: '' },
-];
-
 const SimpleLoader = () => (
     <div className="fixed inset-0 bg-black z-[100] flex items-center justify-center">
         <Loader2 className="w-8 h-8 text-primary animate-spin" />
@@ -63,15 +18,10 @@ const Landing = () => {
     const [isEntering, setIsEntering] = useState(false);
 
     useEffect(() => {
-        const date = new Date();
-        setCurrentDate(date.toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' }));
-
-        // When landing on the public wiki, clear the active dashboard session
-        // This forces a re-authentication check if the user tries to go back to the dashboard
+        setCurrentDate('February 7, 2026');
         sessionStorage.removeItem('active_session');
     }, []);
 
-    // Navigation handler
     const handleEntry = () => {
         setIsEntering(true);
         setTimeout(() => {
@@ -84,41 +34,38 @@ const Landing = () => {
     }
 
     return (
-        <div className="min-h-screen bg-white text-black font-sans selection:bg-[#c8e2f2]">
+        <div className="min-h-screen bg-white text-[#202122] font-serif selection:bg-blue-200 selection:text-blue-900">
             {/* Wikipedia-style Header */}
-            <header className="border-b border-[#a7d7f9] bg-white h-16 flex items-center px-4 sticky top-0 z-50">
+            <header className="border-b border-[#a7d7f9] bg-white h-16 flex items-center px-4 sticky top-0 z-50 font-sans">
                 <div className="flex items-center gap-4 w-full max-w-[1600px] mx-auto">
-                    {/* Logo Area */}
-                    <div className="flex items-center gap-2 mr-6">
+                    <div className="flex items-center gap-2 mr-6 shrink-0 font-serif">
                         <div className="w-10 h-10 bg-black text-white rounded-full flex items-center justify-center font-serif font-bold text-xl">
                             W
                         </div>
-                        <div className="hidden md:block leading-tight">
+                        <div className="hidden sm:block leading-tight">
                             <div className="font-serif text-lg">The Wiki</div>
-                            <div className="text-[10px] text-gray-500 font-sans">The Free Encyclopedia</div>
+                            <div className="text-[10px] text-gray-400 font-sans uppercase tracking-tighter">The Free Operational Encyclopedia</div>
                         </div>
                     </div>
 
                     {/* Search Bar */}
-                    <div className="flex-1 max-w-md">
+                    <div className="flex-1 max-w-xl hidden md:block">
                         <div className="relative flex items-center">
                             <input
                                 type="text"
-                                placeholder="Search The Wiki"
-                                className="w-full px-4 py-2 border border-[#a2a9b1] rounded-none focus:outline-none focus:ring-1 focus:ring-blue-500 text-sm"
+                                placeholder="Search Protocols..."
+                                className="w-full px-4 py-2 border border-[#a2a9b1] rounded-none focus:outline-none focus:ring-1 focus:ring-blue-500 text-sm font-sans"
                             />
-                            <button className="bg-[#36c] text-white px-4 py-2 border border-[#36c] font-bold text-sm">
+                            <button className="bg-[#36c] text-white px-4 py-2 border border-[#36c] font-bold text-sm hover:bg-[#447ff5] font-sans">
                                 Search
                             </button>
                         </div>
                     </div>
 
-                    {/* User Tools - MODIFIED */}
-                    <div className="ml-auto text-xs flex items-center gap-4 text-[#36c]">
-                        {/* Removed Create account */}
-                        <span className="hidden sm:inline text-black cursor-default">Not logged in</span>
-                        <span onClick={handleEntry} className="hidden sm:inline hover:underline cursor-pointer font-bold">Log in</span>
-                        <button className="sm:hidden">
+                    <div className="ml-auto text-xs flex items-center gap-4 text-[#36c] shrink-0 font-sans">
+                        <span className="hidden lg:inline text-black cursor-default">Status: <span className="text-green-600 font-mono animate-pulse">CLASSIFIED</span></span>
+                        <span onClick={handleEntry} className="hover:underline cursor-pointer font-bold bg-[#36c]/5 px-3 py-1.5 rounded-sm">Enter Mission</span>
+                        <button className="md:hidden">
                             <Menu size={20} className="text-black" />
                         </button>
                     </div>
@@ -128,166 +75,172 @@ const Landing = () => {
             {/* Main Layout */}
             <div className="max-w-[1600px] mx-auto flex">
                 {/* Sidebar */}
-                <aside className="w-44 hidden md:block pt-6 px-4 text-xs bg-[#f6f6f6] min-h-screen border-r border-[#a2a9b1]">
+                <aside className="w-44 hidden md:block pt-6 px-4 text-xs bg-[#f6f6f6] min-h-screen border-r border-[#a2a9b1] shrink-0 font-sans">
                     <div className="mb-6">
                         <div className="text-center mb-4">
-                            <div className="w-24 h-24 mx-auto bg-[#e1e1e1] rounded-full flex items-center justify-center text-gray-400 mb-2">
-                                <Globe size={48} />
+                            <div className="w-24 h-24 mx-auto bg-[#e1e1e1] rounded-full flex items-center justify-center text-gray-400 mb-2 border border-[#a2a9b1]">
+                                <Globe size={48} className="opacity-40" />
                             </div>
                         </div>
-                        <ul className="space-y-2 text-[#0645ad]">
-                            <li className="hover:underline cursor-pointer">Main page</li>
-                            <li className="hover:underline cursor-pointer">Contents</li>
-                            <li className="hover:underline cursor-pointer">Current events</li>
-                            <li className="hover:underline cursor-pointer">Random article</li>
-                            <li className="hover:underline cursor-pointer">About The Wiki</li>
-                            <li className="hover:underline cursor-pointer">Contact us</li>
-                            <li className="hover:underline cursor-pointer">Donate</li>
+                        <ul className="space-y-3 text-[#0645ad]">
+                            <li className="font-bold text-black uppercase tracking-tighter mb-1">Navigation</li>
+                            <li>Main page</li>
+                            <li>Operational Paths</li>
+                            <li>Deep Web Feed</li>
+                            <li>Shadow Ops</li>
+                            <hr className="border-[#a2a9b1]" />
+                            <li className="font-bold text-black uppercase tracking-tighter mb-1">Project Info</li>
+                            <li>About NYTVNT</li>
+                            <li>Ethics Protocol</li>
+                            <li className="text-red-700">Donate Crypto</li>
                         </ul>
                     </div>
                 </aside>
 
                 {/* Article Content */}
-                <main className="flex-1 px-4 md:px-8 py-6 bg-white max-w-5xl">
+                <main className="flex-1 px-4 sm:px-6 md:px-8 py-6 bg-white max-w-5xl">
                     {/* Article Header */}
                     <div className="border-b border-[#a2a9b1] mb-6 pb-2">
-                        <div className="flex items-baseline justify-between">
-                            <h1 className="text-3xl font-serif border-b-0 mb-0 font-normal py-1">NYTVNT (Network)</h1>
-                            <div className="text-xs text-[#72777d] flex gap-2">
-                                <span>Article</span>
-                                <span>Talk</span>
+                        <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-2">
+                            <h1 className="text-4xl font-serif mb-0 font-normal">NYTVNT: The Operative Records</h1>
+                            <div className="text-xs text-[#72777d] flex gap-2 font-sans py-1">
+                                <span className="cursor-pointer font-bold border-b-2 border-orange-500">Article</span>
+                                <span className="cursor-pointer">Talk</span>
+                                <span className="cursor-pointer">Read</span>
+                                <span className="cursor-pointer">View History</span>
                             </div>
                         </div>
-                        <div className="text-sm text-[#54595d] mt-1">
-                            From The Wiki, the free encyclopedia
+                        <div className="text-[13px] text-[#54595d] mt-1 italic">
+                            From The Wiki, the encyclopedia of technical warfare and shadow architectures
                         </div>
                     </div>
 
-                    <div className="flex flex-col-reverse md:flex-row gap-6">
+                    <div className="flex flex-col-reverse lg:flex-row gap-8">
                         {/* Text Content */}
-                        <div className="flex-1 text-[#202122] leading-7 text-[15px] font-sans">
+                        <div className="flex-1 leading-8 text-[17px] text-justify">
                             {/* Infobox for Mobile */}
-                            <div className="md:hidden border border-[#a2a9b1] bg-[#f8f9fa] p-4 mb-4 text-xs">
-                                <div className="bg-[#b0c4de] text-center font-bold py-1 mb-2">NYTVNT</div>
-                                <div className="grid grid-cols-2 gap-2">
-                                    <div className="font-bold">Founded</div>
-                                    <div>2024 (approx.)</div>
-                                    <div className="font-bold">Type</div>
-                                    <div>Underground Network</div>
-                                    <div className="font-bold">Status</div>
-                                    <div>Active / Classified</div>
+                            <div className="lg:hidden border border-[#a2a9b1] bg-[#f8f9fa] p-4 mb-6 text-xs shadow-sm font-sans">
+                                <div className="bg-[#b0c4de] text-center font-bold py-1.5 mb-2 border border-[#a2a9b1]">OPERATIVE LOG [2024]</div>
+                                <div className="grid grid-cols-2 gap-y-3 gap-x-2">
+                                    <div className="font-bold border-r border-[#a2a9b1] pr-2 text-right uppercase tracking-tighter">Deployed</div>
+                                    <div>0x7E8 (Feb 2024)</div>
+                                    <div className="font-bold border-r border-[#a2a9b1] pr-2 text-right uppercase tracking-tighter">Focus</div>
+                                    <div>Shadow Systems</div>
+                                    <div className="font-bold border-r border-[#a2a9b1] pr-2 text-right uppercase tracking-tighter">Status</div>
+                                    <div>Active / Hostile</div>
+                                    <div className="font-bold border-r border-[#a2a9b1] pr-2 text-right uppercase tracking-tighter">Motto</div>
+                                    <td className="italic text-[10px]">Verify, then Nullify.</td>
                                 </div>
                             </div>
 
-                            <p className="mb-4">
-                                <b>NYTVNT</b> (pronounced <i>/nɛt-vɛnt/</i>) is a decentralized collective and operational framework associated with <a href="#" className="text-[#0645ad] hover:underline">cybersecurity research</a>, <a href="#" className="text-[#0645ad] hover:underline">offensive operations</a>, and digital defense mechanisms. Unlike traditional hacktivist groups, NYTVNT operates on a philosophy of "constructive exploitation," encouraging members to break systems solely for the purpose of engineering superior defenses.
-                            </p>
-
-                            <p className="mb-4">
-                                The group emerged following a series of high-profile data breaches in the mid-2020s, which exposed the vulnerabilities of critical global infrastructure. It is rumored to be a recruitment ground for elite <a href="#" className="text-[#0645ad] hover:underline">security operators</a> seeking to bypass standard corporate red-tape.
+                            <p className="mb-6">
+                                The emergence of <b>NYTVNT</b> (Network Venting Protocols) in late <b>2024</b> marked a paradigm shift in how technical proficiency is cultivated within the underground. Far from a repository for passive reading, the collective operates as a fragmented intelligence engine, distributing its knowledge across seven distinct operative disciplines.
                             </p>
 
                             {/* TOC */}
-                            <div className="bg-[#f8f9fa] border border-[#a2a9b1] inline-block px-4 py-3 my-4 rounded-sm">
-                                <div className="font-bold text-center mb-2 text-sm">Contents</div>
-                                <ol className="list-decimal list-inside text-[#0645ad] text-sm space-y-1">
-                                    <li className="hover:underline cursor-pointer">History and Origins</li>
-                                    <li className="hover:underline cursor-pointer">Philosophy</li>
-                                    <li className="hover:underline cursor-pointer">
-                                        <span onClick={() => document.getElementById('recruitment').scrollIntoView()} className="cursor-pointer">
-                                            Recruitment and "The Call"
-                                        </span>
-                                    </li>
-                                    <li className="hover:underline cursor-pointer">Controversies</li>
-                                    <li className="hover:underline cursor-pointer">References</li>
+                            <div className="bg-[#f8f9fa] border border-[#a2a9b1] inline-block px-6 py-4 my-8 rounded-sm w-full sm:w-auto font-sans">
+                                <div className="font-bold text-center mb-3 text-sm">Contents</div>
+                                <ol className="list-decimal list-inside text-[#0645ad] text-[14px] space-y-1.5">
+                                    <li>Origins and Evolution</li>
+                                    <li>Disciplines of the Operator</li>
+                                    <li>The Shadow Economy</li>
+                                    <li>The Terminal Gateway</li>
                                 </ol>
                             </div>
 
-                            <h2 className="text-2xl font-serif border-b border-[#a2a9b1] mt-8 mb-4 py-1">History and Origins</h2>
-                            <p className="mb-4">
-                                The exact origins of NYTVNT are obscured by digital misinformation and contradictory reports. Early mentions of the acronym appeared in encrypted logs recovered from the <i>Project Zero</i> incident. Analysts suggest it began as a reaction to "The Great Silence"—a period where major corporations suppressed vulnerability disclosures.
-                            </p>
-                            <p className="mb-4">
-                                A faction of developers, disgruntled by the lack of transparency, began sharing <a href="#" className="text-[#0645ad] hover:underline">zero-day exploits</a> amongst themselves, not to sell, but to patch. This formed the "Breaking Guild."
+                            <h2 className="text-2xl border-b border-[#a2a9b1] mt-12 mb-6 py-1">Origins and Evolution</h2>
+                            <p className="mb-6">
+                                Documentary evidence suggests the project's inception was a reaction to the increasing "sanitization" of security training. NYTVNT serves those who find the standard curriculum insufficient. It is less of a school and more of a <i>proving ground</i>, where the only grade that matters is the successful execution of an operation.
                             </p>
 
-                            <h2 className="text-2xl font-serif border-b border-[#a2a9b1] mt-8 mb-4 py-1">Philosophy</h2>
-                            <div className="bg-[#f9f9f9] border-l-4 border-[#a2a9b1] p-4 my-4 italic text-gray-600">
-                                "To understand the shield, one must first master the sword. We do not learn to destroy; we destroy to understand what cannot be broken."
+                            <h2 className="text-2xl border-b border-[#a2a9b1] mt-12 mb-6 py-1">Disciplines of the Operator</h2>
+                            <p className="mb-6">
+                                The path of an operative is rarely linear. Experience gained through the <b>Forge</b>—a rigorous hardening of one's own environment—acts as the foundational requirement. Once the node is secure, the operative may branch into the more aggressive methodologies.
+                            </p>
+                            <p className="mb-6 italic text-gray-700 bg-gray-50 p-6 border-l-4 border-blue-200 leading-relaxed shadow-sm">
+                                Legends speak of those who master the <b>Sentinel</b> protocols, transforming themselves into "ghosts" within the Dark Web, collecting whispers of breaches before they even manifest. Others, driven by a destructive curiosity, descend into <b>Exploit</b>, where the goal is not just to break, but to understand the very soul of the vulnerability.
+                            </p>
+                            <p className="mb-6">
+                                For those who seek the preservation of digital order, the <b>Protector</b> and <b>Builder</b> disciplines offer a constructive counterpart. It is said that an <b>Architect</b> does not merely build a wall; they weave a tapestry of decoys, traps, and immutable logic that makes attack not just difficult, but mathematically unprofitable.
+                            </p>
+
+                            <h2 className="text-2xl border-b border-[#a2a9b1] mt-12 mb-6 py-1">The Shadow Economy</h2>
+                            <p className="mb-6">
+                                Within the internal network, status is not granted; it is purchased through labor. The <b>Coin</b> system serves as a decentralized ledger of reputation. Successful data exfiltration, vulnerability patching, or intelligence reporting credits the operative's wallet. These credits are the only key to the higher-tier paths, where the modules transition from theory to "live-fire" simulations.
+                            </p>
+
+                            <div className="bg-[#f0f2f5] border-l-4 border-[#36c] p-8 my-10 italic text-slate-900 shadow-sm leading-8">
+                                "The coin is the heartbeat of the collective. If you stop producing value, your node goes silent. We do not tolerate static."
+                                <span className="block text-[11px] mt-4 font-bold not-italic font-sans tracking-[0.2em] uppercase opacity-50">— Decrypted Header from [node-e02]</span>
                             </div>
-                            <p className="mb-4">
-                                The central tenet of the group is that theoretical security is a fallacy. Real security comes only from the practical application of offensive techniques. They categorize their operations into distinct paths: <b>Combat</b> (Attack), <b>Defense</b> (Protect), and <b>Convergence</b> (Engineering).
+
+                            <h2 className="text-2xl border-b border-[#a2a9b1] mt-12 mb-6 py-1 text-red-900">The Terminal Gateway</h2>
+                            <p className="mb-8">
+                                To transition from a reader to an operative, one must find the breach. The <b>Terminal Gateway</b> remains the only validated entry point. It requires an active handshake with the central auth-node. It is at this point that a <span className="text-blue-700 font-bold">Future Warrior</span> either collapses under the weight of the challenges or begins their <span className="text-blue-700 font-bold underline decoration-dotted underline-offset-4">Ascension</span> to the rank of <b>Hacker Elite</b>.
                             </p>
 
-                            <h2 id="recruitment" className="text-2xl font-serif border-b border-[#a2a9b1] mt-8 mb-4 py-1">Recruitment and "The Call"</h2>
-                            <p className="mb-4">
-                                NYTVNT does not advertise publicly. Prospective members often find themselves redirected to the network through hidden protocols in compromised servers or embedded steganography in public forums.
-                            </p>
-                            <p className="mb-4">
-                                Access to the operational dashboard is restricted. However, it is an open secret that the <b onClick={handleEntry} className="text-[#0645ad] hover:underline cursor-pointer hover:bg-blue-50 transition-colors">The Call of Hackers</b> (often just referred to as "Enter Mission") serves as the primary gateway for those who know where to look.
-                            </p>
-                            <p className="mb-4 text-sm text-gray-600">
-                                <sup>[citation needed]</sup> <i>Some sources claim the login portal is disguised as a standard Wikipedia entry point until accessed by specific signatures.</i>
-                            </p>
+                            <div className="flex justify-center my-16">
+                                <button
+                                    onClick={handleEntry}
+                                    className="px-10 py-4 bg-[#36c] text-white font-serif text-xl hover:bg-blue-700 transition-all shadow-[4px_4px_0px_rgba(0,0,0,0.2)] group active:translate-y-1 active:shadow-none"
+                                >
+                                    Initiate Handshake <span className="ml-2 opacity-0 group-hover:opacity-100 transition-opacity">→</span>
+                                </button>
+                            </div>
 
-                            <h2 className="text-2xl font-serif border-b border-[#a2a9b1] mt-8 mb-4 py-1">See Also</h2>
-                            <ul className="list-disc list-inside text-[#0645ad] mb-8 space-y-1">
-                                <li className="hover:underline cursor-pointer">List of hacker groups</li>
-                                <li className="hover:underline cursor-pointer">Cyberwarfare</li>
-                                <li className="hover:underline cursor-pointer">Penetration testing</li>
-                            </ul>
-
-                            <div className="text-xs text-[#54595d] border-t border-[#a2a9b1] pt-4 mt-12">
-                                <p>This page was last edited on {currentDate}, at 23:42 (UTC).</p>
-                                <p className="mt-2">Text is available under the Creative Commons Attribution-ShareAlike License; additional terms may apply.</p>
+                            <div className="text-[11px] text-[#54595d] border-t border-[#a2a9b1] pt-6 mt-20 leading-relaxed font-sans">
+                                <p>Sychronized: {currentDate} | Node: NYTVNT-MAIN-01</p>
+                                <p className="mt-2 uppercase tracking-[0.05em] opacity-80">Warning: This document contains memetic agents designed to discourage unauthorized researchers. If you experience dizziness, please disconnect immediately. </p>
                             </div>
                         </div>
 
                         {/* Desktop Infobox */}
-                        <div className="w-72 hidden md:block shrink-0">
-                            <div className="border border-[#a2a9b1] bg-[#f8f9fa] p-1 text-sm">
-                                <div className="bg-[#b0c4de] text-center font-bold py-1 mb-2">NYTVNT</div>
-                                <div className="relative mb-4">
-                                    <div className="w-full h-40 bg-gray-200 flex items-center justify-center border border-[#a2a9b1]">
-                                        <Globe size={64} className="text-gray-400" />
+                        <div className="w-full lg:w-80 shrink-0 hidden lg:block font-sans">
+                            <div className="border border-[#a2a9b1] bg-[#f8f9fa] p-1 text-sm shadow-sm sticky top-24">
+                                <div className="bg-[#b0c4de] text-center font-bold py-1.5 mb-3 border border-[#a2a9b1] font-serif tracking-widest uppercase">OPERATIVE DOSSIER</div>
+                                <div className="px-2 mb-4">
+                                    <div className="w-full h-44 bg-gray-200 flex items-center justify-center border border-[#a2a9b1] relative overflow-hidden group">
+                                        <Globe size={80} className="text-gray-400 group-hover:text-blue-500 transition-colors duration-700" />
+                                        <div className="absolute inset-0 bg-gradient-to-t from-black/5 to-transparent shadow-inner"></div>
                                     </div>
-                                    <div className="text-[10px] mt-1 text-center leading-tight">
-                                        The decentralized seal often associated with node operators.
+                                    <div className="text-[10px] mt-2 text-center leading-tight text-gray-500 italic font-serif px-2">
+                                        "Visibility is a privilege, and we are revoked."
                                     </div>
                                 </div>
 
-                                <table className="w-full text-left text-xs">
+                                <table className="w-full text-left text-[12px] border-collapse font-serif font-medium">
                                     <tbody>
                                         <tr className="border-t border-[#a2a9b1]">
-                                            <th className="py-1 pr-2 align-top">Founded</th>
-                                            <td className="py-1">2024; 2 years ago</td>
+                                            <th className="py-2 px-3 bg-[#f2f2f2] w-24 uppercase text-[10px] font-sans tracking-tighter">Deployment</th>
+                                            <td className="py-2 px-3">February 2024</td>
                                         </tr>
                                         <tr className="border-t border-[#a2a9b1]">
-                                            <th className="py-1 pr-2 align-top">Motto</th>
-                                            <td className="py-1 italic">"Break Systems. Build Defenses."</td>
+                                            <th className="py-2 px-3 bg-[#f2f2f2] uppercase text-[10px] font-sans tracking-tighter">Origin</th>
+                                            <td className="py-2 px-3 italic">Null-Collective</td>
                                         </tr>
                                         <tr className="border-t border-[#a2a9b1]">
-                                            <th className="py-1 pr-2 align-top">Focus</th>
-                                            <td className="py-1">
-                                                <div className="space-y-1">
-                                                    <div>• Offensive Security</div>
-                                                    <div>• Infrastructure Hardening</div>
-                                                    <div>• Cryptography</div>
+                                            <th className="py-2 px-3 bg-[#f2f2f2] uppercase text-[10px] font-sans tracking-tighter">Reputation</th>
+                                            <td className="py-2 px-3 font-mono text-blue-600">8.2M XP (Active)</td>
+                                        </tr>
+                                        <tr className="border-t border-[#a2a9b1]">
+                                            <th className="py-2 px-3 bg-[#f2f2f2] uppercase text-[10px] font-sans tracking-tighter">Directives</th>
+                                            <td className="py-2 px-3">
+                                                <div className="space-y-1 text-[11px] font-sans font-normal">
+                                                    <div className="flex items-center gap-1">■ Defense-Harden</div>
+                                                    <div className="flex items-center gap-1">■ Offensive-Pry</div>
+                                                    <div className="flex items-center gap-1">■ Intel-Harvest</div>
+                                                    <div className="flex items-center gap-1">■ Crypto-Ops</div>
                                                 </div>
                                             </td>
                                         </tr>
                                         <tr className="border-t border-[#a2a9b1]">
-                                            <th className="py-1 pr-2 align-top">Membership</th>
-                                            <td className="py-1">Unknown (Classified)</td>
-                                        </tr>
-                                        <tr className="border-t border-[#a2a9b1]">
-                                            <th className="py-1 pr-2 align-top">Website</th>
-                                            <td className="py-1">
+                                            <th className="py-2 px-3 bg-[#f2f2f2] uppercase text-[10px] font-sans tracking-tighter">Gateway</th>
+                                            <td className="py-2 px-3">
                                                 <span
                                                     onClick={handleEntry}
-                                                    className="text-[#0645ad] hover:underline cursor-pointer"
+                                                    className="text-[#0645ad] hover:underline cursor-pointer font-bold font-sans"
                                                 >
-                                                    nytvnt.dev/ops
+                                                    nytvnt://pro.dev
                                                 </span>
                                             </td>
                                         </tr>

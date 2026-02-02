@@ -1,13 +1,13 @@
 import { Trophy, Target, Shield, Zap, BookOpen, Coffee, Award, Crown } from 'lucide-react';
 
 export const RANKS = [
-    { id: 'rank_0', title: 'SCRIPT KIDDIE', minXp: 0, icon: 'Zap' },
+    { id: 'rank_0', title: 'FUTURE WARRIOR', minXp: 0, icon: 'Zap' },
     { id: 'rank_1', title: 'NEOPHYTE', minXp: 500, icon: 'BookOpen' },
     { id: 'rank_2', title: 'OPERATOR', minXp: 2000, icon: 'Target' },
     { id: 'rank_3', title: 'SPECIALIST', minXp: 5000, icon: 'Shield' },
-    { id: 'rank_4', title: 'ELITE', minXp: 10000, icon: 'Trophy' },
+    { id: 'rank_4', title: 'HACKER ELITE', minXp: 10000, icon: 'Trophy' },
     { id: 'rank_5', title: 'ARCHITECT', minXp: 20000, icon: 'Crown' },
-    { id: 'rank_6', title: 'ASCENDANT', minXp: 100000, icon: 'Award' }, // Unreachable basically, but good for "Max"
+    { id: 'rank_6', title: 'ASCENDANT', minXp: 100000, icon: 'Award' },
 ];
 
 export const MEDALS = [
