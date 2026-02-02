@@ -6,6 +6,7 @@ import { Loader2 } from 'lucide-react';
 const ProtectedRoute = ({ children }) => {
     const { user, isLoading } = useAuth();
     const location = useLocation();
+    const hasActiveSession = sessionStorage.getItem('active_session') === 'true';
 
     if (isLoading) {
         return (
@@ -15,7 +16,7 @@ const ProtectedRoute = ({ children }) => {
         );
     }
 
-    if (!user) {
+    if (!user || !hasActiveSession) {
         return <Navigate to="/login" state={{ from: location }} replace />;
     }
 

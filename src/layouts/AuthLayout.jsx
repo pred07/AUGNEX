@@ -4,9 +4,9 @@ import { motion } from 'framer-motion';
 const AuthLayout = ({ children }) => {
     return (
         <div className="min-h-screen w-full flex items-center justify-center relative overflow-hidden bg-background">
-            {/* Anonymous Mask GIF Background */}
+            {/* Anonymous Mask GIF Background - Blurred & Visible */}
             <div
-                className="absolute inset-0 z-0 opacity-40 mix-blend-luminosity animate-pulse-slow scale-[1.05]"
+                className="absolute inset-0 z-0 opacity-60 mix-blend-luminosity animate-pulse-slow scale-[1.05] blur-md"
                 style={{
                     backgroundImage: 'url(/anonymous-bg.gif)',
                     backgroundSize: 'cover',
@@ -15,11 +15,11 @@ const AuthLayout = ({ children }) => {
                 }}
             />
 
-            {/* Cyber Tint Overlay */}
-            <div className="absolute inset-0 z-[1] bg-primary/10 mix-blend-overlay" />
+            {/* Cyber Tint Overlay - Reduced for clarity */}
+            <div className="absolute inset-0 z-[1] bg-primary/5 mix-blend-overlay" />
 
-            {/* Dark Gradient Overlay for Readability & Blending */}
-            <div className="absolute inset-0 z-[2] bg-gradient-to-b from-background/90 via-background/50 to-background/90" />
+            {/* Dark Gradient Overlay - More transparent in center */}
+            <div className="absolute inset-0 z-[2] bg-gradient-to-b from-background/80 via-background/40 to-background/90" />
 
             {/* Background Grid */}
             <div className="absolute inset-0 bg-grid-pattern opacity-10 pointer-events-none" />

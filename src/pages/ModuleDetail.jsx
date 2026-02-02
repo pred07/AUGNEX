@@ -62,91 +62,62 @@ const ModuleDetail = () => {
         loadContent();
     }, [moduleId, moduleData, path, locked, navigate]); // Removed isModuleLocked from dep to avoid loop if state changes
 
-    const handleUnlock = async () => {
-        if (balance < 1) return;
-
-        const success = await unlockModule(path.id, moduleId);
-        if (success) {
-            addPurchasedModule(path.id, moduleId);
-            // State update will trigger re-render efficiently
-        }
+    // [DYNAMIC ECONOMY]
+    // Calculate unlock cost based on module index (simulated difficulty)
+    // Basic (first 3): 1 Coin
+    // Medium (next 5): 2 Coins
+    // Advanced (rest): 3 Coins
+    const getUnlockCost = () => {
+        if (!path) return 1;
+        const index = currentModuleIndex;
+        if (index < 3) return 1;
+        if (index < 8) return 2;
+        return 3;
     };
 
-    if (!moduleData || !path) {
-        return (
-            <div className="flex flex-col items-center justify-center h-[60vh] text-center space-y-4 font-mono">
-                <AlertTriangle className="w-16 h-16 text-red-500 animate-pulse" />
-                <h2 className="text-2xl font-bold text-white tracking-widest">ERROR: DATA CORRUPTED</h2>
-                <button onClick={() => navigate('/paths')} className="text-primary hover:text-white transition-colors underline decoration-dotted underline-offset-4 mt-4">
-                    // RETURN TO BASE
-                </button>
-            </div>
-        );
-    }
+    // Calculate completion reward (1 to 3 coins random)
+    // In a real app, this should be consistent per module, but random is fun for "Loot".
+    const getCompletionReward = () => {
+        const index = currentModuleIndex;
+        if (index < 5) return 1; // Early game: 1 coin guarunteed
+        return Math.floor(Math.random() * 3) + 1; // 1-3 coins
+    };
 
-    // [NEW] Lock Screen
-    if (locked) {
-        return (
-            <div className="max-w-4xl mx-auto py-20 px-6 text-center">
-                <div className="glass-card p-12 border border-white/10 relative overflow-hidden backdrop-blur-xl bg-black/40">
-                    <div className="absolute top-0 w-full h-1 bg-gradient-to-r from-transparent via-red-500/50 to-transparent"></div>
+    const unlockCost = getUnlockCost();
 
-                    <Lock className="w-16 h-16 text-red-500 mx-auto mb-6" />
+    const handleUnlock = async () => {
+        if (balance < unlockCost) return;
 
-                    <h1 className="text-3xl font-bold text-white mb-2 tracking-widest">ENCRYPTED MODULE</h1>
-                    <p className="text-gray-400 font-mono mb-8 uppercase text-sm tracking-wider">
-                        Clearance-Level 4 Required to Decrypt
-                    </p>
-
-                    <div className="flex flex-col items-center gap-6">
-                        <div className="flex items-center gap-4 bg-black/40 px-6 py-3 rounded border border-white/5">
-                            <span className="text-gray-400 font-mono text-xs uppercase">Your Balance</span>
-                            <div className="flex items-center gap-2 text-primary font-bold font-mono">
-                                <Coins size={16} />
-                                <span>{balance} COINS</span>
-                            </div>
-                        </div>
-
-                        {balance > 0 ? (
-                            <div className="space-y-4">
-                                <Button
-                                    onClick={handleUnlock}
-                                    isLoading={isWalletProcessing}
-                                    icon={Unlock}
-                                    className="bg-primary text-black hover:bg-primary/90 px-8 py-4 text-sm font-bold tracking-widest"
-                                >
-                                    UNLOCK MODULE (-1 COIN)
-                                </Button>
-                                <p className="text-xs text-gray-500 font-mono animate-pulse">
-                                    Decrypting will consume 1 database credit.
-                                </p>
-                            </div>
-                        ) : (
-                            <div className="space-y-4">
-                                <div className="p-4 bg-red-500/10 border border-red-500/20 rounded text-red-400 text-xs font-mono">
-                                    INSUFFICIENT FUNDS. PLEASE RECHARGE WALLET.
-                                </div>
-                                <Button
-                                    onClick={() => navigate('/profile')}
-                                    variant="outline"
-                                    icon={ArrowRight}
-                                >
-                                    GO TO WALLET
-                                </Button>
-                            </div>
-                        )}
-                    </div>
-                </div>
-            </div>
-        );
-    }
+        const success = await unlockModule(path.id, moduleId, unlockCost);
+        if (success) {
+            addPurchasedModule(path.id, moduleId);
+        }
+    };
 
     const isCompleted = isModuleCompleted(path.id, moduleId);
     const nextModuleId = getNextModuleId(path.id, moduleId);
     const isAdmin = user?.role === 'admin';
 
-    const handleComplete = () => {
-        markModuleComplete(path.id, moduleId, moduleData.xp || 100);
+    const handleComplete = async () => {
+        // [ECONOMY] Award Coins on Completion
+        // We do this by calling the service directly to ensure secure transaction
+        const reward = getCompletionReward();
+
+        try {
+            // Update Context (Client State)
+            markModuleComplete(path.id, moduleId, moduleData.xp || 100, reward);
+
+            // Update Database (Server State)
+            const { completeModule } = await import('../lib/firestoreService');
+            if (user?.uid) {
+                await completeModule(user.uid, path.id, moduleId, moduleData.xp || 100, reward);
+                // Refresh wallet
+                // We need a way to refresh wallet context. 
+                // For now, next page load will catch it, or we trigger it if we had access to recharge().
+            }
+        } catch (e) {
+            console.error("Completion error", e);
+        }
     };
 
     const getTypeIcon = (type) => {
@@ -193,22 +164,67 @@ const ModuleDetail = () => {
                 {/* LEFT COLUMN: Content & Actions */}
                 <div className="lg:col-span-8 flex flex-col justify-between min-h-[500px]">
                     <div>
-                        <motion.div
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.5 }}
-                            className="prose prose-invert prose-lg max-w-none custom-markdown prose-p:text-gray-300 prose-strong:text-white"
-                        >
-                            {loading ? (
-                                <div className="space-y-4 opacity-50">
-                                    <div className="h-4 bg-white/10 rounded w-3/4 animate-pulse"></div>
-                                    <div className="h-4 bg-white/10 rounded w-full animate-pulse"></div>
-                                    <div className="h-4 bg-white/10 rounded w-5/6 animate-pulse"></div>
+                        {locked ? (
+                            <div className="flex flex-col items-center justify-center py-20 border border-white/10 bg-black/40 rounded-xl backdrop-blur-sm">
+                                <div className="w-20 h-20 rounded-full bg-red-500/10 flex items-center justify-center mb-6 border border-red-500/20 shadow-[0_0_30px_rgba(239,68,68,0.2)]">
+                                    <Lock className="w-10 h-10 text-red-500" />
                                 </div>
-                            ) : (
-                                <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>
-                            )}
-                        </motion.div>
+                                <h2 className="text-3xl font-bold text-white mb-2 tracking-widest uppercase font-orbitron">Restricted Access</h2>
+                                <p className="text-gray-400 mb-8 max-w-md text-center font-mono text-sm leading-relaxed">
+                                    This intelligence file is classified. Decryption requires <span className="text-white">Level {unlockCost}</span> clearance or a Coin override.
+                                </p>
+
+                                <div className="bg-black/40 px-8 py-6 rounded-lg border border-white/5 mb-8 flex items-center gap-8">
+                                    <div className="text-right">
+                                        <div className="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Current Balance</div>
+                                        <div className="text-2xl font-bold text-primary flex items-center justify-end gap-2">
+                                            {balance} <Coins size={16} />
+                                        </div>
+                                    </div>
+                                    <div className="w-px h-10 bg-white/10" />
+                                    <div>
+                                        <div className="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Decryption Cost</div>
+                                        <div className="text-2xl font-bold text-red-400 flex items-center gap-2">
+                                            {unlockCost} <Coins size={16} />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <CyberButton
+                                    onClick={handleUnlock}
+                                    loading={isWalletProcessing}
+                                    disabled={balance < unlockCost}
+                                    icon={Unlock}
+                                    variant="primary"
+                                    className={cn("min-w-[280px]", balance < unlockCost && "border-red-500/30 text-red-500 hover:bg-red-500/10")}
+                                >
+                                    {balance < unlockCost ? "INSUFFICIENT FUNDS" : `UNLOCK ACCESS (-${unlockCost} COINS)`}
+                                </CyberButton>
+
+                                {balance < unlockCost && (
+                                    <p className="mt-4 text-[10px] text-red-400 uppercase tracking-widest animate-pulse">
+                                        Action Denied: Wallet Empty
+                                    </p>
+                                )}
+                            </div>
+                        ) : (
+                            <motion.div
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 0.5 }}
+                                className="prose prose-invert prose-lg max-w-none custom-markdown prose-p:text-gray-300 prose-strong:text-white"
+                            >
+                                {loading ? (
+                                    <div className="space-y-4 opacity-50">
+                                        <div className="h-4 bg-white/10 rounded w-3/4 animate-pulse"></div>
+                                        <div className="h-4 bg-white/10 rounded w-full animate-pulse"></div>
+                                        <div className="h-4 bg-white/10 rounded w-5/6 animate-pulse"></div>
+                                    </div>
+                                ) : (
+                                    <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>
+                                )}
+                            </motion.div>
+                        )}
 
                         {/* Quiz Inline */}
                         {!isCompleted && quizData && (
@@ -237,7 +253,7 @@ const ModuleDetail = () => {
                                     variant={isCompleted ? 'success' : 'primary'}
                                     className="flex-1"
                                 >
-                                    {isCompleted ? 'MODULE COMPLETE' : 'ACKNOWLEDGE & COMPLETE'}
+                                    {isCompleted ? 'MODULE COMPLETE' : `ACKNOWLEDGE & COMPLETE (+${getCompletionReward()} COINS)`}
                                 </CyberButton>
                             )}
 

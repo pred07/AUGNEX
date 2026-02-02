@@ -6,7 +6,9 @@ import { WalletProvider } from './context/WalletContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import MainLayout from './layouts/MainLayout';
 import Login from './pages/Login';
+import ModeratorLogin from './pages/ModeratorLogin';
 import Dashboard from './pages/Dashboard';
+import Landing from './pages/Landing';
 
 import LearningPaths from './pages/LearningPaths';
 import ModuleDetail from './pages/ModuleDetail';
@@ -31,8 +33,13 @@ function App() {
             <WalletProvider>
               <Routes>
                 <Route path="/login" element={<Login />} />
+                <Route path="/moderator" element={<ModeratorLogin />} />
 
-                <Route path="/" element={
+                {/* Public Landing Page */}
+                <Route path="/" element={<Landing />} />
+
+                {/* Protected Dashboard */}
+                <Route path="/dashboard" element={
                   <ProtectedRoute>
                     <MainLayout>
                       <Dashboard />

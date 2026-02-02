@@ -114,15 +114,26 @@ export const ProgressProvider = ({ children }) => {
         }
     };
 
-    const markModuleComplete = (pathId, moduleId, xpReward = 100) => {
+    const markModuleComplete = (pathId, moduleId, xpReward = 100, coinReward = 0) => {
         setProgress(prev => {
             const pathProgress = prev[pathId] || [];
             if (pathProgress.includes(moduleId)) {
                 return prev; // Already completed
             }
 
-            // Update localStorage
+            // Update localStorage (Sync)
             const result = localStorageService.completeModule(pathId, moduleId, xpReward);
+
+            // Update Firestore (Async - Fire & Forget)
+            if (user && user.uid) {
+                // Determine if we need to call the complex CompleteModule with coins
+                if (coinReward > 0) {
+                    // We need to import completeModule from firestoreService here or pass it down
+                    // Since we can't easily import circular deps, we rely on the component calling the service directly
+                    // OR we just use this for state/local storage and let the component handle the DB call.
+                    // LET'S make this pure state update + localstorage, and let Component handle DB call (cleaner).
+                }
+            }
 
             if (result) {
                 const newProgress = result.completedModules;

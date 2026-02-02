@@ -24,8 +24,15 @@ export const AuthProvider = ({ children }) => {
         const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
             if (firebaseUser) {
                 try {
-                    // 1. Check/Create Firestore Document (Self-healing context)
-                    // We import these from lib/firestoreService which must be added to imports
+                    // Check session timeout (10 hours)
+                    const loginTime = localStorage.getItem('auth_timestamp');
+                    const tenHours = 10 * 60 * 60 * 1000;
+                    if (loginTime && (Date.now() - parseInt(loginTime)) > tenHours) {
+                        console.log("Session timed out after 10 hours");
+                        await logout();
+                        return;
+                    }
+
                     let firestoreUser = await getUserProgress(firebaseUser.uid);
 
                     if (!firestoreUser) {
@@ -82,9 +89,9 @@ export const AuthProvider = ({ children }) => {
 
     const login = async (email, password) => {
         try {
-            // Verify credentials
             await signInWithEmailAndPassword(auth, email, password);
-            // Auth listener will handle state update
+            localStorage.setItem('auth_timestamp', Date.now().toString());
+            sessionStorage.setItem('active_session', 'true');
         } catch (error) {
             console.error("Login Error:", error);
             throw new Error(error.message);
@@ -123,6 +130,8 @@ export const AuthProvider = ({ children }) => {
     const loginWithGoogle = async () => {
         try {
             const result = await signInWithPopup(auth, googleProvider);
+            localStorage.setItem('auth_timestamp', Date.now().toString());
+            sessionStorage.setItem('active_session', 'true');
 
             // Save to localStorage
             localStorageService.saveUserData({
@@ -145,6 +154,8 @@ export const AuthProvider = ({ children }) => {
         try {
             await signOut(auth);
             localStorageService.clearUserData();
+            localStorage.removeItem('auth_timestamp');
+            sessionStorage.removeItem('active_session');
         } catch (error) {
             console.error("Logout Error:", error);
             throw new Error(error.message);

@@ -85,10 +85,11 @@ export const WalletProvider = ({ children }) => {
      * Spending a coin to unlock a module
      * @param {string} pathId 
      * @param {string} moduleId 
+     * @param {number} cost [NEW]
      * @returns {Promise<boolean>} success
      */
-    const unlockModule = async (pathId, moduleId) => {
-        if (balance < 1) {
+    const unlockModule = async (pathId, moduleId, cost = 1) => {
+        if (balance < cost) {
             console.warn("Insufficient funds");
             return false;
         }
@@ -97,13 +98,13 @@ export const WalletProvider = ({ children }) => {
         try {
             // Mock
             if (user?.username === 'admin' || user?.username === 'learner') {
-                setBalance(prev => prev - 1);
+                setBalance(prev => prev - cost);
                 await new Promise(r => setTimeout(r, 500));
                 return true;
             }
 
             // Real
-            const success = await deductCoin(user.uid, pathId, moduleId);
+            const success = await deductCoin(user.uid, pathId, moduleId, cost);
             if (success === true) {
                 // Fetch new balance to be sure, or decrement optimistically
                 const newBal = await getWalletBalance(user.uid);

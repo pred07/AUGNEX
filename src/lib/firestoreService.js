@@ -118,175 +118,6 @@ export const updateLastActive = async (uid) => {
     }
 };
 
-/**
- * Complete a module and update progress
- * @param {string} uid - User ID
- * @param {string} pathId - Learning path ID
- * @param {string} moduleId - Module ID
- * @param {number} xpReward - XP to award
- * @returns {Promise<void>}
- */
-export const completeModule = async (uid, pathId, moduleId, xpReward = 100) => {
-    try {
-        const userRef = doc(db, 'users', uid);
-
-        // Use dot notation to update nested field
-        const updates = {
-            [`progress.completedModules.${pathId}`]: arrayUnion(moduleId),
-            'progress.xp': increment(xpReward),
-            'progress.lastUpdated': serverTimestamp(),
-            lastActive: serverTimestamp()
-        };
-
-        await updateDoc(userRef, updates);
-        console.log(`✅ Module ${moduleId} completed, +${xpReward} XP`);
-    } catch (error) {
-        console.error('Error completing module:', error);
-        throw error;
-    }
-};
-
-/**
- * Award a badge to user
- * @param {string} uid - User ID
- * @param {string} badgeId - Badge ID
- * @returns {Promise<void>}
- */
-export const awardBadge = async (uid, badgeId) => {
-    try {
-        const userRef = doc(db, 'users', uid);
-
-        await updateDoc(userRef, {
-            'progress.unlockedBadges': arrayUnion(badgeId),
-            'progress.lastUpdated': serverTimestamp(),
-            lastActive: serverTimestamp()
-        });
-
-        console.log(`🎖️ Badge awarded: ${badgeId}`);
-    } catch (error) {
-        console.error('Error awarding badge:', error);
-        throw error;
-    }
-};
-
-/**
- * Award a medal to user
- * @param {string} uid - User ID
- * @param {string} medalId - Medal ID
- * @returns {Promise<void>}
- */
-export const awardMedal = async (uid, medalId) => {
-    try {
-        const userRef = doc(db, 'users', uid);
-
-        await updateDoc(userRef, {
-            'progress.unlockedMedals': arrayUnion(medalId),
-            'progress.lastUpdated': serverTimestamp(),
-            lastActive: serverTimestamp()
-        });
-
-        console.log(`🏅 Medal awarded: ${medalId}`);
-    } catch (error) {
-        console.error('Error awarding medal:', error);
-        throw error;
-    }
-};
-
-/**
- * Sync local progress data to Firestore (for migration)
- * @param {string} uid - User ID
- * @param {Object} localProgress - Progress data from localStorage
- * @returns {Promise<void>}
- */
-export const syncLocalToFirestore = async (uid, localProgress) => {
-    try {
-        const userRef = doc(db, 'users', uid);
-
-        // Check if user document exists
-        const userSnap = await getDoc(userRef);
-
-        if (!userSnap.exists()) {
-            console.warn('User document does not exist, cannot sync');
-            return;
-        }
-
-        const updates = {
-            'progress.completedModules': localProgress.progress || {},
-            'progress.xp': localProgress.xp || 0,
-            'progress.unlockedBadges': localProgress.unlockedBadges || [],
-            'progress.unlockedMedals': localProgress.unlockedMedals || [],
-            'progress.lastUpdated': serverTimestamp(),
-            lastActive: serverTimestamp()
-        };
-
-        await updateDoc(userRef, updates);
-        console.log('✅ Local progress synced to Firestore');
-    } catch (error) {
-        console.error('Error syncing to Firestore:', error);
-        throw error;
-    }
-};
-
-/**
- * Update user's last accessed module
- * @param {string} uid - User ID
- * @param {Object} moduleData - { pathId, moduleId, timestamp }
- * @returns {Promise<void>}
- */
-export const updateLastAccessedModule = async (uid, moduleData) => {
-    try {
-        const userRef = doc(db, 'users', uid);
-        await updateDoc(userRef, {
-            'progress.lastAccessedModule': moduleData,
-            lastActive: serverTimestamp()
-        });
-    } catch (error) {
-        console.error('Error updating last accessed module:', error);
-    }
-};
-
-/**
- * Update user profile information
- * @param {string} uid - User ID
- * @param {Object} updates - Profile updates
- * @returns {Promise<void>}
- */
-export const updateUserProfile = async (uid, updates) => {
-    try {
-        const userRef = doc(db, 'users', uid);
-
-        await updateDoc(userRef, {
-            ...updates,
-            lastActive: serverTimestamp()
-        });
-
-        console.log('✅ Profile updated');
-    } catch (error) {
-        console.error('Error updating profile:', error);
-        throw error;
-    }
-};
-
-/**
- * Update user role (Admin only via rules)
- * @param {string} uid - User ID
- * @param {string} newRole - New role ('admin' or 'learner')
- * @returns {Promise<boolean>}
- */
-export const updateUserRole = async (uid, newRole) => {
-    try {
-        const userRef = doc(db, 'users', uid);
-        await updateDoc(userRef, {
-            role: newRole,
-            lastActive: serverTimestamp()
-        });
-        return true;
-    } catch (error) {
-        console.error('Error updating role:', error);
-        return false;
-    }
-};
-
 // --- WALLET FUNCTIONS ---
 
 export const getWalletBalance = async (uid) => {
@@ -320,7 +151,8 @@ export const rechargeWallet = async (uid, amount = 80) => {
     }
 };
 
-export const deductCoin = async (uid, pathId, moduleId) => {
+// [UPDATED] Deduct Coin with Dynamic Amount
+export const deductCoin = async (uid, pathId, moduleId, cost = 1) => {
     const userRef = doc(db, 'users', uid);
     try {
         return await runTransaction(db, async (transaction) => {
@@ -337,13 +169,13 @@ export const deductCoin = async (uid, pathId, moduleId) => {
             }
 
             // 2. Check Balance
-            if (balance < 1) {
+            if (balance < cost) {
                 throw new Error("Insufficient Funds");
             }
 
             // 3. Deduct & Unlock
             transaction.update(userRef, {
-                walletBalance: balance - 1,
+                walletBalance: balance - cost,
                 'progress.purchasedModules': arrayUnion(moduleId)
             });
 
@@ -352,6 +184,38 @@ export const deductCoin = async (uid, pathId, moduleId) => {
     } catch (error) {
         console.error("Transaction failed: ", error);
         return false;
+    }
+};
+
+/**
+ * Complete a module and update progress
+ * @param {string} uid - User ID
+ * @param {string} pathId - Learning path ID
+ * @param {string} moduleId - Module ID
+ * @param {number} xpReward - XP to award
+ * @param {number} coinReward - Coins to award [NEW]
+ * @returns {Promise<void>}
+ */
+export const completeModule = async (uid, pathId, moduleId, xpReward = 100, coinReward = 0) => {
+    try {
+        const userRef = doc(db, 'users', uid);
+        const updates = {
+            [`progress.completedModules.${pathId}`]: arrayUnion(moduleId),
+            'progress.xp': increment(xpReward),
+            'progress.lastUpdated': serverTimestamp(),
+            lastActive: serverTimestamp()
+        };
+
+        // Add coin reward if applicable
+        if (coinReward > 0) {
+            updates['walletBalance'] = increment(coinReward);
+        }
+
+        await updateDoc(userRef, updates);
+        console.log(`✅ Module ${moduleId} completed, +${xpReward} XP, +${coinReward} Coins`);
+    } catch (error) {
+        console.error('Error completing module:', error);
+        throw error;
     }
 };
 
