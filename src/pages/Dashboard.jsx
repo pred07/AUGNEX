@@ -44,7 +44,7 @@ const Dashboard = () => {
                 {/* Module Overview - 2/3 Width */}
                 <section className="lg:col-span-2 space-y-4">
                     <div className="flex items-center justify-between">
-                        <h3 className="text-lg text-muted">Available Modules (Forge)</h3>
+                        <h3 className="text-xl font-orbitron font-bold text-white tracking-wider">AVAILABLE MODULES (FORGE)</h3>
                         <span className="text-xs text-primary font-mono cursor-pointer hover:underline" onClick={() => navigate('/paths')}>VIEW ALL PATHS</span>
                     </div>
 

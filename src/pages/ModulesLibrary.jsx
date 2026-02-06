@@ -64,7 +64,7 @@ const ModulesLibrary = () => {
                 </div>
 
                 {/* Path Filters */}
-                <div className="flex gap-2 overflow-x-auto pb-2 md:pb-0 w-full md:w-auto no-scrollbar">
+                <div className="flex gap-2 overflow-x-auto pb-2 md:pb-0 w-full md:w-auto scrollbar-hide">
                     <button
                         onClick={() => setSelectedPath('all')}
                         className={`px-4 py-1.5 rounded-full text-xs font-mono whitespace-nowrap border transition-all ${selectedPath === 'all'

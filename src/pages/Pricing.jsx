@@ -1,16 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import MainLayout from '../layouts/MainLayout';
 import { motion } from 'framer-motion';
-import { Check, Zap, Crown, Star, Ticket, Coins, CreditCard } from 'lucide-react';
-import Button from '../components/ui/Button';
-import { getDoc, doc, collection, getDocs, addDoc, serverTimestamp } from 'firebase/firestore';
-import { db } from '../lib/firebase';
-import { redeemCoupon as redeemCouponService } from '../lib/firestoreService';
-import { useAuth } from '../context/AuthContext';
-
-import React, { useState, useEffect } from 'react';
-import MainLayout from '../layouts/MainLayout';
-import { motion } from 'framer-motion';
 import { Check, Zap, Crown, Star, Ticket, Coins, Lock, Terminal, Shield, Cpu, Code } from 'lucide-react';
 import Button from '../components/ui/Button';
 import { db } from '../lib/firebase';
@@ -195,13 +185,14 @@ const Pricing = () => {
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: index * 0.1 + 0.2 }}
-                            className={`relative group bg-black/40 border ${tier.popular ? 'border-primary shadow-[0_0_20px_rgba(0,255,157,0.15)]' : 'border-white/10'} rounded-2xl p-8 backdrop-blur-sm overflow-hidden hover:border-white/30 transition-all flex flex-col`}
+                            className={`relative group glass-card rounded-xl p-8 overflow-hidden hover:border-white/30 transition-all flex flex-col ${tier.popular ? 'border-primary shadow-[0_0_20px_rgba(0,255,157,0.15)]' : ''}`}
                         >
                             {tier.popular && (
                                 <div className="absolute top-0 right-0 bg-primary text-black text-xs font-bold px-3 py-1 rounded-bl-lg font-mono">
-                                    RECOMMENDED
+                                    POPULAR
                                 </div>
-                            )}
+                            )
+                            }
 
                             <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${tier.color} flex items-center justify-center mb-6 shadow-lg`}>
                                 <Icon className="text-white w-7 h-7" />
@@ -270,10 +261,8 @@ const Pricing = () => {
                 )}
             </div>
 
-        </div>
+        </div >
     );
 };
-
-export default Pricing;
 
 export default Pricing;

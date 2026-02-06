@@ -54,11 +54,22 @@ const MainLayout = ({ children }) => {
                 animate={{ x: 0 }}
                 className="hidden md:flex fixed w-20 xl:w-64 h-screen border-r border-white/5 bg-surface/50 backdrop-blur-xl flex-col z-40 transition-colors duration-500"
             >
-                <Link to={homePath} className="p-6 flex items-center justify-center xl:justify-start gap-3 border-b border-white/5 hover:bg-white/5 transition-colors">
-                    <div className="w-8 h-8 rounded bg-primary/20 flex items-center justify-center text-primary border border-primary/50 shadow-[0_0_10px_rgba(0,255,157,0.2)] p-1">
-                        <span className="font-mono font-bold text-lg leading-none pt-0.5">&gt;</span>
+                <Link to={homePath} className="group p-6 flex items-center justify-center xl:justify-start gap-3 border-b border-white/5 hover:bg-white/5 transition-colors relative overflow-hidden">
+                    {/* Access Light */}
+                    <div className="absolute top-0 left-0 w-1 h-full bg-primary/0 group-hover:bg-primary/50 transition-all duration-300 blur-sm" />
+
+                    <div className="w-8 h-8 rounded bg-primary/10 flex items-center justify-center text-primary border border-primary/30 shadow-[0_0_10px_rgba(0,255,157,0.1)] group-hover:shadow-[0_0_20px_rgba(0,255,157,0.4)] group-hover:border-primary/80 group-hover:bg-primary/20 transition-all duration-300 p-1">
+                        <span className="font-mono font-bold text-lg leading-none pt-0.5 group-hover:rotate-[-90deg] transition-transform duration-500">&gt;</span>
                     </div>
-                    <span className="hidden xl:block font-orbitron font-bold tracking-wider text-xl text-white whitespace-nowrap">NYTVNT-OPS</span>
+
+                    <div className="hidden xl:flex flex-col">
+                        <span className="font-orbitron font-bold tracking-wider text-xl text-white whitespace-nowrap group-hover:text-primary transition-colors duration-300 flex items-center gap-1">
+                            NYTVNT-OPS<span className="animate-pulse text-primary">_</span>
+                        </span>
+                        <span className="text-[9px] font-mono text-gray-500 leading-none uppercase tracking-[0.2em] group-hover:text-primary/70 transition-colors">
+                            System Online
+                        </span>
+                    </div>
                 </Link>
 
                 <nav className="flex-1 flex flex-col gap-2 p-4 mt-4">

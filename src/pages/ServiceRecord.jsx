@@ -4,7 +4,7 @@ import { useProgress } from '../context/ProgressContext';
 import { useAuth } from '../context/AuthContext';
 import { RANKS, MEDALS } from '../data/achievements';
 import * as Icons from 'lucide-react';
-import { Share2, Edit, Copy, Check, X, Camera } from 'lucide-react';
+import { Share2, Edit, Copy, Check, X } from 'lucide-react';
 import { cn } from '../lib/utils';
 import Button from '../components/ui/Button';
 
@@ -110,7 +110,7 @@ const ServiceRecord = () => {
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="bg-surface/30 border border-white/5 rounded-2xl p-8 relative overflow-hidden group"
+                className="bg-surface/30 border border-white/5 rounded-xl p-8 relative overflow-hidden group"
             >
                 {/* Edit Button */}
                 <button

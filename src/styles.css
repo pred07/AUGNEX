@@ -255,6 +255,16 @@
   @apply text-primary hover:text-primary/80 transition-colors underline decoration-primary/30 underline-offset-4;
 }
 
+.prose hr {
+  @apply border-0 h-px my-12 bg-gradient-to-r from-transparent via-primary/30 to-transparent relative overflow-visible;
+}
+
+.prose hr::after {
+  content: '';
+  @apply absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-1.5 h-1.5 bg-background border border-primary/60 rotate-45;
+  box-shadow: 0 0 10px rgba(0, 255, 157, 0.3);
+}
+
 /* Custom Utilities */
 .scrollbar-hide::-webkit-scrollbar {
   display: none;

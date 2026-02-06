@@ -62,6 +62,17 @@ const ModuleDetail = () => {
         loadContent();
     }, [moduleId, moduleData, path, locked, navigate]); // Removed isModuleLocked from dep to avoid loop if state changes
 
+    // Scroll active module in sidebar to view on mount/change
+    useEffect(() => {
+        const activeItem = document.getElementById(`module-sidebar-item-${moduleId}`);
+        if (activeItem) {
+            // Using a small timeout ensures the DOM is fully rendered/stabilized
+            setTimeout(() => {
+                activeItem.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 100);
+        }
+    }, [moduleId]);
+
     // [DYNAMIC ECONOMY]
     // Calculate unlock cost based on module index (simulated difficulty)
     // Basic (first 3): 1 Coin
@@ -251,9 +262,10 @@ const ModuleDetail = () => {
                                     onClick={handleComplete}
                                     disabled={isCompleted}
                                     variant={isCompleted ? 'success' : 'primary'}
-                                    className="flex-1"
+                                    className="flex-1 h-20 text-lg tracking-widest"
+                                    icon={isCompleted ? CheckCircle2 : Terminal}
                                 >
-                                    {isCompleted ? 'MODULE COMPLETE' : `ACKNOWLEDGE & COMPLETE (+${getCompletionReward()} COINS)`}
+                                    {isCompleted ? 'MODULE COMPLETE' : <span className="flex flex-col items-start"><span className="text-[10px] opacity-70 mb-0.5">MISSION OBJECTIVE</span><span>ACKNOWLEDGE & COMPLETE</span></span>}
                                 </CyberButton>
                             )}
 
@@ -261,24 +273,31 @@ const ModuleDetail = () => {
                             {nextModuleId && (
                                 <button
                                     onClick={() => navigate(`/modules/${nextModuleId}`)}
-                                    // disabled={!isCompleted && !isAdmin} 
-                                    // PERMISSION FIX: Allow checking next module even if not completed, 
-                                    // if it's locked they'll just hit the lock screen.
-                                    // But typically "Next" should be sequential?
-                                    // Let's keep it sequential.
                                     disabled={!isCompleted && !isAdmin}
                                     className={cn(
-                                        "flex-1 flex items-center justify-between px-6 py-4 rounded border text-sm font-mono tracking-widest uppercase transition-all",
+                                        "flex-1 flex items-center justify-between px-8 py-4 rounded-xl border-2 transition-all h-20",
                                         (!isCompleted && !isAdmin)
-                                            ? "border-white/5 text-gray-600 cursor-not-allowed bg-black/20"
-                                            : "border-white/10 text-white bg-white/5 hover:bg-white/10 hover:border-white/20"
+                                            ? "border-white/5 border-dashed text-gray-600 cursor-not-allowed bg-black/20 hover:border-white/10"
+                                            : "border-white/10 text-white bg-white/5 hover:bg-white/10 hover:border-primary/50 hover:shadow-[0_0_20px_rgba(0,255,157,0.1)]"
                                     )}
                                 >
                                     <span className="flex flex-col items-start gap-1">
-                                        <span className="text-[10px] text-gray-500">NEXT SEQUENCE</span>
-                                        <span>PROCEED</span>
+                                        <span className={cn("text-[10px] tracking-widest uppercase font-bold", (!isCompleted && !isAdmin) ? "text-gray-700" : "text-gray-400")}>
+                                            NEXT SEQUENCE
+                                        </span>
+                                        <span className={cn("font-orbitron tracking-wider text-lg", (!isCompleted && !isAdmin) ? "text-gray-700" : "text-white")}>
+                                            PROCEED
+                                        </span>
                                     </span>
-                                    {(!isCompleted && !isAdmin) ? <Lock size={16} /> : <ArrowRight size={16} />}
+                                    {(!isCompleted && !isAdmin) ? (
+                                        <div className="w-10 h-10 rounded-full bg-black/40 border border-white/5 flex items-center justify-center">
+                                            <Lock size={16} className="text-gray-700" />
+                                        </div>
+                                    ) : (
+                                        <div className="w-10 h-10 rounded-full bg-primary/10 border border-primary/50 flex items-center justify-center">
+                                            <ArrowRight size={16} className="text-primary" />
+                                        </div>
+                                    )}
                                 </button>
                             )}
                         </div>
@@ -307,13 +326,13 @@ const ModuleDetail = () => {
                                 return (
                                     <div
                                         key={mod.id}
+                                        id={`module-sidebar-item-${mod.id}`}
                                         onClick={() => navigate(`/modules/${mod.id}`)}
                                         className={cn(
                                             "p-4 transition-colors relative group",
                                             isActive ? "bg-white/5" : "hover:bg-white/5 cursor-pointer",
                                             isModLocked && "opacity-75" // Less opacity for locked but clickable
                                         )}
-                                        ref={isActive ? (el) => el?.scrollIntoView({ behavior: 'smooth', block: 'center' }) : null}
                                     >
                                         {isActive && <div className={cn("absolute left-0 top-0 bottom-0 w-[2px]", path.color.replace('text-', 'bg-'))} />}
 
