@@ -41,8 +41,10 @@ const Landing = () => {
         events.forEach(event => window.addEventListener(event, resetTimer));
 
         const intervalId = setInterval(() => {
-            if (Date.now() - lastInteraction > 5000 && !isEntering) {
-                // If idle for > 5 seconds, trigger entry
+            const hasAutoRedirected = sessionStorage.getItem('has_visited_login');
+
+            // Only auto-redirect if we haven't visited login yet in this session
+            if (!hasAutoRedirected && Date.now() - lastInteraction > 5000 && !isEntering) {
                 handleEntry();
             }
         }, 1000);
@@ -54,6 +56,9 @@ const Landing = () => {
     }, [lastInteraction, isEntering]);
 
     const handleEntry = () => {
+        // Mark that we are entering/have entered, so auto-redirect doesn't fire again if we come back
+        sessionStorage.setItem('has_visited_login', 'true');
+
         setIsEntering(true);
         setTimeout(() => {
             navigate('/login');
