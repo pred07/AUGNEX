@@ -64,7 +64,7 @@ const Landing = () => {
 
         setIsEntering(true);
         setTimeout(() => {
-            navigate('/login');
+            navigate('/login', { replace: true });
         }, 6000); // Increased to 6 seconds for effect
     };
 
