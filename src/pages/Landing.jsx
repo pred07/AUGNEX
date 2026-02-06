@@ -68,12 +68,11 @@ const Landing = () => {
         }, 6000); // Increased to 6 seconds for effect
     };
 
-    if (isEntering) {
-        return <SimpleLoader />;
-    }
-
+    // Move SimpleLoader to be an overlay instead of replacing content
+    // This prevents unmounting/remounting issues on back navigation
     return (
         <div className="min-h-screen bg-white text-[#202122] font-serif selection:bg-blue-200 selection:text-blue-900">
+            {isEntering && <SimpleLoader />}
             {/* Wikipedia-style Header */}
             <header className="border-b border-[#a7d7f9] bg-white h-16 flex items-center px-4 sticky top-0 z-50 font-sans">
                 <div className="flex items-center gap-4 w-full max-w-[1600px] mx-auto">
