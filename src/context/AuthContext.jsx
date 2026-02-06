@@ -1,11 +1,12 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { auth, googleProvider, signInWithPopup } from '../lib/firebase';
+import { auth, googleProvider, signInWithPopup, signInWithRedirect } from '../lib/firebase';
 import {
     createUserWithEmailAndPassword,
     signInWithEmailAndPassword,
     updateProfile,
     sendEmailVerification,
     onAuthStateChanged,
+    getRedirectResult,
     signOut,
     updatePassword
 } from 'firebase/auth';
@@ -20,6 +21,41 @@ export const AuthProvider = ({ children }) => {
 
     useEffect(() => {
         let mounted = true;
+
+        // Handle redirect result (for failed popups)
+        getRedirectResult(auth).then(async (result) => {
+            if (result && result.user) {
+                console.log("Redirect login successful:", result.user.email);
+                localStorage.setItem('auth_timestamp', Date.now().toString());
+                sessionStorage.setItem('active_session', 'true');
+
+                // Ensure firestore doc creation happens here too if needed
+                let firestoreUser = await getUserProgress(result.user.uid);
+                if (!firestoreUser) {
+                    await createUserDocument(result.user.uid, {
+                        email: result.user.email,
+                        username: result.user.displayName || result.user.email.split('@')[0],
+                        photoURL: result.user.photoURL,
+                        role: result.user.email === 'admin@nytvnt.dev' ? 'admin' : 'learner'
+                    });
+                    firestoreUser = await getUserProgress(result.user.uid);
+                }
+
+                const userData = {
+                    uid: result.user.uid,
+                    email: result.user.email,
+                    displayName: result.user.displayName,
+                    photoURL: result.user.photoURL,
+                    providerData: result.user.providerData,
+                    role: firestoreUser?.role || (result.user.email === 'admin@nytvnt.dev' ? 'admin' : 'learner'),
+                    walletBalance: firestoreUser?.walletBalance || 0
+                };
+                localStorageService.saveUserData(userData);
+                if (mounted) setUser(userData);
+            }
+        }).catch((error) => {
+            console.error("Redirect Login Error:", error);
+        });
 
         const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
             if (firebaseUser) {
@@ -146,6 +182,12 @@ export const AuthProvider = ({ children }) => {
             return result.user;
         } catch (error) {
             console.error("Google Login Error:", error);
+            if (error.code === 'auth/popup-closed-by-user' || error.code === 'auth/popup-blocked') {
+                console.log("Popup failed, falling back to redirect...");
+                await signInWithRedirect(auth, googleProvider);
+                // Return null as we are redirecting away
+                return null;
+            }
             throw new Error(error.message);
         }
     };
