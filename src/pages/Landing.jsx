@@ -13,14 +13,20 @@ const SimpleLoader = () => (
 
 const Landing = () => {
     const navigate = useNavigate();
-    const { isAuthenticated } = useAuth();
+    const { isAuthenticated, isLoading } = useAuth();
     const [currentDate, setCurrentDate] = useState('');
     const [isEntering, setIsEntering] = useState(false);
 
     useEffect(() => {
-        setCurrentDate('February 7, 2026');
-        sessionStorage.removeItem('active_session');
-    }, []);
+        if (!isLoading) {
+            if (isAuthenticated) {
+                navigate('/dashboard');
+            } else {
+                setCurrentDate('February 7, 2026');
+                sessionStorage.removeItem('active_session');
+            }
+        }
+    }, [isAuthenticated, isLoading, navigate]);
 
     const handleEntry = () => {
         setIsEntering(true);

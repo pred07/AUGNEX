@@ -41,6 +41,9 @@ const MainLayout = ({ children }) => {
         return `https://api.dicebear.com/9.x/dylan/svg?seed=${seed}`;
     };
 
+    // Determine home path based on auth status
+    const homePath = user ? '/dashboard' : '/';
+
     return (
         <div className="min-h-screen bg-background flex text-gray-100 overflow-hidden font-inter transition-colors duration-500">
             <BackgroundEffects />
@@ -51,7 +54,7 @@ const MainLayout = ({ children }) => {
                 animate={{ x: 0 }}
                 className="hidden md:flex fixed w-20 xl:w-64 h-screen border-r border-white/5 bg-surface/50 backdrop-blur-xl flex-col z-40 transition-colors duration-500"
             >
-                <Link to="/" className="p-6 flex items-center justify-center xl:justify-start gap-3 border-b border-white/5 hover:bg-white/5 transition-colors">
+                <Link to={homePath} className="p-6 flex items-center justify-center xl:justify-start gap-3 border-b border-white/5 hover:bg-white/5 transition-colors">
                     <div className="w-8 h-8 rounded bg-primary/20 flex items-center justify-center text-primary border border-primary/50 shadow-[0_0_10px_rgba(0,255,157,0.2)] p-1">
                         <span className="font-mono font-bold text-lg leading-none pt-0.5">&gt;</span>
                     </div>
@@ -59,7 +62,7 @@ const MainLayout = ({ children }) => {
                 </Link>
 
                 <nav className="flex-1 flex flex-col gap-2 p-4 mt-4">
-                    <SidebarItem icon={Home} label="Dashboard" path="/" isActive={location.pathname === '/'} />
+                    <SidebarItem icon={Home} label="Dashboard" path="/dashboard" isActive={location.pathname === '/dashboard'} />
                     <SidebarItem icon={Map} label="Learning Paths" path="/paths" isActive={location.pathname === '/paths'} />
                     <SidebarItem icon={Box} label="Library" path="/modules" isActive={location.pathname === '/modules'} />
                     <SidebarItem icon={Coins} label="Coins" path="/subscription" isActive={location.pathname === '/subscription'} />
@@ -127,7 +130,7 @@ const MainLayout = ({ children }) => {
 
             {/* Mobile Bottom Navigation - Visible < md */}
             < div className="md:hidden fixed bottom-0 left-0 right-0 h-16 bg-surface/90 backdrop-blur-xl border-t border-white/10 z-50 flex items-center justify-around px-2 transition-colors duration-500" >
-                <Link to="/" className={cn("p-2 rounded-lg flex flex-col items-center gap-1", location.pathname === '/' ? "text-primary" : "text-muted")}>
+                <Link to="/dashboard" className={cn("p-2 rounded-lg flex flex-col items-center gap-1", location.pathname === '/dashboard' ? "text-primary" : "text-muted")}>
                     <Home size={20} />
                     <span className="text-[10px] font-mono">Home</span>
                 </Link>
@@ -172,7 +175,7 @@ const MainLayout = ({ children }) => {
 
             {/* Mobile Top Bar (Branding) */}
             < div className="md:hidden fixed top-0 left-0 right-0 h-14 bg-background/80 backdrop-blur-md border-b border-white/5 z-40 flex items-center justify-between px-4 transition-colors duration-500" >
-                <Link to="/" className="flex items-center gap-2">
+                <Link to={homePath} className="flex items-center gap-2">
                     <div className="w-6 h-6 rounded bg-primary/20 flex items-center justify-center text-primary border border-primary/50 p-0.5">
                         <span className="font-mono font-bold text-sm leading-none pt-0.5">&gt;</span>
                     </div>
