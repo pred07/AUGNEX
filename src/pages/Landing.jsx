@@ -41,8 +41,8 @@ const Landing = () => {
         events.forEach(event => window.addEventListener(event, resetTimer));
 
         const intervalId = setInterval(() => {
-            if (Date.now() - lastInteraction > 8000 && !isEntering) {
-                // If idle for > 8 seconds, trigger entry
+            if (Date.now() - lastInteraction > 5000 && !isEntering) {
+                // If idle for > 5 seconds, trigger entry
                 handleEntry();
             }
         }, 1000);
