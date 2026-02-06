@@ -18,6 +18,9 @@ const Landing = () => {
     const [isEntering, setIsEntering] = useState(false);
 
     useEffect(() => {
+        // Reset entry state on mount to fix "stuck" loader on back navigation
+        setIsEntering(false);
+
         if (!isLoading) {
             if (isAuthenticated) {
                 navigate('/dashboard');
