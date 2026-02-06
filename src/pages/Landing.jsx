@@ -28,11 +28,36 @@ const Landing = () => {
         }
     }, [isAuthenticated, isLoading, navigate]);
 
+    // Idle Timer Logic
+    const [lastInteraction, setLastInteraction] = useState(Date.now());
+
+    useEffect(() => {
+        const events = ['mousemove', 'scroll', 'keydown', 'click', 'touchstart'];
+
+        const resetTimer = () => {
+            setLastInteraction(Date.now());
+        };
+
+        events.forEach(event => window.addEventListener(event, resetTimer));
+
+        const intervalId = setInterval(() => {
+            if (Date.now() - lastInteraction > 8000 && !isEntering) {
+                // If idle for > 8 seconds, trigger entry
+                handleEntry();
+            }
+        }, 1000);
+
+        return () => {
+            events.forEach(event => window.removeEventListener(event, resetTimer));
+            clearInterval(intervalId);
+        };
+    }, [lastInteraction, isEntering]);
+
     const handleEntry = () => {
         setIsEntering(true);
         setTimeout(() => {
             navigate('/login');
-        }, 2500);
+        }, 6000); // Increased to 6 seconds for effect
     };
 
     if (isEntering) {
