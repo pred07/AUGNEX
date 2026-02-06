@@ -167,7 +167,7 @@ const Landing = () => {
                                     <div className="font-bold border-r border-[#a2a9b1] pr-2 text-right uppercase tracking-tighter">Status</div>
                                     <div>Active / Hostile</div>
                                     <div className="font-bold border-r border-[#a2a9b1] pr-2 text-right uppercase tracking-tighter">Motto</div>
-                                    <td className="italic text-[10px]">Verify, then Nullify.</td>
+                                    <div className="italic text-[10px]">Verify, then Nullify.</div>
                                 </div>
                             </div>
 
