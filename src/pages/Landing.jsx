@@ -65,7 +65,7 @@ const Landing = () => {
         setIsEntering(true);
         setTimeout(() => {
             navigate('/login', { replace: true });
-        }, 6000); // Increased to 6 seconds for effect
+        }, 8000); // Increased to 8 seconds for effect
     };
 
     // Move SimpleLoader to be an overlay instead of replacing content
