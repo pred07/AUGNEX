@@ -40,11 +40,11 @@ const ModulesLibrary = () => {
         <div className="max-w-7xl mx-auto space-y-8 pb-20">
             {/* Header */}
             <div className="space-y-4">
-                <h1 className="text-4xl font-orbitron font-bold text-white tracking-wider flex items-center gap-3">
-                    <Box className="text-primary" size={40} />
-                    MISSION LIBRARY
+                <h1 className="text-2xl sm:text-3xl md:text-4xl font-orbitron font-bold text-white tracking-wider flex items-center gap-2 sm:gap-3 break-words">
+                    <Box className="text-primary shrink-0" size={32} />
+                    <span className="break-words">MISSION LIBRARY</span>
                 </h1>
-                <p className="text-gray-400 font-mono text-sm max-w-2xl">
+                <p className="text-gray-400 font-mono text-xs sm:text-sm max-w-2xl break-words">
                     Access the complete database of {allModules.length} training modules. Search specific topics or browse by classification.
                 </p>
             </div>

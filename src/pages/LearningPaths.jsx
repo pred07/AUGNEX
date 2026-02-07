@@ -47,12 +47,12 @@ const PathCard = ({ path, isSelected, onClick }) => {
                     </div>
                     <div>
                         <h3 className={cn(
-                            "text-xl font-bold font-rajdhani uppercase tracking-wide",
+                            "text-base sm:text-lg md:text-xl font-bold font-rajdhani uppercase tracking-wide break-words",
                             isSelected ? "text-white" : "text-gray-400 group-hover:text-white"
                         )}>
                             {path.title}
                         </h3>
-                        <p className="text-xs font-mono text-gray-500">{path.subtitle}</p>
+                        <p className="text-[10px] sm:text-xs font-mono text-gray-500 break-words">{path.subtitle}</p>
                     </div>
                 </div>
 
@@ -104,7 +104,7 @@ const ModuleItem = ({ module, status, pathColor, index }) => {
                 </div>
                 <div>
                     <div className={cn(
-                        "text-sm font-bold font-rajdhani transition-colors",
+                        "text-xs sm:text-sm font-bold font-rajdhani transition-colors break-words",
                         status === 'locked' ? "text-gray-500" : "text-gray-200 group-hover:text-white"
                     )}>
                         {module.title}
@@ -129,7 +129,7 @@ const ModuleItem = ({ module, status, pathColor, index }) => {
                 {status === 'active' && <Play size={14} className={cn("animate-pulse", pathColor)} />}
                 {status === 'locked' && <Lock size={14} className="text-gray-800" />}
             </div>
-        </motion.div>
+        </motion.div >
     );
 };
 
@@ -167,10 +167,10 @@ const LearningPaths = () => {
             {/* Header */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 gap-4">
                 <div>
-                    <h1 className="text-4xl md:text-5xl font-bold font-orbitron text-white mb-2 tracking-tight">
+                    <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold font-orbitron text-white mb-2 tracking-tight break-words">
                         OPERATIONAL <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">PATHWAYS</span>
                     </h1>
-                    <p className="text-gray-400 font-mono text-sm uppercase tracking-widest border-l-2 border-cyan-500/50 pl-4">
+                    <p className="text-gray-400 font-mono text-xs sm:text-sm uppercase tracking-widest border-l-2 border-cyan-500/50 pl-3 sm:pl-4 break-words">
                         Select Protocol // Init Sequence
                     </p>
                 </div>
@@ -251,8 +251,8 @@ const LearningPaths = () => {
                                                     <Globe size={10} />
                                                     <span>ACTIVE PROTOCOL</span>
                                                 </div>
-                                                <h2 className="text-4xl font-bold text-white mb-2 font-orbitron tracking-wide">{selectedPath.title}</h2>
-                                                <p className="text-gray-400 text-sm max-w-xl leading-relaxed">{selectedPath.description}</p>
+                                                <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-2 font-orbitron tracking-wide break-words">{selectedPath.title}</h2>
+                                                <p className="text-gray-400 text-xs sm:text-sm max-w-xl leading-relaxed break-words">{selectedPath.description}</p>
                                             </div>
                                             <div className="text-right hidden md:block">
                                                 <div className="text-4xl font-bold font-rajdhani text-white">{progressPercent}%</div>
@@ -275,7 +275,8 @@ const LearningPaths = () => {
                                                         >
                                                             <span className="flex items-center gap-2">
                                                                 <Play size={16} className="fill-current" />
-                                                                <span>CONTINUE: {nextModule.title}</span>
+                                                                <span className="hidden sm:inline">CONTINUE: {nextModule.title}</span>
+                                                                <span className="sm:hidden text-xs">CONTINUE</span>
                                                             </span>
                                                         </Button>
                                                     </div>

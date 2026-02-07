@@ -81,8 +81,8 @@ const Landing = () => {
                             W
                         </div>
                         <div className="hidden sm:block leading-tight">
-                            <div className="font-serif text-lg">The Wiki</div>
-                            <div className="text-[10px] text-gray-400 font-sans uppercase tracking-tighter">The Free Operational Encyclopedia</div>
+                            <div className="font-serif text-base sm:text-lg">The Wiki</div>
+                            <div className="text-[9px] sm:text-[10px] text-gray-400 font-sans uppercase tracking-tighter break-words max-w-[140px]">The Free Operational Encyclopedia</div>
                         </div>
                     </div>
 
@@ -102,7 +102,7 @@ const Landing = () => {
 
                     <div className="ml-auto text-xs flex items-center gap-4 text-[#36c] shrink-0 font-sans">
                         <span className="hidden lg:inline text-black cursor-default">Status: <span className="text-green-600 font-mono animate-pulse">CLASSIFIED</span></span>
-                        <span onClick={handleEntry} className="hover:underline cursor-pointer font-bold bg-[#36c]/5 px-3 py-1.5 rounded-sm">Enter Mission</span>
+                        <span onClick={handleEntry} className="hover:underline cursor-pointer font-bold bg-[#36c]/5 px-2 sm:px-3 py-1.5 rounded-sm text-xs sm:text-sm whitespace-nowrap">Enter Mission</span>
                         <button className="md:hidden">
                             <Menu size={20} className="text-black" />
                         </button>
@@ -140,7 +140,7 @@ const Landing = () => {
                     {/* Article Header */}
                     <div className="border-b border-[#a2a9b1] mb-6 pb-2">
                         <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-2">
-                            <h1 className="text-4xl font-serif mb-0 font-normal">NYTVNT: The Operative Records</h1>
+                            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-serif mb-0 font-normal break-words">NYTVNT: The Operative Records</h1>
                             <div className="text-xs text-[#72777d] flex gap-2 font-sans py-1">
                                 <span className="cursor-pointer font-bold border-b-2 border-orange-500">Article</span>
                                 <span className="cursor-pointer">Talk</span>
@@ -155,19 +155,19 @@ const Landing = () => {
 
                     <div className="flex flex-col-reverse lg:flex-row gap-8">
                         {/* Text Content */}
-                        <div className="flex-1 leading-8 text-[17px] text-justify">
+                        <div className="flex-1 leading-7 sm:leading-8 text-[15px] sm:text-[17px] text-left sm:text-justify break-words">
                             {/* Infobox for Mobile */}
-                            <div className="lg:hidden border border-[#a2a9b1] bg-[#f8f9fa] p-4 mb-6 text-xs shadow-sm font-sans">
-                                <div className="bg-[#b0c4de] text-center font-bold py-1.5 mb-2 border border-[#a2a9b1]">OPERATIVE LOG [2024]</div>
-                                <div className="grid grid-cols-2 gap-y-3 gap-x-2">
-                                    <div className="font-bold border-r border-[#a2a9b1] pr-2 text-right uppercase tracking-tighter">Deployed</div>
-                                    <div>0x7E8 (Feb 2024)</div>
-                                    <div className="font-bold border-r border-[#a2a9b1] pr-2 text-right uppercase tracking-tighter">Focus</div>
-                                    <div>Shadow Systems</div>
-                                    <div className="font-bold border-r border-[#a2a9b1] pr-2 text-right uppercase tracking-tighter">Status</div>
-                                    <div>Active / Hostile</div>
-                                    <div className="font-bold border-r border-[#a2a9b1] pr-2 text-right uppercase tracking-tighter">Motto</div>
-                                    <div className="italic text-[10px]">Verify, then Nullify.</div>
+                            <div className="lg:hidden border border-[#a2a9b1] bg-[#f8f9fa] p-3 sm:p-4 mb-6 text-xs shadow-sm font-sans">
+                                <div className="bg-[#b0c4de] text-center font-bold py-1.5 mb-2 border border-[#a2a9b1] text-[11px] sm:text-xs">OPERATIVE LOG [2024]</div>
+                                <div className="grid grid-cols-2 gap-y-2 sm:gap-y-3 gap-x-1 sm:gap-x-2">
+                                    <div className="font-bold border-r border-[#a2a9b1] pr-1 sm:pr-2 text-right uppercase tracking-tighter text-[10px] sm:text-xs">Deployed</div>
+                                    <div className="text-[10px] sm:text-xs break-words">0x7E8 (Feb 2024)</div>
+                                    <div className="font-bold border-r border-[#a2a9b1] pr-1 sm:pr-2 text-right uppercase tracking-tighter text-[10px] sm:text-xs">Focus</div>
+                                    <div className="text-[10px] sm:text-xs break-words">Shadow Systems</div>
+                                    <div className="font-bold border-r border-[#a2a9b1] pr-1 sm:pr-2 text-right uppercase tracking-tighter text-[10px] sm:text-xs">Status</div>
+                                    <div className="text-[10px] sm:text-xs break-words">Active / Hostile</div>
+                                    <div className="font-bold border-r border-[#a2a9b1] pr-1 sm:pr-2 text-right uppercase tracking-tighter text-[10px] sm:text-xs">Motto</div>
+                                    <div className="italic text-[9px] sm:text-[10px] break-words">Verify, then Nullify.</div>
                                 </div>
                             </div>
 
@@ -220,9 +220,11 @@ const Landing = () => {
                             <div className="flex justify-center my-16">
                                 <button
                                     onClick={handleEntry}
-                                    className="px-10 py-4 bg-[#36c] text-white font-serif text-xl hover:bg-blue-700 transition-all shadow-[4px_4px_0px_rgba(0,0,0,0.2)] group active:translate-y-1 active:shadow-none"
+                                    className="px-6 sm:px-10 py-3 sm:py-4 bg-[#36c] text-white font-serif text-base sm:text-xl hover:bg-blue-700 transition-all shadow-[4px_4px_0px_rgba(0,0,0,0.2)] group active:translate-y-1 active:shadow-none"
                                 >
-                                    Initiate Handshake <span className="ml-2 opacity-0 group-hover:opacity-100 transition-opacity">→</span>
+                                    <span className="hidden sm:inline">Initiate Handshake</span>
+                                    <span className="sm:hidden">Enter Now</span>
+                                    <span className="ml-2 opacity-0 group-hover:opacity-100 transition-opacity">→</span>
                                 </button>
                             </div>
 
