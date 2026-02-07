@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import MainLayout from '../layouts/MainLayout';
 import { motion } from 'framer-motion';
-import { Check, Zap, Crown, Star, Ticket, Coins, Lock, Terminal, Shield, Cpu, Code } from 'lucide-react';
+import { Check, Ticket, Coins, Lock, Terminal, Shield, Cpu, Code, Target } from 'lucide-react';
 import Button from '../components/ui/Button';
 import { db } from '../lib/firebase';
 import { redeemCoupon as redeemCouponService } from '../lib/firestoreService';
@@ -74,7 +74,7 @@ const Pricing = () => {
             cost: 'FREE',
             subtext: 'Default Clearance',
             features: ['Access to Basic Modules', 'Community Access', 'Public Leaderboard'],
-            icon: Star,
+            icon: Terminal,
             color: 'from-blue-500 to-cyan-500',
             action: 'ACTIVE',
             active: true
@@ -85,7 +85,7 @@ const Pricing = () => {
             cost: '1500 ₡',
             subtext: 'OR Solve "Gatekeeper" CTF',
             features: ['Unlock Advanced Modules', 'Private Discord Channel', 'Certification', 'Priority Support'],
-            icon: Zap,
+            icon: Cpu,
             color: 'from-purple-500 to-pink-500',
             action: 'UNLOCK TIER',
             popular: true
@@ -96,7 +96,7 @@ const Pricing = () => {
             cost: '5000 ₡',
             subtext: 'OR Find Hidden Root Flag',
             features: ['Lifetime Access', '1-on-1 Mentorship', 'Custom Learning Path', 'Physical Swag Pack'],
-            icon: Crown,
+            icon: Target,
             color: 'from-amber-500 to-red-500',
             action: 'INITIATE BREACH'
         }
